@@ -81,10 +81,11 @@ module Externals
       return false unless File.exists?('.gitignore')
       row = nil
       open('.gitignore') do |f|
-        row = f.readlines.grep path
+        rows = f.readlines
+        row = rows.detect {|r| r.strip == path.strip}
       end
       
-      row && !row.empty?
+      row
     end
     
     def append_ignore path
