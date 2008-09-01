@@ -1,0 +1,7 @@
+.svn
+test/workdir
+test/repositories/svnrepo
+test/repositories/gitrepo
+test/applications/rails_app
+nbproject/
+*~

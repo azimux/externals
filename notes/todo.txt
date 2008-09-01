@@ -1,0 +1,11 @@
+TODO
+
+- Add "remove" command
+
+DONE
+
+- Create a "fill_options" method in the 'projects/scms' classes to fill in opts
+Basically, everything specific to an scm belongs in those files and no where else. 
+Currently the filling of scm specific options (such as --git and --svn) occurs in
+ext.rb which is not OK.
+
