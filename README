@@ -30,43 +30,42 @@ Same as ext checkout but performs an export option instead (for git, does a
 
 ext status
 
-Performs a status operation for the main project and all some projects
+Performs a status operation for the main project and all subprojects
+
+ext touch_emptydirs
+
+Recurses through the directory tree from the directory it is ran from, and adds
+a '.emptydir' file to any empty directories.  This helps with scm's that do not
+track empty directories (such as git)
 
 ext update_ignores
 
-Adds the subproject paths to the ignore feature of the top level project.  
+Adds the subproject paths to the ignore feature of the top level project.  This 
+should rarely need to be ran because ext add automatically updates the ignores
+for the main project.
 
 ext add <repository:branch> [path] [project_name]
 
 Adds a subproject to the main project.  If the project_type is set in .externals,
 ext can figure out the path on its own (ie, if it's set to rails, if the 
 project_name is rails, it will go in vendor/rails, if it's anything else it goes 
-in vendor/plugins)
+in vendor/plugins.)  It will also update the ignores accordingly, that is, for
+git entries are added to .gitignore, and for subversion the proper 'svn propset'
+commands are ran.  It will then proceed to checkout the added subproject.
 
 ext remove [-d|--delete]<path or name>
 
 Tells externals to no longer manage the specified subproject.  If -d or --delete
-are given, the subproject's files will be deleted from the hard disk.
+are given, the subproject's files will be deleted from the hard disk.  Not yet
+implemented.
 
-ext co [project_name]
+ext co, ext ex, ext up, ext st
+ 
+All do the same as the longer form, except the action will only be performed on
+the subprojects, instead of on the main project and the subprojects.
 
-Checks out subproject named by project_name if given, otherwise all subprojects are checked
-out.  If a subproject is already checked out, "up" is performed instead.
+The externals project is copyright 2008 by Miles Georgi, nopugs.com, azimux.com
+and is released under the MIT license.  
 
-ext ex [project_name]
-
-like co but does an export and set of checkout.
-
-ext up [project_name]
-
-Updates an already checked out subproject to the current tip of it's branch in the
-remote repository.  If  no project name is given, all subprojects are updated.
-
-ext stat [project_name]
-
-Prints out the current status of the subproject, or all subprojects
-if no project name is given.
-
-The externals project is copyright 2008 by Miles Georgi and is released under 
-the MIT license.  The license is available in the same directory as this README
+The license is available in the same directory as this README
 file and is named MIT_LICENSE.txt
