@@ -417,7 +417,7 @@ Please use the --type option to tell ext which to use."
 
       config.sections << Configuration::Section.new("[main]\n",
         "scm = #{scm}\n" +
-          "#{'type = ' + type if type}")
+          "#{'type = ' + type if type}\n")
 
       config.write
       reload_configuration
