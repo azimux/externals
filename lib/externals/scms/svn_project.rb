@@ -60,7 +60,7 @@ module Externals
       status = `svn st`
 
       status.split("\n").grep(/^\?/).each do |to_add|
-        puts `svn add #{to_add.gsub(/^\?/,"")}`
+        puts `svn add #{to_add.gsub(/^\?\s*/,"")}`
       end
     end
 
@@ -85,7 +85,7 @@ module Externals
         ignore_text = `svn propget svn:ignore`
         ignore_text += "\n#{child}"
 
-        puts `svn propset svn:ignore #{ignore_text} .`
+        puts `svn propset svn:ignore "#{ignore_text}" .`
       end
     end
   end

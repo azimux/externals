@@ -1,4 +1,4 @@
-$:.unshift File.join(File.dirname(__FILE__),'..','lib')
+$:.unshift File.join(File.dirname(__FILE__),'..','lib') if $0 == __FILE__
 
 require 'externals/test_case'
 require 'externals/ext'

@@ -42,7 +42,7 @@ module Externals
       end
     end
 
-    puts "Project types available: #{project_types.join(' ')}"
+    #puts "Project types available: #{project_types.join(' ')}"
 
     def self.project_type_files
       project_types.map do |project_type|
@@ -99,13 +99,15 @@ module Externals
     def self.registered_scms
       return @registered_scms if @registered_scms
       @registered_scms ||= []
-
-      Dir.entries(File.join(File.dirname(__FILE__), 'scms')).each do |file|
+      
+      scmdir = File.join(File.dirname(__FILE__), 'scms')
+      
+      Dir.entries(scmdir).each do |file|
         if file =~ /^(.*)_project\.rb$/
           @registered_scms << $1
         end
       end
-
+      
       @registered_scms
     end
 
@@ -146,7 +148,8 @@ module Externals
 
         if possible_project_types.size > 1
           raise "We found multiple project types that this could be: #{possible_project_types.join(',')}
-Please use the --type option to tell ext which to use."
+Please use  
+ the --type option to tell ext which to use."
         else
           possible_project_types.each do |project_type|
             install_project_type project_type
@@ -222,6 +225,7 @@ Please use the --type option to tell ext which to use."
 
       project.co
 
+      
       update_ignore args, options
     end
 
@@ -244,7 +248,9 @@ Please use the --type option to tell ext which to use."
       project = self.class.project_class(scm).new(".")
 
       projects.each do |subproject|
+        puts "about to add #{subproject.path} to ignore"
         project.update_ignore subproject.path unless subproject.main?
+        puts "finished adding #{subproject.path}"
       end
     end
 

@@ -35,15 +35,11 @@ module Externals
     def initialize row_string, is_main = false
       raise "Abstract class" if self.class == Project
       
-      puts "called with #{row_string}"
-
       #It's the main project
       self.is_main = is_main
         
       if row_string =~ PROJECT_LINE_REGEX
-        puts "repbranch = #{$1}"
         repbranch = trim_quotes($1)
-        puts "path = #{$2}"
         self.path = trim_quotes($2)
 
         if repbranch =~ /^(.*):(\w+)$/
@@ -53,7 +49,7 @@ module Externals
           self.repository = repbranch
         end
       else
-        raise "poorly formatted ext entry: #{row_string}"
+        raise "poorly formatted .externals entry: #{row_string}"
       end
     end
     

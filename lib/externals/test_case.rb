@@ -36,7 +36,6 @@ module Externals
     end
     
     def destroy_test_repository scm 
-      puts "Current directory #{Dir.pwd}"
       puts(rmcmd = "rm -rf #{repository_dir(scm)}")
       puts `#{rmcmd}`
     end
@@ -53,7 +52,7 @@ module Externals
     def create_rails_application
       Dir.mkdir applications_dir unless File.exists?(applications_dir)
       Dir.chdir applications_dir do
-        puts `ruby #{rails_bin_prefix}rails rails_app`
+        puts `rails rails_app`
       end
     end
     

@@ -1,4 +1,4 @@
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
 require 'externals/test_case'
 require 'externals/ext'
 
@@ -25,7 +25,6 @@ module Externals
         `mkdir workdir`
       
         Dir.chdir 'workdir' do
-          puts "Currently in #{Dir.pwd}"
           Ext.run "checkout", "--git", repository_dir('git')
         
           assert File.exists?(File.join(repository_dir('git'),'.git'))

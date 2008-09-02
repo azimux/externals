@@ -1,4 +1,4 @@
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
 require 'externals/test_case'
 require 'externals/ext'
 
@@ -52,8 +52,6 @@ module Externals
         Dir.chdir 'workdir' do
           `mkdir checkout`
           Dir.chdir 'checkout' do
-
-            puts "Currently in #{Dir.pwd}"
             source = File.join(root_dir, 'test', 'workdir', 'rails_app')
             puts "About to checkout #{ source}"
             Ext.run "checkout", "--git", source

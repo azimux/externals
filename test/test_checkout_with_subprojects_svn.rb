@@ -1,4 +1,4 @@
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
 require 'externals/test_case'
 require 'externals/ext'
 
@@ -63,8 +63,6 @@ module Externals
         Dir.chdir 'workdir' do
           `mkdir checkout`
           Dir.chdir 'checkout' do
-
-            puts "Currently in #{Dir.pwd}"
             source = repository_dir('svn')
 
             if windows?
@@ -107,8 +105,6 @@ module Externals
         Dir.chdir 'workdir' do
           `mkdir export`
           Dir.chdir 'export' do
-
-            puts "Currently in #{Dir.pwd}"
             source = repository_dir('svn')
 
             if windows?
