@@ -52,12 +52,12 @@ module Externals
     def create_rails_application
       Dir.mkdir applications_dir unless File.exists?(applications_dir)
       Dir.chdir applications_dir do
-        puts `rails rails_app`
+        if windows?
+          puts `ruby C:\\ruby\\bin\\rails rails_app`
+        else
+          puts `rails rails_app`
+        end
       end
-    end
-    
-    def rails_bin_prefix
-      "C:\\ruby\\bin\\" if windows?
     end
     
     def windows?

@@ -5,3 +5,4 @@ test/repositories/gitrepo
 test/applications/rails_app
 nbproject/
 *~
+tmp/*
