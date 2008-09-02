@@ -132,7 +132,11 @@ module Externals
               end
 
               %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
-                puts "#{proj}: #{assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))}"
+                puts "filethere? #{proj}: #{File.exists?(File.join('vendor', 'plugins', proj, 'lib'))}"
+                if !File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+                  puts "here"
+                end
+                assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
               end
               
               %w(foreign_key_migrations redhillonrails_core).each do |proj|

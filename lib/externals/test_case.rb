@@ -6,32 +6,39 @@ module Externals
     
     def initialize_test_git_repository
       scm = 'git'
-      Dir.chdir(File.join(File.dirname(__FILE__), '..', '..', 'test','repositories')) do
-        `mkdir #{scm}repo`
-        Dir.chdir("#{scm}repo") do
-          `git init`
-          open 'readme.txt', 'w' do |f|
-            f.write "readme.txt Line 1
+      Dir.chdir(File.join(File.dirname(__FILE__), '..', '..', 'test')) do
+        `mkdir repositories` unless File.exists? 'repositories'
+        Dir.chdir 'repositories' do
+          `mkdir #{scm}repo`
+          Dir.chdir("#{scm}repo") do
+            `git init`
+            open 'readme.txt', 'w' do |f|
+              f.write "readme.txt Line 1
             Line 2
             Line 3"
+            end
+          
+            `git add .`
+            `git commit -m "added readme.txt"`
+          
+            open 'readme.txt', 'a' do |f|
+              f.write "line 4"
+            end
+          
+            `git add .`
+            `git commit -m "added a line to readme.txt"`
           end
-          
-          `git add .`
-          `git commit -m "added readme.txt"`
-          
-          open 'readme.txt', 'a' do |f|
-            f.write "line 4"
-          end
-          
-          `git add .`
-          `git commit -m "added a line to readme.txt"`
         end
       end
     end
+    
     def initialize_test_svn_repository
       scm = 'svn'
-      Dir.chdir(File.join(File.dirname(__FILE__), '..', '..', 'test','repositories')) do
-        puts `svnadmin create #{scm}repo`
+      Dir.chdir(File.join(File.dirname(__FILE__), '..', '..', 'test')) do
+        `mkdir repositories` unless File.exists? 'repositories'
+        Dir.chdir 'repositories' do
+          puts `svnadmin create #{scm}repo`
+        end
       end
     end
     
