@@ -6,3 +6,4 @@ test/applications/rails_app
 nbproject/
 *~
 tmp/*
+pkg/
