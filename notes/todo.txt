@@ -9,3 +9,4 @@ Basically, everything specific to an scm belongs in those files and no where els
 Currently the filling of scm specific options (such as --git and --svn) occurs in
 ext.rb which is not OK.
 
+- change "add" command to "install"

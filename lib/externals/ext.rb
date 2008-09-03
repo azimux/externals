@@ -10,12 +10,12 @@ module Externals
   # Main commands only operate on the main project
   FULL_COMMANDS_HASH = [[:checkout, ""], [:export, ""], [:status, ""], [:update, ""]]
   SHORT_COMMANDS_HASH = [[:co, ""], [:ex, ""], [:st, ""], [:up, ""]]
-  MAIN_COMMANDS_HASH = [[:update_ignore, ""], [:add, ""], [:init, ""], [:touch_emptydirs, ""], [:help, ""]]
+  MAIN_COMMANDS_HASH = [[:update_ignore, ""], [:install, ""], [:init, ""], [:touch_emptydirs, ""], [:help, ""]]
 
 
   FULL_COMMANDS = [:checkout, :export, :status, :update]
   SHORT_COMMANDS = [:co, :ex, :st, :up]
-  MAIN_COMMANDS = [:update_ignore, :add, :init, :touch_emptydirs, :help]
+  MAIN_COMMANDS = [:update_ignore, :install, :init, :touch_emptydirs, :help]
 
   COMMANDS = FULL_COMMANDS + SHORT_COMMANDS + MAIN_COMMANDS
 
@@ -206,7 +206,7 @@ Please use
       end
     end
 
-    def add args, options
+    def install args, options
       init args, options unless File.exists? '.externals'
       row = args.join " "
 

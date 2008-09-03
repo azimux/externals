@@ -41,10 +41,10 @@ track empty directories (such as git)
 ext update_ignores
 
 Adds the subproject paths to the ignore feature of the top level project.  This 
-should rarely need to be ran because ext add automatically updates the ignores
+should rarely need to be ran because 'ext install' automatically updates the ignores
 for the main project.
 
-ext add <repository:branch> [path] [project_name]
+ext install <repository:branch> [path] [project_name]
 
 Adds a subproject to the main project.  If the project_type is set in .externals,
 ext can figure out the path on its own (ie, if it's set to rails, if the 

@@ -11,7 +11,7 @@ end
 
 gem_specification = Gem::Specification.new do |specification|
   specification.name = 'ext'
-  specification.version = '0.0.1'
+  specification.version = '0.0.2'
   specification.platform = Gem::Platform::RUBY
   
   specification.summary = 
@@ -23,7 +23,7 @@ projects that have some plugins managed by svn and some managed by git.}
 to the scm:externals feature of subversion.  It's particularly useful for rails 
 projects that have some plugins managed by svn and some managed by git.  
 
-For example, "ext add git://github.com/rails/rails.git" from within a rails 
+For example, "ext install git://github.com/rails/rails.git" from within a rails 
 application directory will realize that this belongs in the vendor/rails folder.  
 It will also realize that this URL is a git repository and clone it into that 
 folder.  

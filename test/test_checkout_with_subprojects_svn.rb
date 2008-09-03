@@ -33,12 +33,12 @@ module Externals
           Ext.run "init"
           raise " could not create .externals"  unless File.exists? '.externals'
           %w(rails acts_as_list).each do |proj|
-            Ext.run "add", "git://github.com/rails/#{proj}.git"
+            Ext.run "install", "git://github.com/rails/#{proj}.git"
           end
 
-          #add a couple svn managed subprojects
+          #install a couple svn managed subprojects
           %w(foreign_key_migrations redhillonrails_core).each do |proj|
-            Ext.run "add", "svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/#{proj}"
+            Ext.run "install", "svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/#{proj}"
           end
 
           SvnProject.add_all
