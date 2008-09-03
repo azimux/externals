@@ -36,7 +36,7 @@ module Externals
       raise "Abstract class" if self.class == Project
       
       #It's the main project
-      self.is_main = is_main
+      self.is_main = is_main || row_string == "."
         
       if row_string =~ PROJECT_LINE_REGEX
         repbranch = trim_quotes($1)
