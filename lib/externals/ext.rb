@@ -71,12 +71,19 @@ module Externals
 
       opts.on("--type TYPE", "-t TYPE", "The type of project the main project is.  For example, 'rails'.",
         Integer) {|type| main_options[:type] = type}
+      opts.on("--workdir DIR", "-w DIR", "The working directory to execute commands from",
+        String) {|dir| 
+        raise "No such directory: #{dir}" unless File.exists?(dir) && File.directory?(dir)
+        main_options[:workdir] = dir
+      }
 
       args = opts.parse(arguments)
 
       unless args.nil? || args.empty?
         command = args[0]
         args = args[1..(args.size - 1)] || []
+
+        puts "args #{args.join(",")}"
       end
 
       command &&= command.to_sym
@@ -85,7 +92,9 @@ module Externals
 
       raise "unknown command #{command}" unless COMMANDS.index command
 
-      new(main_options).send(command, args, sub_options)
+      Dir.chdir(main_options[:workdir] || ".") do
+        new(main_options).send(command, args, sub_options)
+      end
     end
 
 
@@ -99,20 +108,24 @@ module Externals
     def self.registered_scms
       return @registered_scms if @registered_scms
       @registered_scms ||= []
-      
+
       scmdir = File.join(File.dirname(__FILE__), 'scms')
-      
+
       Dir.entries(scmdir).each do |file|
         if file =~ /^(.*)_project\.rb$/
           @registered_scms << $1
         end
       end
-      
+
       @registered_scms
     end
 
     def projects
       configuration.projects
+    end
+
+    def subprojects
+      configuration.subprojects
     end
 
     def configuration
@@ -148,7 +161,7 @@ module Externals
 
         if possible_project_types.size > 1
           raise "We found multiple project types that this could be: #{possible_project_types.join(',')}
-Please use  
+Please use
  the --type option to tell ext which to use."
         else
           possible_project_types.each do |project_type|
@@ -180,7 +193,7 @@ Please use
         end
 
         if project_name_or_path
-          project = projects.detect do |project|
+          project = subprojects.detect do |project|
             project.name == project_name_or_path || project.path == project_name_or_path
           end
 
@@ -188,28 +201,17 @@ Please use
 
           project.send command_name, args, options
         else
-          projects.each {|p| p.send(*([command_name, args, options].flatten))}
+          subprojects.each {|p| p.send(*([command_name, args, options].flatten))}
         end
       end
     end
 
-    #    LONG_COMMANDS.each do |command_name|
-    #      define_method command_name do |project, options|
-    #        if project
-    #          self.class.project(project).send(command_name, options)
-    #        else
-    #          unless options[:only_externals] || ONLY_EXTERNALS.index(command_name)
-    #            main_project.send(command_name, options)
-    #          end
-    #          projects.each {|p| p.send(command_name, options)}
-    #        end
-    #      end
-    #    end
-
     def add args, options
+      init args, options unless File.exists? '.externals'
       row = args.join " "
 
-      options = options.dup
+      orig_options = options.dup
+
       scm = options[:scm]
 
       scm ||= infer_scm(row)
@@ -225,20 +227,17 @@ Please use
 
       project.co
 
-      
-      update_ignore args, options
+      update_ignore args, orig_options
     end
 
     def update_ignore args, options
       #path = args[0]
 
-      scm = options[:scm]
 
-      unless scm
-        scm = configuration['main']
-        scm = scm['scm'] if scm
-      end
+      scm = configuration['main']
+      scm = scm['scm'] if scm
 
+      scm ||= options[:scm]
 
       unless scm
         raise "You need to either specify the scm as the first line in .externals (for example, scm = git), or use an option to specify it
@@ -247,14 +246,16 @@ Please use
 
       project = self.class.project_class(scm).new(".")
 
-      projects.each do |subproject|
+      raise "only makes sense for main project" unless project.main?
+
+      subprojects.each do |subproject|
         puts "about to add #{subproject.path} to ignore"
-        project.update_ignore subproject.path unless subproject.main?
+        project.update_ignore subproject.path
         puts "finished adding #{subproject.path}"
       end
     end
 
-    def  touch_emptydirs args, options
+    def touch_emptydirs args, options
       require 'find'
 
       excludes = ['.','..','.svn', '.git']
@@ -297,17 +298,17 @@ Please use
         scm ||= configuration['main']
         scm &&= scm['scm']
       end
-      
+
       if !scm
         possible_project_classes = self.class.project_classes.select do |project_class|
           project_class.detected?
         end
-        
+
         raise "Could not determine this projects scm" if  possible_project_classes.empty?
         if possible_project_classes.size > 1
           raise "This project appears to be managed by multiple SCMs: #{
           possible_project_classes.map(&:to_s).join(',')}
-Please explicitly declare the SCM (by using --git or --svn, or, 
+Please explicitly declare the SCM (by using --git or --svn, or,
 by creating the .externals file manually"
         end
 

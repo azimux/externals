@@ -138,6 +138,15 @@ module Externals
         retval
       end
 
+      def subprojects
+        retval = []
+        sections.each do |section|
+          retval += section.projects unless section.main?
+        end
+
+        retval
+      end
+
       def write path = ".externals"
         open(path, 'w') do |f|
           sections.each do |section|

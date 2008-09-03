@@ -1,17 +1,17 @@
 module Externals
   class SvnProject < Project
     def co *args
-      puts(rmdircmd = "rmdir #{path}")
+      (rmdircmd = "rmdir #{path}")
 
-      puts `#{rmdircmd}`
+      `#{rmdircmd}` if File.exists? path
       puts(svncocmd = "svn co #{repository} #{path}")
       puts `#{svncocmd}`
     end
 
     def ex *args
-      puts(rmdircmd = "rmdir #{path}")
+      (rmdircmd = "rmdir #{path}")
 
-      puts `#{rmdircmd}`
+      `#{rmdircmd}` if File.exists? path
       puts(svncocmd = "svn export #{repository} #{path}")
       puts `#{svncocmd}`
     end
@@ -67,26 +67,36 @@ module Externals
 
     protected
     def ignore_contains? path
-      parent = File.dirname(path)
-      child = File.basename(path)
-
-      ignore_text = ''
-      Dir.chdir parent do
-        puts(ignore_text = `svn propget svn:ignore`)
-      end
-      ignore_text =~ Regexp.new("^\\s*#{child}\\s*$")
+      ignore_text(path) =~ Regexp.new("^\\s*#{File.basename(path)}\\s*$")
     end
 
     def append_ignore path
       parent = File.dirname(path)
       child = File.basename(path)
 
-      Dir.chdir(parent) do
-        ignore_text = `svn propget svn:ignore`
-        ignore_text += "\n#{child}"
+      rows = ignore_text(path).split(/\n/)
+      
+      return if rows.detect {|row| row.strip == child.strip}
+      
+      rows << child.strip
 
-        puts `svn propset svn:ignore "#{ignore_text}" .`
+      rows.delete_if {|row| row =~ /^\s*$/}
+
+      Dir.chdir(parent) do
+
+        open('.gitignore', 'w') do |f|
+          f.write "#{rows.compact.join("\n")}\n"
+        end
+        puts `svn propset svn:ignore "#{ignore_text(path)}" .`
       end
+    end
+
+    def ignore_text(path)
+      ignore_text = ''
+      Dir.chdir File.dirname(path) do
+        puts(ignore_text = `svn propget svn:ignore`)
+      end
+      ignore_text
     end
   end
 end
