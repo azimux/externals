@@ -75,19 +75,15 @@ module Externals
       child = File.basename(path)
 
       rows = ignore_text(path).split(/\n/)
-      
+
       return if rows.detect {|row| row.strip == child.strip}
-      
+
       rows << child.strip
 
       rows.delete_if {|row| row =~ /^\s*$/}
 
       Dir.chdir(parent) do
-
-        open('.gitignore', 'w') do |f|
-          f.write "#{rows.compact.join("\n")}\n"
-        end
-        puts `svn propset svn:ignore "#{ignore_text(path)}" .`
+        puts `svn propset svn:ignore "#{rows.compact.join("\n")}\n" .`
       end
     end
 
