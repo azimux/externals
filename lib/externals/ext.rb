@@ -72,7 +72,7 @@ module Externals
       opts.on("--type TYPE", "-t TYPE", "The type of project the main project is.  For example, 'rails'.",
         Integer) {|type| main_options[:type] = type}
       opts.on("--workdir DIR", "-w DIR", "The working directory to execute commands from",
-        String) {|dir| 
+        String) {|dir|
         raise "No such directory: #{dir}" unless File.exists?(dir) && File.directory?(dir)
         main_options[:workdir] = dir
       }
@@ -82,8 +82,6 @@ module Externals
       unless args.nil? || args.empty?
         command = args[0]
         args = args[1..(args.size - 1)] || []
-
-        puts "args #{args.join(",")}"
       end
 
       command &&= command.to_sym

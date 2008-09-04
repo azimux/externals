@@ -9,7 +9,8 @@ submodules.  Also, the branch tip doesn't automatically move with git-submodule.
 Subversion always checks out the branch tip for subprojects when performing a 
 checkout or update.
 
-Externals is designed such that adding support for a new SCM is easy.
+Externals is designed such that adding support for a new SCM, or new project 
+types is easy.
 
 The externals executable is called ext.  Commands come in a long form and a 
 short form.  The longer form applies the action to the main project.  The short 
@@ -49,9 +50,11 @@ ext install <repository:branch> [path] [project_name]
 Adds a subproject to the main project.  If the project_type is set in .externals,
 ext can figure out the path on its own (ie, if it's set to rails, if the 
 project_name is rails, it will go in vendor/rails, if it's anything else it goes 
-in vendor/plugins.)  It will also update the ignores accordingly, that is, for
+in vendor/plugins.)  Otherwise be sure to include a path to install it to.  ext 
+will also update the ignores accordingly, that is, for
 git entries are added to .gitignore, and for subversion the proper 'svn propset'
-commands are ran.  It will then proceed to checkout the added subproject.
+commands are ran.  It will then proceed to checkout the added subproject and 
+register it in your .externals file.
 
 ext remove [-d|--delete]<path or name>
 
