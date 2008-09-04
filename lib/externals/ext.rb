@@ -1,6 +1,8 @@
 require 'externals/project'
 require 'externals/configuration/configuration'
 require 'optparse'
+require 'externals/command'
+require 'ext/symbol'
 
 module Externals
   PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
@@ -8,21 +10,52 @@ module Externals
   # Full commands operate on the main project as well as the externals
   # short commands only operate on the externals
   # Main commands only operate on the main project
-  FULL_COMMANDS_HASH = [[:checkout, ""], [:export, ""], [:status, ""], [:update, ""]]
-  SHORT_COMMANDS_HASH = [[:co, ""], [:ex, ""], [:st, ""], [:up, ""]]
-  MAIN_COMMANDS_HASH = [[:update_ignore, ""], [:install, ""], [:init, ""], [:touch_emptydirs, ""], [:help, ""]]
+  FULL_COMMANDS_HASH = [
+    [:checkout, "ext checkout <repository>", %{
+      Checks out <repository>, and checks out any subprojects registered in
+<repository>'s .externals file.}], 
+    [:export, "ext export <repository>", %{
+Like checkout except this command fetches as little history as possible.}],
+    [:status, "ext status", %{
+      Prints out the status of the main project, followed by the status of each
+subproject.}], 
+    [:update, "ext update", %{
+      Brings the main project, and all subprojects, up to the latest version.}]
+  ]
+  SHORT_COMMANDS_HASH = [
+    [:co, "Like checkout, but skips the main project and only checks out subprojects."], 
+    [:ex, "Like export, but skips the main project."], 
+    [:st, "Like status, but skips the main project."], 
+    [:up, "Like update, but skips the main project."]
+  ]
+  MAIN_COMMANDS_HASH = [
+    [:update_ignore, "Adds all paths to subprojects that are registered in 
+.externals to the ignore feature of the main project.  This is automatically 
+performed by install, and so you probably only will run this if you are manually
+maintaining .externals"], 
+    [:install, "ext install <repository[:branch]> [path]", "Registers <repository> in .externals
+under the appropriate SCM.  Checks out the project, and also adds it to the ignore
+feature offered by the SCM of the main project."], 
+    [:init, "Creates a .externals file containing only [main]  It will try to 
+Determine the SCM used by the main project, as well as the project type.  You
+don't have to specify a project type if you don't want to or if your project type
+isn't supported.  It just means that when using 'install' that you'll want to
+specify the path."], 
+    [:touch_emptydirs, "Recurses through all directories from the top and adds
+a .emptydir file to any empty directories it comes across.  Useful for dealing 
+with SCMs that refuse to track empty directories (such as git, for example)"], 
+    [:help, "You probably just ran this command just now."]
+  ]
 
 
-  FULL_COMMANDS = [:checkout, :export, :status, :update]
-  SHORT_COMMANDS = [:co, :ex, :st, :up]
-  MAIN_COMMANDS = [:update_ignore, :install, :init, :touch_emptydirs, :help]
+  FULL_COMMANDS = FULL_COMMANDS_HASH.map(&:first)
+  SHORT_COMMANDS =  SHORT_COMMANDS_HASH.map(&:first)
+  MAIN_COMMANDS = MAIN_COMMANDS_HASH.map(&:first)
 
   COMMANDS = FULL_COMMANDS + SHORT_COMMANDS + MAIN_COMMANDS
 
 
   class Ext
-
-
     Dir.entries(File.join(File.dirname(__FILE__), '..', 'ext')).each do |extension|
       require "ext/#{extension}" if extension =~ /.rb$/
     end
@@ -61,17 +94,17 @@ module Externals
       main_options = {}
       sub_options = {}
 
-      #      opts.on("--only-externals", "-e",
-      #        "Do not run the command for the main project, only for the external projects",
-      #        Integer) {options[:only_externals] = true}
-
       project_classes.each do |project_class|
         project_class.fill_in_opts(opts, main_options, sub_options)
       end
 
       opts.on("--type TYPE", "-t TYPE", "The type of project the main project is.  For example, 'rails'.",
-        Integer) {|type| main_options[:type] = type}
-      opts.on("--workdir DIR", "-w DIR", "The working directory to execute commands from",
+        Integer) {|type| sub_options[:scm] = main_options[:type] = type}
+      opts.on("--scm SCM", "-s SCM", "The SCM used to manage the main project.  For example, '--scm svn'.",
+        Integer) {|scm| sub_options[:scm] = main_options[:scm] = scm}
+      opts.on("--workdir DIR", "-w DIR", "The working directory to execute commands from.  Use this if for some reason you
+        cannot execute ext from the main project's directory (or if it's just inconvenient, such as in a script
+        or in a Capistrano task)",
         String) {|dir|
         raise "No such directory: #{dir}" unless File.exists?(dir) && File.directory?(dir)
         main_options[:workdir] = dir
@@ -95,14 +128,24 @@ module Externals
       end
     end
 
+    def print_commands(commands)
+      commands.each do |command|
+        puts Command.new(*command)
+      end
+      puts
+    end
 
+    def help(args, options)
+      puts "Commands that apply to the main project or the .externals file:"
+      print_commands(MAIN_COMMANDS_HASH)
 
+      puts "Commands that apply to the main project and all subprojects"
+      print_commands(FULL_COMMANDS_HASH)
 
-    #    def register_scm scm_sym
-    #      registered_scms << scm_sym
-    #    end
-
-
+      puts "Commands that only apply to the subprojects"
+      print_commands(SHORT_COMMANDS_HASH)
+    end
+    
     def self.registered_scms
       return @registered_scms if @registered_scms
       @registered_scms ||= []

@@ -57,7 +57,7 @@ module Externals
     end
 
     def self.fill_in_opts opts, main_options, sub_options
-      opts.on("--git", "-g", "Use git to checkout/export the main project",
+      opts.on("--git", "-g", "same as '--scm git'  Uses git to checkout/export the main project",
         Integer) {sub_options[:scm] = main_options[:scm] = 'git'}
     end
 
