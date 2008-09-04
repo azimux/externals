@@ -11,7 +11,7 @@ end
 
 gem_specification = Gem::Specification.new do |specification|
   specification.name = 'ext'
-  specification.version = '0.0.6'
+  specification.version = '0.0.7'
   specification.platform = Gem::Platform::RUBY
   specification.rubyforge_project = 'ext'
   
@@ -53,7 +53,11 @@ the main project.}
   specification.homepage = "http://nopugs.com/ext-tutorial"
   
   specification.test_files = FileList['test/test_*.rb']
-  specification.executables = ['ext', 'ext.bat']
+  
+  specification.bindir = "bin"
+  specification.executables = ['ext']
+  specification.default_executable = "ext"
+  
   specification.files = ['Rakefile', 'README', 'MIT_LICENSE.txt'] + 
     FileList['lib/**/*.rb']
   #specification.require_path = 'lib'
