@@ -11,8 +11,9 @@ end
 
 gem_specification = Gem::Specification.new do |specification|
   specification.name = 'ext'
-  specification.version = '0.0.2'
+  specification.version = '0.0.5'
   specification.platform = Gem::Platform::RUBY
+  specification.rubyforge_project = 'ext'
   
   specification.summary = 
     %{Provides an SCM agnostic way to manage subprojects with a workflow similar 
