@@ -12,13 +12,24 @@ module Externals
     end
     
     def to_s
-      retval = "  #{name}"
-      retval += "     Usage: #{usage}\n" if usage
-      summary.split(/\n/).each do |line|
-        retval += "       #{line}\n"
+      retval = StringIO.new
+      retval.printf "%-16s", name
+      if usage
+        retval.printf "Usage: #{usage}\n"
+      else
+        dont_pad_first = true
       end
       
-      retval
+      summary.split(/\n/).each_with_index do |line, index|
+        if index == 0 && dont_pad_first
+          retval.printf "%s\n", line.strip
+        else
+          retval.printf "%16s%s\n", '', line.strip
+        end
+      end
+      
+      retval.printf "\n"
+      retval.string
     end
   end
 end

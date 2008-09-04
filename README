@@ -16,56 +16,90 @@ The externals executable is called ext.  Commands come in a long form and a
 short form.  The longer form applies the action to the main project.  The short 
 forms apply the action to all sub projects.
 
-The commands are as follows:
+The commands and usage are as follows (from 'ext help'):
 
-ext checkout [--git|--svn] <repository>
+ext [OPTIONS] <command> [repository[:branch]] [path]
+    -g, --git                        same as '--scm git'  Uses git to checkout/export the main project
+    -s, --svn, --subversion          same as '--scm svn'  Uses subversion to checkout/export the main project
+    -t, --type TYPE                  The type of project the main project is.  For example, 'rails'.
+        --scm SCM                    The SCM used to manage the main project.  For example, '--scm svn'.
+    -w, --workdir DIR                The working directory to execute commands from.  Use this if for some reason you
+        cannot execute ext from the main project's directory (or if it's just inconvenient, such as in a script
+        or in a Capistrano task)
+        --help                       does the same as 'ext help'  If you use this with a command
+        it will ignore the command and run help instead.
 
-Tries to determine the SCM to use based on <repository>.   If the repository does
-not reveal this information,  use one of the switches to tell ext the scm to use for
-the main project.  Once checked out, all of the subprojects are in turn checked out.
 
-ext export [--git|--svn] <repository>
 
-Same as ext checkout but performs an export option instead (for git, does a 
-'git clone --depth 1') 
+Commands that apply to the main project or the .externals file:
+update_ignore, install, init, touch_emptydirs, help
 
-ext status
+update_ignore   Adds all paths to subprojects that are
+                registered in .externals to the ignore feature of the
+                main project.  This is automatically performed by install,
+                and so you probably only will run this if you are manually
+                maintaining .externals
 
-Performs a status operation for the main project and all subprojects
+install         Usage: ext install <repository[:branch]> [path]
+                Registers <repository> in .externals under the appropriate
+                SCM.  Checks out the project, and also adds it to the ignore
+                feature offered by the SCM of the main project.  If the SCM type
+                is not obvious from the repository URL, use the --scm, --git, 
+                or --svn flags.
 
-ext touch_emptydirs
+init            Creates a .externals file containing only [main]
+                It will try to determine the SCM used by the main project,
+                as well as the project type.  You don't have to specify
+                a project type if you don't want to or if your project type
+                isn't supported.  It just means that when using 'install'
+                that you'll want to specify the path.
 
-Recurses through the directory tree from the directory it is ran from, and adds
-a '.emptydir' file to any empty directories.  This helps with scm's that do not
-track empty directories (such as git)
+touch_emptydirs Recurses through all directories from the
+                top and adds a .emptydir file to any empty directories it
+                comes across.  Useful for dealing with SCMs that refuse to
+                track empty directories (such as git, for example)
 
-ext update_ignores
+help            You probably just ran this command just now.
 
-Adds the subproject paths to the ignore feature of the top level project.  This 
-should rarely need to be ran because 'ext install' automatically updates the ignores
-for the main project.
 
-ext install <repository:branch> [path] [project_name]
 
-Adds a subproject to the main project.  If the project_type is set in .externals,
-ext can figure out the path on its own (ie, if it's set to rails, if the 
-project_name is rails, it will go in vendor/rails, if it's anything else it goes 
-in vendor/plugins.)  Otherwise be sure to include a path to install it to.  ext 
-will also update the ignores accordingly, that is, for
-git entries are added to .gitignore, and for subversion the proper 'svn propset'
-commands are ran.  It will then proceed to checkout the added subproject and 
-register it in your .externals file.
+Commands that apply to the main project and all subprojects:
+checkout, export, status, update
 
-ext remove [-d|--delete]<path or name>
+checkout        Usage: ext checkout <repository>
+                
+                Checks out <repository>, and checks out any subprojects
+                registered in <repository>'s .externals file.
 
-Tells externals to no longer manage the specified subproject.  If -d or --delete
-are given, the subproject's files will be deleted from the hard disk.  Not yet
-implemented.
+export          Usage: ext export <repository>
+                
+                Like checkout except this command fetches as little
+                history as possible.
 
-ext co, ext ex, ext up, ext st
- 
-All do the same as the longer form, except the action will only be performed on
-the subprojects, instead of on the main project and the subprojects.
+status          Usage: ext status
+                
+                Prints out the status of the main project, followed by
+                the status of each subproject.
+
+update          Usage: ext update
+                
+                Brings the main project, and all subprojects, up to the
+                latest version.
+
+
+
+Commands that only apply to the subprojects:
+co, ex, st, up
+
+co              Like checkout, but skips the main project and
+                only checks out subprojects.
+
+ex              Like export, but skips the main project.
+
+st              Like status, but skips the main project.
+
+up              Like update, but skips the main project.
+
 
 The externals project is copyright 2008 by Miles Georgi, nopugs.com, azimux.com
 and is released under the MIT license.  

@@ -12,38 +12,47 @@ module Externals
   # Main commands only operate on the main project
   FULL_COMMANDS_HASH = [
     [:checkout, "ext checkout <repository>", %{
-      Checks out <repository>, and checks out any subprojects registered in
-<repository>'s .externals file.}], 
+      Checks out <repository>, and checks out any subprojects
+      registered in <repository>'s .externals file.}],
     [:export, "ext export <repository>", %{
-Like checkout except this command fetches as little history as possible.}],
+      Like checkout except this command fetches as little
+      history as possible.}],
     [:status, "ext status", %{
-      Prints out the status of the main project, followed by the status of each
-subproject.}], 
+      Prints out the status of the main project, followed by
+      the status of each subproject.}],
     [:update, "ext update", %{
-      Brings the main project, and all subprojects, up to the latest version.}]
+      Brings the main project, and all subprojects, up to the
+      latest version.}]
   ]
   SHORT_COMMANDS_HASH = [
-    [:co, "Like checkout, but skips the main project and only checks out subprojects."], 
-    [:ex, "Like export, but skips the main project."], 
-    [:st, "Like status, but skips the main project."], 
+    [:co, "Like checkout, but skips the main project and
+          only checks out subprojects."],
+    [:ex, "Like export, but skips the main project."],
+    [:st, "Like status, but skips the main project."],
     [:up, "Like update, but skips the main project."]
   ]
   MAIN_COMMANDS_HASH = [
-    [:update_ignore, "Adds all paths to subprojects that are registered in 
-.externals to the ignore feature of the main project.  This is automatically 
-performed by install, and so you probably only will run this if you are manually
-maintaining .externals"], 
-    [:install, "ext install <repository[:branch]> [path]", "Registers <repository> in .externals
-under the appropriate SCM.  Checks out the project, and also adds it to the ignore
-feature offered by the SCM of the main project."], 
-    [:init, "Creates a .externals file containing only [main]  It will try to 
-Determine the SCM used by the main project, as well as the project type.  You
-don't have to specify a project type if you don't want to or if your project type
-isn't supported.  It just means that when using 'install' that you'll want to
-specify the path."], 
-    [:touch_emptydirs, "Recurses through all directories from the top and adds
-a .emptydir file to any empty directories it comes across.  Useful for dealing 
-with SCMs that refuse to track empty directories (such as git, for example)"], 
+    [:update_ignore, "Adds all paths to subprojects that are
+      registered in .externals to the ignore feature of the
+      main project.  This is automatically performed by install,
+      and so you probably only will run this if you are manually
+      maintaining .externals"],
+    [:install, "ext install <repository[:branch]> [path]",
+      "Registers <repository> in .externals under the appropriate
+      SCM.  Checks out the project, and also adds it to the ignore
+      feature offered by the SCM of the main project.  If the SCM 
+      type is not obvious from the repository URL, use the --scm, 
+      --git, or --svn flags."],
+    [:init, "Creates a .externals file containing only [main]
+      It will try to determine the SCM used by the main project,
+      as well as the project type.  You don't have to specify
+      a project type if you don't want to or if your project type
+      isn't supported.  It just means that when using 'install'
+      that you'll want to specify the path."],
+    [:touch_emptydirs, "Recurses through all directories from the
+      top and adds a .emptydir file to any empty directories it
+      comes across.  Useful for dealing with SCMs that refuse to
+      track empty directories (such as git, for example)"],
     [:help, "You probably just ran this command just now."]
   ]
 
@@ -87,12 +96,10 @@ with SCMs that refuse to track empty directories (such as git, for example)"],
       require file
     end
 
-
-    def self.run *arguments
+    def self.new_opts main_options, sub_options
       opts = OptionParser.new
 
-      main_options = {}
-      sub_options = {}
+      opts.banner = "ext [OPTIONS] <command> [repository[:branch]] [path]"
 
       project_classes.each do |project_class|
         project_class.fill_in_opts(opts, main_options, sub_options)
@@ -109,6 +116,16 @@ with SCMs that refuse to track empty directories (such as git, for example)"],
         raise "No such directory: #{dir}" unless File.exists?(dir) && File.directory?(dir)
         main_options[:workdir] = dir
       }
+      opts.on("--help", "does the same as 'ext help'  If you use this with a command
+        it will ignore the command and run help instead.") {main_options[:help] = true}
+    end
+
+    def self.run *arguments
+
+      main_options = {}
+      sub_options = {}
+
+      opts = new_opts main_options, sub_options
 
       args = opts.parse(arguments)
 
@@ -119,9 +136,19 @@ with SCMs that refuse to track empty directories (such as git, for example)"],
 
       command &&= command.to_sym
 
-      puts opts.to_s unless command
+      command = :help if main_options[:help]
 
-      raise "unknown command #{command}" unless COMMANDS.index command
+      if !command || command.to_s == ''
+        puts "hey... you didn't tell me what you want to do."
+        puts "Try 'ext help' for a list of commands"
+        exit
+      end
+
+      unless COMMANDS.index command
+        puts "unknown command: #{command}"
+        puts "for a list of commands try 'ext help'"
+        exit
+      end
 
       Dir.chdir(main_options[:workdir] || ".") do
         new(main_options).send(command, args, sub_options)
@@ -136,16 +163,21 @@ with SCMs that refuse to track empty directories (such as git, for example)"],
     end
 
     def help(args, options)
-      puts "Commands that apply to the main project or the .externals file:"
+      puts "#{self.class.new_opts({},{}).to_s}\n\n"
+
+      puts "\nCommands that apply to the main project or the .externals file:"
+      puts "#{MAIN_COMMANDS.join(', ')}\n\n"
       print_commands(MAIN_COMMANDS_HASH)
 
-      puts "Commands that apply to the main project and all subprojects"
+      puts "\nCommands that apply to the main project and all subprojects:"
+      puts "#{FULL_COMMANDS.join(', ')}\n\n"
       print_commands(FULL_COMMANDS_HASH)
 
-      puts "Commands that only apply to the subprojects"
+      puts "\nCommands that only apply to the subprojects:"
+      puts "#{SHORT_COMMANDS.join(', ')}\n\n"
       print_commands(SHORT_COMMANDS_HASH)
     end
-    
+
     def self.registered_scms
       return @registered_scms if @registered_scms
       @registered_scms ||= []

@@ -46,7 +46,7 @@ module Externals
     end
 
     def st *args
-      puts "status for #{path}:"
+      puts "\nstatus for #{path}:"
       Dir.chdir path do
         puts `git status`
       end
