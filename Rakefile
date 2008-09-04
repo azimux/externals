@@ -52,11 +52,10 @@ the main project.}
   specification.homepage = "http://nopugs.com/ext-tutorial"
   
   specification.test_files = FileList['test/test_*.rb']
-  specification.executables = ['ext']
+  specification.executables = ['ext', 'ext.bat']
   specification.files = ['Rakefile', 'README', 'MIT_LICENSE.txt'] + 
     FileList['lib/**/*.rb']
   #specification.require_path = 'lib'
-  
 end
 
 Rake::GemPackageTask.new(gem_specification) do |package|
