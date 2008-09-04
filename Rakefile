@@ -11,7 +11,7 @@ end
 
 gem_specification = Gem::Specification.new do |specification|
   specification.name = 'ext'
-  specification.version = '0.0.5'
+  specification.version = '0.0.6'
   specification.platform = Gem::Platform::RUBY
   specification.rubyforge_project = 'ext'
   

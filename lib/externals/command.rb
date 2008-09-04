@@ -1,3 +1,5 @@
+require 'stringio'
+
 module Externals
   class Command
     attr_reader :name, :usage, :summary
