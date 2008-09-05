@@ -163,6 +163,7 @@ module Externals
     end
 
     def help(args, options)
+      puts "There's a tutorial available at http://nopugs.com/ext-tutorial\n\n"
       puts "#{self.class.new_opts({},{}).to_s}\n\n"
 
       puts "\nCommands that apply to the main project or the .externals file:"

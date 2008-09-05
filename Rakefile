@@ -11,7 +11,7 @@ end
 
 gem_specification = Gem::Specification.new do |specification|
   specification.name = 'ext'
-  specification.version = '0.0.7'
+  specification.version = '0.0.8'
   specification.platform = Gem::Platform::RUBY
   specification.rubyforge_project = 'ext'
   
@@ -37,7 +37,7 @@ project is checked out via "ext checkout" it knows where to fetch the
 subprojects.  
 
 There are several other useful commands, such as init, touch_emptydirs, add_all, 
-export, status.  I plan to put up a tutorial at http://nopugs.com/ext-tutorial
+export, status.  There's a tutorial at http://nopugs.com/ext-tutorial
 
 The reason I made this project is that I was frustrated by two things:
 
