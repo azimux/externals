@@ -14,7 +14,9 @@ module Externals
       puts(gitclonecmd = "git clone \"#{repository}\" #{dest}")
       puts `#{gitclonecmd}`
       if branch
-        puts `cd #{path}; git checkout --track -b #{branch} origin/#{branch}`
+        Dir.chdir path do
+          puts `git checkout --track -b #{branch} origin/#{branch}`
+        end
       end
     end
 
