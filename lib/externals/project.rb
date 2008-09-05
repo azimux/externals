@@ -41,8 +41,11 @@ module Externals
       if row_string =~ PROJECT_LINE_REGEX
         repbranch = trim_quotes($1)
         self.path = trim_quotes($2)
+        
+        repbranch = repbranch.strip if repbranch
+        self.path = self.path.strip if self.path
 
-        if repbranch =~ /^(.*):(\w+)$/
+        if repbranch =~ /^([^\n]*):(\w+)$/
           self.repository = $1
           self.branch = $2
         else

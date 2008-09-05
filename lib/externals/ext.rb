@@ -72,7 +72,10 @@ module Externals
     Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','scms')).each do |project|
       require "externals/scms/#{project}" if project =~ /_project.rb$/
     end
-
+    
+    Dir.entries(PROJECT_TYPES_DIRECTORY).each do |type|
+      require File.join(PROJECT_TYPES_DIRECTORY, type) if type =~ /\.rb$/
+    end
 
     def self.project_types
       types = Dir.entries(PROJECT_TYPES_DIRECTORY).select do |file|

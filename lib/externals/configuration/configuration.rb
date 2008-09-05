@@ -31,8 +31,8 @@ module Externals
         end
 
         rows.each do |row|
-          if row =~ /\s*(\w+)\s*=\s*([^#]*)(?:#.*)?$/ && key.to_s == $1
-            return $2
+          if row =~ /\s*(\w+)\s*=\s*([^#\n]*)(?:#[^\n])?$/ && key.to_s == $1
+            return $2.strip
           end
         end
         nil
