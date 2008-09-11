@@ -9,6 +9,8 @@ module Externals
       create_rails_application
       destroy_test_repository 'svn'
       initialize_test_svn_repository
+      destroy_test_modules_repository 'svn'
+      create_test_modules_repository 'svn'
 
       Dir.chdir File.join(root_dir, 'test') do
         parts = 'workdir/checkout/rails_app/vendor/plugins/foreign_key_migrations/lib/red_hill_consulting/foreign_key_migrations/active_record/connection_adapters/.svn/text-base/table_definition.rb.svn-base'.split('/')
@@ -40,7 +42,13 @@ module Externals
           %w(foreign_key_migrations redhillonrails_core).each do |proj|
             Ext.run "install", "svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/#{proj}"
           end
-
+          
+          #install project with a branch
+          Ext.run "install", "git://github.com/azimux/engines.git:edge"
+          
+          #install project with a non-default path
+          Ext.run "install", "--svn", "file:///#{modules_repository_dir('svn')}", "modules"
+        
           SvnProject.add_all
 
           puts `svn commit -m "created empty rails app with some subprojects"`
@@ -89,11 +97,20 @@ module Externals
                 assert `git show 92f944818eece9fe4bc62ffb39accdb71ebc32be` =~ /azimux/
               end
 
-              %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
-                assert File.exists?(File.join('vendor', 'plugins',proj, 'lib'))
+              %w(foreign_key_migrations redhillonrails_core acts_as_list engines).each do |proj|
+                assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
               end
 
               assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+              
+              assert File.exists?(File.join('modules', 'modules.txt'))
+              
+              assert File.read(File.join('modules', 'modules.txt')) =~ /line1 of/
+              
+              Dir.chdir File.join('vendor','plugins','engines') do
+                assert(`git branch -a` =~ /^\*\s*edge\s*$/)
+                assert(`git branch -a` !~ /^\*\s*master\s*$/)
+              end
             end
           end
         end

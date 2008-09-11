@@ -292,6 +292,13 @@ Please use
       scm = options[:scm]
 
       scm ||= infer_scm(row)
+      
+      unless scm
+        raise "Unable to determine SCM from the repository name.  
+You need to either specify the scm used to manage the subproject
+that you are installing. Use an option to specify it
+(such as --git or --svn)"
+      end
 
       if !configuration[scm]
         configuration.add_empty_section(scm)

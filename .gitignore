@@ -1,7 +1,7 @@
 .svn
 test/workdir
-test/repositories/svnrepo
-test/repositories/gitrepo
+test/repositories/*
+test/repositories/*
 test/applications/rails_app
 nbproject/
 *~
