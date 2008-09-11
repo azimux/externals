@@ -14,6 +14,10 @@ module Externals
 
     def teardown
       destroy_test_repository 'git'
+      Dir.chdir File.join(root_dir, 'test') do
+        `rm -rf workdir`
+      end
+  
     end
    
     def test_repository_created

@@ -40,6 +40,15 @@ module Externals
     def teardown
       destroy_rails_application
 
+      Dir.chdir File.join(root_dir, 'test') do
+        parts = 'workdir/checkout/rails_app/vendor/plugins/foreign_key_migrations/lib/red_hill_consulting/foreign_key_migrations/active_record/connection_adapters/.svn/text-base/table_definition.rb.svn-base'.split('/')
+        if File.exists? File.join(*parts)
+          Dir.chdir File.join(*(parts[0..-2])) do
+            File.delete parts[-1]
+          end
+        end
+        `rm -rf workdir`
+      end
       #      Dir.chdir File.join(root_dir, 'test') do
       #        `rm -rf workdir`
       #      end

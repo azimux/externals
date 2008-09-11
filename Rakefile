@@ -6,7 +6,7 @@ require 'rake/gempackagetask'
 Rake::TestTask.new('test') do |task|
   task.libs = [File.expand_path('lib'),File.expand_path('test')]
   task.pattern = './test/test_*.rb'
-  task.warning = true
+  #task.warning = true
 end
 
 gem_specification = Gem::Specification.new do |specification|
