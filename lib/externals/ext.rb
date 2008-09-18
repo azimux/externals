@@ -2,7 +2,7 @@ require 'externals/project'
 require 'externals/configuration/configuration'
 require 'optparse'
 require 'externals/command'
-require 'ext/symbol'
+require 'extensions/symbol'
 
 module Externals
   PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
@@ -65,8 +65,8 @@ module Externals
 
 
   class Ext
-    Dir.entries(File.join(File.dirname(__FILE__), '..', 'ext')).each do |extension|
-      require "ext/#{extension}" if extension =~ /.rb$/
+    Dir.entries(File.join(File.dirname(__FILE__), '..', 'extensions')).each do |extension|
+      require "extensions/#{extension}" if extension =~ /.rb$/
     end
 
     Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','scms')).each do |project|
