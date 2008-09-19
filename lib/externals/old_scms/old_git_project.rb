@@ -1,10 +1,5 @@
 module Externals
-  class GitProject < Project
-    
-    def default_branch
-      'master'
-    end
-    
+  class OldGitProject < OldProject
     def co *args
       puts "path is #{path} repository is #{repository}"
       if path != '.'
@@ -117,6 +112,5 @@ module Externals
         $1
       end
     end
-    
   end
 end

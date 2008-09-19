@@ -1,17 +1,29 @@
 module Externals
   module RailsProjectType
     def self.install
-      Externals::Project.send(:include, Externals::RailsProjectType::Project)
+      #obj.send(:extend, Externals::RailsProjectType::Project)
+      Externals::OldProject.send(:include, Externals::RailsProjectType::Project)
     end
-
-    module Project
-      def default_path row
-        if row.repository =~ /\/([\w_-]*)(?:.git)?$/
-          ($1 == 'rails') ? File.join("vendor","rails") : File.join("vendor","plugins", $1)
+    
+    class DefaultPathCalculator
+      def default_path name
+        if name
+          (name == 'rails') ? File.join("vendor","rails") : File.join("vendor","plugins", name)
+        else
+          raise "couldn't figure out project name..."
         end
       end
     end
     
+    module Project
+      def default_path
+        if name
+          (name == 'rails') ? File.join("vendor","rails") : File.join("vendor","plugins", name)
+        else
+          raise "couldn't figure out project name..."
+        end
+      end
+    end
   end
   
   

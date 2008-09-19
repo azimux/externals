@@ -1,78 +1,104 @@
 module Externals
   module Configuration
-    SECTION_TITLE_REGEX = /^\s*\[(\w+)\]\s*$/
-    SECTION_TITLE_REGEX_NO_GROUPS = /^\s*\[(?:\w+)\]\s*$/
+    SECTION_TITLE_REGEX_NO_GROUPS = /^\s*\[(?:[^\]]*)\]\s*$/
+    SECTION_TITLE_REGEX = /^\s*\[([^\]]*)\]\s*$/
 
 
     class Section
-      attr_accessor :title_string, :body_string, :title, :rows, :scm
+      attr_accessor :title_string, :body_string, :title, :rows
 
-      def main?
-        title == 'main'
-      end
-
-      def initialize title_string, body_string, scm = nil
+      def initialize title_string, body_string
         self.title_string = title_string
         self.body_string = body_string
-        self.scm = scm
 
         self.title = SECTION_TITLE_REGEX.match(title_string)[1]
-        
-        self.scm ||= self.title
 
         raise "Invalid section title: #{title_string}" unless title
 
         self.rows = body_string.split(/\n/)
       end
 
-      def setting key
-        if !main?
-          raise "this isn't a section of the configuration that can contain settings"
-        end
 
+      SETTING_REGEX = /^\s*([\.\w_-]+)\s*=\s*([^#\n]*)(?:#[^\n]*)?$/
+      SET_SETTING_REGEX = /^(\s*(?:[\.\w_-]+)\s*=\s*)(?:[^#\n]*)(#[^\n]*)?$/
+      
+      def attributes
+        retval = {}
         rows.each do |row|
-          if row =~ /\s*(\w+)\s*=\s*([^#\n]*)(?:#[^\n])?$/ && key.to_s == $1
+          if row =~ SETTING_REGEX
+            retval[$1.strip] = $2.strip
+          end
+        end
+        retval
+      end
+      def setting key
+        rows.each do |row|
+          if row =~ SETTING_REGEX && key.to_s == $1
             return $2.strip
           end
         end
         nil
       end
+      def set_setting key, value
+        key = key.to_s
+        found = nil
+
+        rows.each_with_index do |row, index|
+          if row =~ SETTING_REGEX && key == $1
+            raise "found #{key} twice!" if found
+            found = index
+          end
+        end
+
+        if found
+          if rows[found] !~ SET_SETTING_REGEX
+            raise "thought I found the row, but didn't"
+          end
+          rows[found] = "#{$1}#{value}#{$2}"
+        else
+          rows << "#{key} = #{value}"
+        end
+        value
+      end
 
       def [] key
         setting(key)
       end
-
-
-      def projects
-        return @projects if @projects
-
-        @projects = []
-
-        if main?
-          @projects = [Ext.project_class(self['scm']).new(".", :is_main)]
-        else
-          rows.each do |row|
-            if Project.project_line?(row)
-              @projects << Ext.project_class(title).new(row)
-            end
-          end
-          @projects
-        end
+      def []= key, value
+        set_setting(key, value)
       end
+
+
+      #      def projects
+      #        return @projects if @projects
+      #
+      #        @projects = []
+      #
+      #        if main?
+      #          @projects = [Ext.project_class(self['scm']).new(".", :is_main)]
+      #        else
+      #          rows.each do |row|
+      #            if Project.project_line?(row)
+      #              @projects << Ext.project_class(title).new(row)
+      #            end
+      #          end
+      #          @projects
+      #        end
+      #      end
 
       def add_row(row)
         rows << row
 
         self.body_string = body_string.chomp + "\n#{row}\n"
-        clear_caches
+        #clear_caches
       end
 
-      def clear_caches
-        @projects = nil
-      end
+      #      def clear_caches
+      #        @projects = nil
+      #      end
 
       def to_s
-        "#{title_string}#{body_string}"
+        "#{title_string}#{rows.join("\n")}"
       end
     end
 
@@ -88,33 +114,39 @@ module Externals
         sections.detect {|section| section.title == title}
       end
       
+      def []= title, hash
+        add_empty_section title
+        section = self[title]
+        hash.each_pair do |key,value|
+          section[key] = value
+        end
+      end
+
       def add_empty_section  title
         raise "Section already exists" if self[title]
         sections << Section.new("\n\n[#{title.to_s}]\n", "")
       end
-      
+
       def self.new_empty
         new nil, true
       end
 
-      def initialize externals_file = nil, empty = false
-        if empty
-          self.file_string = ''
-          return
-        end
-        
-        if !externals_file && File.exists?('.externals')
-          open('.externals', 'r') do |f|
-            externals_file = f.read
-          end
-        end
+      def initialize file_string = nil, empty = false
+        self.file_string = file_string
 
-        externals_file ||= ""
+        return if empty
+        raise "I was given no file_string" unless file_string
 
-        self.file_string = externals_file
+        #        if !externals_file && File.exists?('.externals')
+        #          open('.externals', 'r') do |f|
+        #            externals_file = f.read
+        #          end
+        #        end
 
-        titles = externals_file.grep SECTION_TITLE_REGEX
-        bodies = externals_file.split SECTION_TITLE_REGEX_NO_GROUPS
+        #externals_file ||= ""
+
+        titles = file_string.grep SECTION_TITLE_REGEX
+        bodies = file_string.split SECTION_TITLE_REGEX_NO_GROUPS
 
         if titles.size > 0 && bodies.size > 0
           if titles.size + 1 != bodies.size
@@ -129,30 +161,33 @@ module Externals
         end
       end
 
-      def projects
-        retval = []
-        sections.each do |section|
-          retval += section.projects
-        end
+      #      def projects
+      #        retval = []
+      #        sections.each do |section|
+      #          retval += section.projects
+      #        end
+      #
+      #        retval
+      #      end
 
-        retval
-      end
+      #      def subprojects
+      #        retval = []
+      #        sections.each do |section|
+      #          retval += section.projects unless section.main?
+      #        end
+      #
+      #        retval
+      #      end
 
-      def subprojects
-        retval = []
-        sections.each do |section|
-          retval += section.projects unless section.main?
-        end
-
-        retval
-      end
-
-      def write path = ".externals"
+      def write path  # = ".externals"
+        raise "no path given" unless path
         open(path, 'w') do |f|
-          sections.each do |section|
-            f.write section.to_s
-          end
+          f.write to_s
         end
+      end
+      
+      def to_s
+        sections.map(&:to_s).join("\n")
       end
     end
   end

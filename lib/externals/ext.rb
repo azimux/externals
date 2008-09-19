@@ -1,5 +1,7 @@
 require 'externals/project'
+require 'externals/old_project'
 require 'externals/configuration/configuration'
+require 'externals/configuration/old_configuration'
 require 'optparse'
 require 'externals/command'
 require 'extensions/symbol'
@@ -40,8 +42,8 @@ module Externals
     [:install, "ext install <repository[:branch]> [path]",
       "Registers <repository> in .externals under the appropriate
       SCM.  Checks out the project, and also adds it to the ignore
-      feature offered by the SCM of the main project.  If the SCM 
-      type is not obvious from the repository URL, use the --scm, 
+      feature offered by the SCM of the main project.  If the SCM
+      type is not obvious from the repository URL, use the --scm,
       --git, or --svn flags."],
     [:init, "Creates a .externals file containing only [main]
       It will try to determine the SCM used by the main project,
@@ -53,7 +55,9 @@ module Externals
       top and adds a .emptydir file to any empty directories it
       comes across.  Useful for dealing with SCMs that refuse to
       track empty directories (such as git, for example)"],
-    [:help, "You probably just ran this command just now."]
+    [:help, "You probably just ran this command just now."],
+    [:upgrade_externals_file, "Converts the old format that stored
+      as [main][svn][git] to [<path1>][<path2>]..."],
   ]
 
 
@@ -72,10 +76,16 @@ module Externals
     Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','scms')).each do |project|
       require "externals/scms/#{project}" if project =~ /_project.rb$/
     end
-    
+
+    Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','old_scms')).each do |project|
+      require "externals/old_scms/#{project}" if project =~ /_project.rb$/
+    end
+
     Dir.entries(PROJECT_TYPES_DIRECTORY).each do |type|
       require File.join(PROJECT_TYPES_DIRECTORY, type) if type =~ /\.rb$/
     end
+
+    attr_accessor :path_calculator
 
     def self.project_types
       types = Dir.entries(PROJECT_TYPES_DIRECTORY).select do |file|
@@ -109,9 +119,11 @@ module Externals
       end
 
       opts.on("--type TYPE", "-t TYPE", "The type of project the main project is.  For example, 'rails'.",
-        Integer) {|type| sub_options[:scm] = main_options[:type] = type}
+        String) {|type| sub_options[:scm] = main_options[:type] = type}
       opts.on("--scm SCM", "-s SCM", "The SCM used to manage the main project.  For example, '--scm svn'.",
-        Integer) {|scm| sub_options[:scm] = main_options[:scm] = scm}
+        String) {|scm| sub_options[:scm] = main_options[:scm] = scm}
+      opts.on("--branch BRANCH", "-b BRANCH", "The branch you want the subproject to checkout when doing 'ext install'",
+        String) {|branch| sub_options[:branch] = main_options[:branch] = branch}
       opts.on("--workdir DIR", "-w DIR", "The working directory to execute commands from.  Use this if for some reason you
         cannot execute ext from the main project's directory (or if it's just inconvenient, such as in a script
         or in a Capistrano task)",
@@ -151,6 +163,10 @@ module Externals
         puts "unknown command: #{command}"
         puts "for a list of commands try 'ext help'"
         exit
+      end
+
+      if (command == :upgrade_externals_file)
+        main_options[:upgrade_externals_file] = true
       end
 
       Dir.chdir(main_options[:workdir] || ".") do
@@ -198,17 +214,32 @@ module Externals
     end
 
     def projects
-      configuration.projects
+      p = []
+      configuration.sections.each do |section|
+        p << Ext.project_class(section[:scm]||infer_scm(section[:repository])).new(
+            section.attributes.merge(:path => section.title))
+      end
+      p
     end
 
     def subprojects
-      configuration.subprojects
+      s = []
+      projects.each do |project|
+        s << project unless project.main_project?
+      end
+      s
     end
 
     def configuration
       return @configuration if @configuration
 
-      @configuration = Configuration::Configuration.new
+      file_string = ''
+      if File.exists? '.externals'
+        open('.externals', 'r') do |f|
+          file_string = f.read
+        end
+      end
+      @configuration = Configuration::Configuration.new(file_string)
     end
 
     def reload_configuration
@@ -219,12 +250,37 @@ module Externals
     def initialize options
       super()
 
-      scm = configuration['main']
+      if options[:upgrade_externals_file]
+        type ||= options[:type]
+        
+
+        if type
+          install_project_type type
+        else
+          
+          possible_project_types = self.class.project_types.select do |project_type|
+            self.class.project_type_detector(project_type).detected?
+          end
+
+          if possible_project_types.size > 1
+            raise "We found multiple project types that this could be: #{possible_project_types.join(',')}
+Please use
+ the --type option to tell ext which to use."
+          elsif possible_project_types.empty?
+            install_project_type OldConfiguration::Configuration.new[:main][:type]
+          else
+            install_project_type possible_project_types.first
+          end
+        end
+        return
+      end
+
+      scm = configuration['.']
       scm = scm['scm'] if scm
       scm ||= options[:scm]
       #scm ||= infer_scm(repository)
 
-      type = configuration['main']
+      type = configuration['.']
       type = type['type'] if type
 
       type ||= options[:type]
@@ -260,6 +316,22 @@ Please use
 
       retval
     end
+    def self.project_class(scm)
+      Externals.module_eval("#{scm.to_s.cap_first}Project", __FILE__, __LINE__)
+    end
+
+    def self.old_project_class(scm)
+      Externals.module_eval("Old#{scm.to_s.cap_first}Project", __FILE__, __LINE__)
+    end
+
+    def self.project_classes
+      retval = []
+      registered_scms.each do |scm|
+        retval << project_class(scm)
+      end
+
+      retval
+    end
 
     SHORT_COMMANDS.each do |command_name|
       define_method command_name do |args, options|
@@ -285,29 +357,37 @@ Please use
 
     def install args, options
       init args, options unless File.exists? '.externals'
-      row = args.join " "
+      repository = args[0]
+      path = args[1]
 
       orig_options = options.dup
 
       scm = options[:scm]
 
-      scm ||= infer_scm(row)
-      
+      scm ||= infer_scm(repository)
+
       unless scm
-        raise "Unable to determine SCM from the repository name.  
+        raise "Unable to determine SCM from the repository name.
 You need to either specify the scm used to manage the subproject
 that you are installing. Use an option to specify it
 (such as --git or --svn)"
       end
 
-      if !configuration[scm]
-        configuration.add_empty_section(scm)
-      end
-      configuration[scm].add_row(row)
-      configuration.write
+      project = self.class.project_class(scm).new(:repository => repository, 
+        :path => path || path_calculator.new, :scm => scm)
+      path = project.path
+      
+      raise "no path" unless path
+      
+      raise "already exists" if configuration[path]
+      
+      project.branch = options[:branch] if options[:branch]
+      
+      attributes = project.attributes.dup
+      attributes.delete(:path)
+      configuration[path] = project.attributes
+      configuration.write '.externals'
       reload_configuration
-
-      project = self.class.project_class(scm).new(row)
 
       project.co
 
@@ -318,7 +398,7 @@ that you are installing. Use an option to specify it
       #path = args[0]
 
 
-      scm = configuration['main']
+      scm = configuration['.']
       scm = scm['scm'] if scm
 
       scm ||= options[:scm]
@@ -328,9 +408,9 @@ that you are installing. Use an option to specify it
           (such as --git or --svn)"
       end
 
-      project = self.class.project_class(scm).new(".")
+      project = self.class.project_class(scm).new(:path => ".")
 
-      raise "only makes sense for main project" unless project.main?
+      raise "only makes sense for main project" unless project.main_project?
 
       subprojects.each do |subproject|
         puts "about to add #{subproject.path} to ignore"
@@ -379,7 +459,7 @@ that you are installing. Use an option to specify it
       scm ||= infer_scm(repository)
 
       if !scm
-        scm ||= configuration['main']
+        scm ||= configuration['.']
         scm &&= scm['scm']
       end
 
@@ -418,7 +498,7 @@ by creating the .externals file manually"
       scm ||= infer_scm(repository)
 
       if !scm
-        scm ||= configuration['main']
+        scm ||= configuration['.']
         scm &&= scm['scm']
       end
 
@@ -506,12 +586,37 @@ Please use the --type option to tell ext which to use."
 
       config = Configuration::Configuration.new_empty
 
-      config.sections << Configuration::Section.new("[main]\n",
-        "scm = #{scm}\n" +
-          "#{'type = ' + type if type}\n")
+      raise ".externals already exists" if File.exists?('.externals')
+      
+      config.add_empty_section '.'
 
-      config.write
+      config['.'][:scm] = scm
+      config['.'][:type] = type if type
+
+      config.write '.externals'
       reload_configuration
+    end
+
+    def upgrade_externals_file args, options = {}
+      old = OldConfiguration::Configuration.new
+
+      config = Configuration::Configuration.new_empty
+
+      main = old['main']
+      config.add_empty_section '.'
+
+      config['.'][:scm] = main[:scm]
+      config['.'][:type] = main[:type]
+
+      old.subprojects.each do |subproject|
+        path = subproject.path
+        config.add_empty_section path
+        config[path][:repository] = subproject.repository
+        config[path][:scm] = subproject.scm
+        config[path][:branch] = subproject.branch if subproject.branch
+      end
+
+      config.write('.externals')
     end
 
     def self.project_type_detector name
@@ -520,6 +625,7 @@ Please use the --type option to tell ext which to use."
 
     def install_project_type name
       Externals.module_eval("#{name.classify}ProjectType", __FILE__, __LINE__).install
+      self.path_calculator = Externals.module_eval("#{name.classify}ProjectType::DefaultPathCalculator", __FILE__, __LINE__)
     end
     #
     #
@@ -549,7 +655,8 @@ Please use the --type option to tell ext which to use."
           (such as --git or --svn)"
         end
 
-        main_project = self.class.project_class(scm).new("#{repository} #{path}", :is_main)
+        main_project = self.class.project_class(scm).new(:repository => repository,
+          :path => path)
 
         main_project.send(sym)
         main_project

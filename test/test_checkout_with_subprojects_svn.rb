@@ -42,13 +42,13 @@ module Externals
           %w(foreign_key_migrations redhillonrails_core).each do |proj|
             Ext.run "install", "svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/#{proj}"
           end
-          
+
           #install project with a branch
-          Ext.run "install", "git://github.com/azimux/engines.git:edge"
-          
+          Ext.run "install", "git://github.com/azimux/engines.git", "-b", "edge"
+
           #install project with a non-default path
           Ext.run "install", "--svn", "file:///#{modules_repository_dir('svn')}", "modules"
-        
+
           SvnProject.add_all
 
           puts `svn commit -m "created empty rails app with some subprojects"`
@@ -60,8 +60,8 @@ module Externals
       destroy_rails_application
       destroy_test_repository 'svn'
       destroy_test_modules_repository 'svn'
-      
-      
+
+
       Dir.chdir File.join(root_dir, 'test') do
         parts = 'workdir/checkout/rails_app/vendor/plugins/foreign_key_migrations/lib/red_hill_consulting/foreign_key_migrations/active_record/connection_adapters/.svn/text-base/table_definition.rb.svn-base'.split('/')
         if File.exists? File.join(*parts)
@@ -71,8 +71,8 @@ module Externals
         end
         `rm -rf workdir`
       end
-      
-      
+
+
       #      Dir.chdir File.join(root_dir, 'test') do
       #        `rm -rf workdir`
       #      end
@@ -106,7 +106,7 @@ module Externals
 
               puts(ignore_text = `svn propget svn:ignore vendor`)
               assert(ignore_text =~ /^rails$/)
-              
+
               Dir.chdir File.join('vendor', 'rails') do
                 assert `git show 92f944818eece9fe4bc62ffb39accdb71ebc32be` =~ /azimux/
               end
@@ -116,11 +116,11 @@ module Externals
               end
 
               assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
-              
+
               assert File.exists?(File.join('modules', 'modules.txt'))
-              
+
               assert File.read(File.join('modules', 'modules.txt')) =~ /line1 of/
-              
+
               Dir.chdir File.join('vendor','plugins','engines') do
                 assert(`git branch -a` =~ /^\*\s*edge\s*$/)
                 assert(`git branch -a` !~ /^\*\s*master\s*$/)
@@ -130,7 +130,7 @@ module Externals
         end
       end
     end
-    
+
     def test_export_with_subproject
       Dir.chdir File.join(root_dir, 'test') do
         Dir.chdir 'workdir' do
@@ -157,7 +157,7 @@ module Externals
 
               puts(ignore_text = `svn propget svn:ignore vendor`)
               assert(ignore_text =~ /^rails$/)
-              
+
               Dir.chdir File.join('vendor', 'rails') do
                 assert `git show 92f944818eece9fe4bc62ffb39accdb71ebc32be` !~ /azimux/
               end
@@ -169,7 +169,7 @@ module Externals
                 end
                 assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
               end
-              
+
               %w(foreign_key_migrations redhillonrails_core).each do |proj|
                 assert !File.exists?(File.join('vendor', 'plugins',proj, '.svn'))
               end

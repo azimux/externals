@@ -1,10 +1,5 @@
 module Externals
-  class SvnProject < Project
-    
-    def default_branch
-      nil
-    end
-    
+  class OldSvnProject < OldProject
     def co *args
       (rmdircmd = "rmdir #{path}")
 
