@@ -26,7 +26,11 @@ svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/foreign_key_migr
 svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/redhillonrails_core"
           end
 
+          assert Ext.externals_file_obsolete?
+          
           Ext.run "upgrade_externals_file"
+          assert !Ext.externals_file_obsolete?
+
           new_text = nil
           open '.externals', 'r' do |f|
             new_text = f.read

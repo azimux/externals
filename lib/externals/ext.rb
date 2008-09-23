@@ -7,6 +7,10 @@ require 'externals/command'
 require 'extensions/symbol'
 
 module Externals
+  #exit status
+  OBSOLETE_EXTERNALS_FILE = 15
+  
+  
   PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
 
   # Full commands operate on the main project as well as the externals
@@ -165,13 +169,28 @@ module Externals
         exit
       end
 
-      if (command == :upgrade_externals_file)
-        main_options[:upgrade_externals_file] = true
-      end
 
       Dir.chdir(main_options[:workdir] || ".") do
+        if (command == :upgrade_externals_file)
+          main_options[:upgrade_externals_file] = true
+        else
+          if externals_file_obsolete?
+            puts "your .externals file Appears to be in an obsolete format"
+            puts "Please run 'ext update_externals_file' to migrate it to the new format"
+            exit OBSOLETE_EXTERNALS_FILE
+          end
+        end
+
         new(main_options).send(command, args, sub_options)
       end
+    end
+    
+    def self.externals_file_obsolete?
+      return false if !File.exists?('.externals')
+      
+      open('.externals', 'r') do |f|
+        f.read =~ /^\s*\[git\]\s*$|^\s*\[main\]\s*$|^\s*\[svn\]\s*$/
+      end      
     end
 
     def print_commands(commands)
@@ -217,7 +236,7 @@ module Externals
       p = []
       configuration.sections.each do |section|
         p << Ext.project_class(section[:scm]||infer_scm(section[:repository])).new(
-            section.attributes.merge(:path => section.title))
+          section.attributes.merge(:path => section.title))
       end
       p
     end
