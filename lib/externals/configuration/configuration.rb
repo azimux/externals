@@ -15,7 +15,7 @@ module Externals
 
         raise "Invalid section title: #{title_string}" unless title
 
-        self.rows = body_string.split(/\n/)
+        self.rows = body_string.strip.split(/\n/)
       end
 
 
@@ -98,7 +98,7 @@ module Externals
       #      end
 
       def to_s
-        "#{title_string}#{rows.join("\n")}"
+        "[#{title}]\n#{rows.join("\n")}"
       end
     end
 
@@ -124,7 +124,7 @@ module Externals
 
       def add_empty_section  title
         raise "Section already exists" if self[title]
-        sections << Section.new("\n\n[#{title.to_s}]\n", "")
+        sections << Section.new("[#{title.to_s}]", "")
       end
 
       def self.new_empty
@@ -187,7 +187,7 @@ module Externals
       end
       
       def to_s
-        sections.map(&:to_s).join("\n")
+        sections.map(&:to_s).join("\n\n")
       end
     end
   end
