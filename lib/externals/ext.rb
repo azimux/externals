@@ -43,7 +43,7 @@ module Externals
       main project.  This is automatically performed by install,
       and so you probably only will run this if you are manually
       maintaining .externals"],
-    [:install, "ext install <repository[:branch]> [path]",
+    [:install, "ext install <repository> [-b <branch>] [path]",
       "Registers <repository> in .externals under the appropriate
       SCM.  Checks out the project, and also adds it to the ignore
       feature offered by the SCM of the main project.  If the SCM
@@ -116,7 +116,7 @@ module Externals
     def self.new_opts main_options, sub_options
       opts = OptionParser.new
 
-      opts.banner = "ext [OPTIONS] <command> [repository[:branch]] [path]"
+      opts.banner = "ext [OPTIONS] <command> [repository] [-b <branch>] [path]"
 
       project_classes.each do |project_class|
         project_class.fill_in_opts(opts, main_options, sub_options)
@@ -171,12 +171,12 @@ module Externals
 
 
       Dir.chdir(main_options[:workdir] || ".") do
-        if (command == :upgrade_externals_file)
+        if command == :upgrade_externals_file
           main_options[:upgrade_externals_file] = true
-        else
+        elsif command != :help
           if externals_file_obsolete?
             puts "your .externals file Appears to be in an obsolete format"
-            puts "Please run 'ext update_externals_file' to migrate it to the new format"
+            puts "Please run 'ext upgrade_externals_file' to migrate it to the new format"
             exit OBSOLETE_EXTERNALS_FILE
           end
         end
@@ -247,6 +247,10 @@ module Externals
         s << project unless project.main_project?
       end
       s
+    end
+    
+    def main_project
+      projects.detect {|p| p.main_project?}
     end
 
     def configuration
@@ -471,11 +475,11 @@ that you are installing. Use an option to specify it
 
     def status args, options
       options ||= {}
-      repository = "."
-      path = "."
-      main_project = nil
+      #repository = "."
+      #path = "."
+      #main_project = nil
       scm = options[:scm]
-      scm ||= infer_scm(repository)
+      #scm ||= infer_scm(repository)
 
       if !scm
         scm ||= configuration['.']
@@ -503,18 +507,19 @@ by creating the .externals file manually"
           (such as --git or --svn)"
       end
 
-      main_project = self.class.project_class(scm).new("#{repository} #{path}", :is_main)
-      main_project.st
+      #main_project = self.class.project_class(scm).new("#{repository} #{path}", :is_main)
+      project = main_project
+      project.scm ||= scm
+      project.st
 
       self.class.new({}).st [], {} #args, options
     end
 
     def update args, options
       options ||= {}
-      repository = args[0]
-      main_project = nil
+      #repository = args[0]
       scm = options[:scm]
-      scm ||= infer_scm(repository)
+      #scm ||= infer_scm(repository)
 
       if !scm
         scm ||= configuration['.']
@@ -526,8 +531,10 @@ by creating the .externals file manually"
           (such as --git or --svn)"
       end
 
-      main_project = self.class.project_class(scm).new("#{repository} #{path}", :is_main)
-      main_project.up
+      #main_project = self.class.project_class(scm).new("#{repository} #{path}", :is_main)
+      project = main_project
+      project.scm ||= scm
+      project.up
 
       self.class.new({}).up [], {} #args, options
     end

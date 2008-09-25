@@ -17,12 +17,14 @@ short form.  The longer form applies the action to the main project.  The short
 forms apply the action to all sub projects.
 
 The commands and usage are as follows (from 'ext help'):
+There's a tutorial available at http://nopugs.com/ext-tutorial
 
-ext [OPTIONS] <command> [repository[:branch]] [path]
+ext [OPTIONS] <command> [repository] [-b <branch>] [path]
     -g, --git                        same as '--scm git'  Uses git to checkout/export the main project
     -s, --svn, --subversion          same as '--scm svn'  Uses subversion to checkout/export the main project
     -t, --type TYPE                  The type of project the main project is.  For example, 'rails'.
         --scm SCM                    The SCM used to manage the main project.  For example, '--scm svn'.
+    -b, --branch BRANCH              The branch you want the subproject to checkout when doing 'ext install'
     -w, --workdir DIR                The working directory to execute commands from.  Use this if for some reason you
         cannot execute ext from the main project's directory (or if it's just inconvenient, such as in a script
         or in a Capistrano task)
@@ -32,7 +34,7 @@ ext [OPTIONS] <command> [repository[:branch]] [path]
 
 
 Commands that apply to the main project or the .externals file:
-update_ignore, install, init, touch_emptydirs, help
+update_ignore, install, init, touch_emptydirs, help, upgrade_externals_file
 
 update_ignore   Adds all paths to subprojects that are
                 registered in .externals to the ignore feature of the
@@ -40,12 +42,12 @@ update_ignore   Adds all paths to subprojects that are
                 and so you probably only will run this if you are manually
                 maintaining .externals
 
-install         Usage: ext install <repository[:branch]> [path]
+install         Usage: ext install <repository> [-b <branch>] [path]
                 Registers <repository> in .externals under the appropriate
                 SCM.  Checks out the project, and also adds it to the ignore
-                feature offered by the SCM of the main project.  If the SCM type
-                is not obvious from the repository URL, use the --scm, --git, 
-                or --svn flags.
+                feature offered by the SCM of the main project.  If the SCM
+                type is not obvious from the repository URL, use the --scm,
+                --git, or --svn flags.
 
 init            Creates a .externals file containing only [main]
                 It will try to determine the SCM used by the main project,
@@ -60,6 +62,9 @@ touch_emptydirs Recurses through all directories from the
                 track empty directories (such as git, for example)
 
 help            You probably just ran this command just now.
+
+upgrade_externals_fileConverts the old format that stored
+                as [main][svn][git] to [<path1>][<path2>]...
 
 
 
@@ -93,13 +98,9 @@ co, ex, st, up
 
 co              Like checkout, but skips the main project and
                 only checks out subprojects.
-
 ex              Like export, but skips the main project.
-
 st              Like status, but skips the main project.
-
 up              Like update, but skips the main project.
-
 
 The externals project is copyright 2008 by Miles Georgi, nopugs.com, azimux.com
 and is released under the MIT license.  
