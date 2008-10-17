@@ -60,6 +60,28 @@ module Externals
         end
         value
       end
+      
+      def rm_setting key
+        key = key.to_s
+        found = nil
+        value = nil
+
+        rows.each_with_index do |row, index|
+          if row =~ SETTING_REGEX && key == $1
+            raise "found #{key} twice!" if found
+            found = index
+          end
+        end
+
+        if found
+          value = self[key]
+          if rows[found] !~ SET_SETTING_REGEX
+            raise "thought I found the row, but didn't"
+          end
+          rows.delete rows[found]
+        end
+        value
+      end
 
       def [] key
         setting(key)
