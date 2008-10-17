@@ -240,6 +240,17 @@ module Externals
       end
       p
     end
+    
+    def subproject_by_name_or_path name
+      name = name.strip
+      project = subprojects.detect {|p| p.path.strip == name}
+      project ||= subprojects.detect do |p|
+        File.split(p.path).last.strip == name
+      end
+      project ||= subprojects.detect do |p|
+        p.name == name
+      end
+    end
 
     def subprojects
       s = []
@@ -376,6 +387,28 @@ Please use
           subprojects.each {|p| p.send(*([command_name, args, options].flatten))}
         end
       end
+    end
+    
+    def freeze args, options
+      project = subproject_by_name_or_path(args[0])
+      
+      raise "No such project named #{args[0]}" unless project
+      
+      revision = args[1] || project.current_revision
+      
+      branch = if project.freeze_involves_branch?
+        project.current_branch
+      end
+      
+      section = configuration[project.path]
+      if section[:branch]
+        if branch
+          section[:branch] = branch
+        else
+          section.rm_setting :branch
+        end
+      end
+      section[:revision] = revision
     end
 
     def install args, options

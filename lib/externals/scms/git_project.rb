@@ -1,10 +1,10 @@
 module Externals
   class GitProject < Project
-    
+
     def default_branch
       'master'
     end
-    
+
     def co *args
       puts "path is #{path} repository is #{repository}"
       if path != '.'
@@ -100,7 +100,7 @@ module Externals
     def append_ignore path
       rows = ignore_text || ''
       return if rows.index path.strip
-      
+
       rows = rows.split(/\n/)
       rows << path.strip
 
@@ -112,11 +112,27 @@ module Externals
       end
     end
 
+    def current_revision
+      Dir.chdir path do
+        if `git show HEAD` =~ /^\s*commit\s*([0-9a-fA-F]*)\s*$/i
+          $1
+        end
+      end
+    end
+
+    def current_branch
+      Dir.chdir path do
+        if `git branch -a` =~ /^\s*\*\s*([^\s]*)\s*$/
+          $1
+        end
+      end
+    end
+
     def extract_name s
       if s =~ /\/([\w_-]+)(?:\.git)?$/
         $1
       end
     end
-    
+
   end
 end

@@ -1,10 +1,10 @@
 module Externals
   class SvnProject < Project
-    
+
     def default_branch
       nil
     end
-    
+
     def co *args
       (rmdircmd = "rmdir #{path}")
 
@@ -99,5 +99,18 @@ module Externals
       end
       ignore_text
     end
+
+    def current_revision
+      Dir.chdir path do
+        if `svn info` =~ /Revision:\s*(\d+)\s*$/
+          $1
+        end
+      end
+    end
+    
+    def freeze_involves_branch?
+      false
+    end
+
   end
 end
