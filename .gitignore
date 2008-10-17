@@ -7,3 +7,5 @@ nbproject/
 *~
 tmp/*
 pkg/
+test/repositories/
+test/cleanreps/
