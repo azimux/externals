@@ -35,16 +35,16 @@ module Externals
           Ext.run "init"
           raise " could not create .externals"  unless File.exists? '.externals'
           %w(rails acts_as_list).each do |proj|
-            Ext.run "install", "git://github.com/rails/#{proj}.git"
+            Ext.run "install", File.join(root_dir, 'test', 'cleanreps', "#{proj}.git")
           end
 
           #install a couple svn managed subprojects
           %w(foreign_key_migrations redhillonrails_core).each do |proj|
-            Ext.run "install", "svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/#{proj}"
+            Ext.run "install", "--svn", "file:///#{File.join(root_dir, 'test', 'cleanreps', proj)}"
           end
 
           #install project with a branch
-          Ext.run "install", "git://github.com/azimux/engines.git", "-b", "edge"
+          Ext.run "install", File.join(root_dir, 'test', 'cleanreps', 'engines.git'), "-b", "edge"
 
           #install project with a non-default path
           Ext.run "install", "--svn", "file:///#{modules_repository_dir('svn')}", "modules"
@@ -159,7 +159,9 @@ module Externals
               assert(ignore_text =~ /^rails$/)
 
               Dir.chdir File.join('vendor', 'rails') do
-                assert `git show 92f944818eece9fe4bc62ffb39accdb71ebc32be` !~ /azimux/
+                #can't check this if it's local.  It seems --depth 1 is ignored for 
+                #repositories on the local machine.
+                #assert `git show 92f944818eece9fe4bc62ffb39accdb71ebc32be` !~ /azimux/
               end
 
               %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|

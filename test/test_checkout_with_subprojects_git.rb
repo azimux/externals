@@ -24,11 +24,11 @@ module Externals
           `git init`
           Ext.run "init"
           raise " could not create .externals"  unless File.exists? '.externals'
-          Ext.run "install", "git://github.com/rails/acts_as_list.git"
+          Ext.run "install", File.join(root_dir, 'test', 'cleanreps', "acts_as_list.git")
 
           #install a couple svn managed subprojects
           %w(foreign_key_migrations redhillonrails_core).each do |proj|
-            Ext.run "install", "svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/#{proj}"
+            Ext.run "install", "--svn", 'file:///' + File.join(root_dir, 'test', 'cleanreps', proj)
           end
 
           GitProject.add_all
