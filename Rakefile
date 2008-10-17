@@ -14,10 +14,9 @@ task :prep_test do
     puts `rm -rf cleanreps`
     Dir.mkdir('cleanreps')
     Dir.chdir('cleanreps') do
-      puts `cp ../setup/*.svn.gz .`
-      puts `gunzip *.svn.gz`
-
       %w(redhillonrails_core foreign_key_migrations).each do |p|
+        puts `cp ../setup/#{p}.svn.gz .`
+        puts `gzip -d #{p}.svn.gz`
         puts `svnadmin create #{p}`
         puts `svnadmin load #{p} < #{p}.svn`
       end
