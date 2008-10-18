@@ -5,6 +5,8 @@ require 'externals/ext'
 
 module Externals
   class TestTouchEmptydirs < TestCase
+    include ExtTestCase
+    
     def setup
       Dir.chdir File.join(root_dir, 'test') do
         `mkdir workdir`

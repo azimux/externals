@@ -4,6 +4,8 @@ require 'externals/ext'
 
 module Externals
   class TestInitGit < TestCase
+    include ExtTestCase
+    
     def setup
       initialize_test_git_repository
       Dir.chdir File.join(root_dir, 'test') do

@@ -9,8 +9,8 @@ require 'extensions/symbol'
 module Externals
   #exit status
   OBSOLETE_EXTERNALS_FILE = 15
-  
-  
+
+
   PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
 
   # Full commands operate on the main project as well as the externals
@@ -49,6 +49,11 @@ module Externals
       feature offered by the SCM of the main project.  If the SCM
       type is not obvious from the repository URL, use the --scm,
       --git, or --svn flags."],
+    [:freeze, "ext freeze project [REVISION]", %{
+      Locks a subproject into a specific revision/branch.  If no
+      revision is supplied, the current revision/branch of the
+      project will be used.  You can specify the project by name
+      or path.}],
     [:init, "Creates a .externals file containing only [main]
       It will try to determine the SCM used by the main project,
       as well as the project type.  You don't have to specify
@@ -184,13 +189,13 @@ module Externals
         new(main_options).send(command, args, sub_options)
       end
     end
-    
+
     def self.externals_file_obsolete?
       return false if !File.exists?('.externals')
-      
+
       open('.externals', 'r') do |f|
         f.read =~ /^\s*\[git\]\s*$|^\s*\[main\]\s*$|^\s*\[svn\]\s*$/
-      end      
+      end
     end
 
     def print_commands(commands)
@@ -240,7 +245,7 @@ module Externals
       end
       p
     end
-    
+
     def subproject_by_name_or_path name
       name = name.strip
       project = subprojects.detect {|p| p.path.strip == name}
@@ -259,7 +264,7 @@ module Externals
       end
       s
     end
-    
+
     def main_project
       projects.detect {|p| p.main_project?}
     end
@@ -286,12 +291,12 @@ module Externals
 
       if options[:upgrade_externals_file]
         type ||= options[:type]
-        
+
 
         if type
           install_project_type type
         else
-          
+
           possible_project_types = self.class.project_types.select do |project_type|
             self.class.project_type_detector(project_type).detected?
           end
@@ -388,18 +393,18 @@ Please use
         end
       end
     end
-    
+
     def freeze args, options
       project = subproject_by_name_or_path(args[0])
-      
+
       raise "No such project named #{args[0]}" unless project
-      
+
       revision = args[1] || project.current_revision
-      
+
       branch = if project.freeze_involves_branch?
         project.current_branch
       end
-      
+
       section = configuration[project.path]
       if section[:branch]
         if branch
@@ -409,6 +414,9 @@ Please use
         end
       end
       section[:revision] = revision
+      configuration.write '.externals'
+
+      subproject_by_name_or_path(args[0]).up
     end
 
     def install args, options
@@ -429,16 +437,16 @@ that you are installing. Use an option to specify it
 (such as --git or --svn)"
       end
 
-      project = self.class.project_class(scm).new(:repository => repository, 
+      project = self.class.project_class(scm).new(:repository => repository,
         :path => path || path_calculator.new, :scm => scm)
       path = project.path
-      
+
       raise "no path" unless path
-      
+
       raise "already exists" if configuration[path]
-      
+
       project.branch = options[:branch] if options[:branch]
-      
+
       attributes = project.attributes.dup
       attributes.delete(:path)
       configuration[path] = project.attributes
@@ -646,7 +654,7 @@ Please use the --type option to tell ext which to use."
       config = Configuration::Configuration.new_empty
 
       raise ".externals already exists" if File.exists?('.externals')
-      
+
       config.add_empty_section '.'
 
       config['.'][:scm] = scm

@@ -4,6 +4,8 @@ require 'externals/ext'
 
 module Externals
   class TestCheckoutWithSubprojectsSvn < TestCase
+    include ExtTestCase
+    
     def setup
       destroy_rails_application
       create_rails_application
@@ -159,7 +161,7 @@ module Externals
               assert(ignore_text =~ /^rails$/)
 
               Dir.chdir File.join('vendor', 'rails') do
-                #can't check this if it's local.  It seems --depth 1 is ignored for 
+                #can't check this if it's local.  It seems --depth 1 is ignored for
                 #repositories on the local machine.
                 #assert `git show 92f944818eece9fe4bc62ffb39accdb71ebc32be` !~ /azimux/
               end

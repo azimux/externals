@@ -4,6 +4,8 @@ require 'externals/ext'
 
 module Externals
   class TestUpgradeExternalsFile < TestCase
+    include ExtTestCase
+    
     def test_upgrade
       Dir.chdir File.join(root_dir, 'test') do
         `rm -rf test_upgrade`

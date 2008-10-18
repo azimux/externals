@@ -4,6 +4,8 @@ require 'externals/ext'
 
 module Externals
   class TestCheckoutGit < TestCase
+    include ExtTestCase
+    
     def setup
       initialize_test_git_repository
 

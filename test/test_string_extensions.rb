@@ -5,6 +5,8 @@ require 'externals/ext'
 
 module Externals
   class TestStringExtensions < TestCase
+    include ExtTestCase
+    
     def test_classify
       assert_equal "yourmom".classify, "Yourmom"
       assert_equal "your_mom".classify, "YourMom"

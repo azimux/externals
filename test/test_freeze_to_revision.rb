@@ -4,6 +4,8 @@ require 'externals/ext'
 
 module Externals
   class TestFreezeToRevision < TestCase
+    include ExtTestCase
+    
     def setup
       destroy_rails_application
       create_rails_application
@@ -30,7 +32,7 @@ module Externals
           %w(foreign_key_migrations redhillonrails_core).each do |proj|
             Ext.run "install", "--svn", 'file:///' + File.join(root_dir, 'test', 'cleanreps', proj)
           end
-          
+
           Ext.run "freeze", "foreign_key_migrations", "2"
           Ext.run "freeze", "acts_as_list", "9baff190a52c05cc542bfcaa7f77a91ce669f2f8"
 
@@ -76,26 +78,24 @@ module Externals
               %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
                 assert(File.read('.gitignore') =~ /^vendor[\/\\]plugins[\/\\]#{proj}$/)
               end
-              
+
               Dir.chdir File.join('vendor', 'plugins') do
                 Dir.chdir 'acts_as_list' do
-                  #doesn't have 8771a632dc26a7782800347993869c964133ea29
-                  assert `git show 8771a632dc26a7782800347993869c964133ea29` =~ 
-                    /fatal: bad object/i
-                  #should have 27a941c80ccaa8afeb9bfecb84c0ff098d8ba962
-                  assert `git show 27a941c80ccaa8afeb9bfecb84c0ff098d8ba962` !~ 
-                    /fatal: bad object/i
-                  #should be 9baff190a52c05cc542bfcaa7f77a91ce669f2f8
-                  assert `git show 9baff190a52c05cc542bfcaa7f77a91ce669f2f8` !~ 
-                    /fatal: bad object/i
-                  assert `git show HEAD` =~ /^\s*commit\s*9baff190a52c05cc542bfcaa7f77a91ce669f2f8\s*$/
+                  %w(8771a632dc26a7782800347993869c964133ea29
+                  27a941c80ccaa8afeb9bfecb84c0ff098d8ba962
+                  9baff190a52c05cc542bfcaa7f77a91ce669f2f8
+                  ).each do |hash|
+                    assert `git show #{hash}` =~ /^commit\s*#{hash}$/i
+                  end
+                  assert `git show HEAD` !~ /^\s*commit\s*8771a632dc26a7782800347993869c964133ea29\s*$/i
+                  assert `git show HEAD` =~ /^\s*commit\s*9baff190a52c05cc542bfcaa7f77a91ce669f2f8\s*$/i
                 end
-              
+
                 Dir.chdir 'foreign_key_migrations' do
                   assert `svn info` =~ /^Revision:\s*2\s*$/i
                 end
               end
-              
+
               %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
                 assert File.exists?(File.join('vendor', 'plugins',proj, 'lib'))
               end

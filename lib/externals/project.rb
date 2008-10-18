@@ -14,9 +14,9 @@ module Externals
       end
     end
     
-    VALID_ATTRIBUTES = [:name, :path, :repository, :branch, :type, :scm].map(&:to_s)
+    VALID_ATTRIB = [:name, :path, :repository, :branch, :type, :scm, :revision].map(&:to_s)
     
-    attr_attr_accessor VALID_ATTRIBUTES
+    attr_attr_accessor VALID_ATTRIB
     def attributes
       @attributes ||= {}
     end
@@ -53,10 +53,10 @@ module Externals
         new_hash
       end
       
-      invalid_attributes = hash.keys - VALID_ATTRIBUTES
+      inVALID_ATTRIB = hash.keys - VALID_ATTRIB
       
-      if !invalid_attributes.empty?
-        raise "invalid attribute(s): #{invalid_attributes.join(', ')}"
+      if !inVALID_ATTRIB.empty?
+        raise "invalid attribute(s): #{inVALID_ATTRIB.join(', ')}"
       end
 
       path = hash.delete('path')

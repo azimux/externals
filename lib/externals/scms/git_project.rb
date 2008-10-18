@@ -1,3 +1,6 @@
+require File.join(File.dirname(__FILE__), '..', 'project')
+
+
 module Externals
   class GitProject < Project
 
@@ -18,9 +21,20 @@ module Externals
 
       puts(gitclonecmd = "git clone \"#{repository}\" #{dest}")
       puts `#{gitclonecmd}`
+
+      change_to_branch_revision
+    end
+
+    def change_to_branch_revision
       if branch
         Dir.chdir path do
           puts `git checkout --track -b #{branch} origin/#{branch}`
+        end
+      end
+
+      if revision
+        Dir.chdir path do
+          puts `git checkout #{revision}`
         end
       end
     end
@@ -40,15 +54,18 @@ module Externals
       puts(gitclonecmd = "git clone --depth 1 \"#{repository}\" #{dest}")
 
       puts `#{gitclonecmd}`
-      if branch
-        puts `cd #{path}; git checkout --track -b #{branch} origin/#{branch}`
-      end
+
+      change_to_branch_revision
     end
 
     def up *args
-      puts "updating #{path}:"
-      Dir.chdir path do
-        puts `git pull`
+      if revision
+        change_to_branch_revision
+      else
+        puts "updating #{path}:"
+        Dir.chdir path do
+          puts `git pull`
+        end
       end
     end
 
@@ -81,8 +98,6 @@ module Externals
       puts `git add .`
     end
 
-
-    protected
     def ignore_contains? path
       text = ignore_text
       text.split(/\n/).detect {|r| r.strip == path.strip}

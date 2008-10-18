@@ -5,6 +5,8 @@ require 'externals/ext'
 
 module Externals
   class TestRailsDetection < TestCase
+    include ExtTestCase
+    
     def setup
       destroy_rails_application
       create_rails_application

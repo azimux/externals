@@ -1,3 +1,5 @@
+require File.join(File.dirname(__FILE__), '..', 'project')
+
 module Externals
   class SvnProject < Project
 
@@ -11,10 +13,26 @@ module Externals
       `#{rmdircmd}` if File.exists? path
       puts(svncocmd = "svn co #{repository} #{path}")
       puts `#{svncocmd}`
+
+      change_to_revision
+    end
+
+    def change_to_revision
+      if revision
+        Dir.chdir path do
+          puts `svn up -r #{revision}`
+        end
+      end
     end
 
     def ex *args
       (rmdircmd = "rmdir #{path}")
+
+      url = repository
+
+      if revision
+        url += "@#{revision}"
+      end
 
       `#{rmdircmd}` if File.exists? path
       puts(svncocmd = "svn export #{repository} #{path}")
@@ -22,9 +40,13 @@ module Externals
     end
 
     def up *args
-      puts "updating #{path}:"
-      Dir.chdir path do
-        puts `svn up .`
+      if revision
+        change_to_revision
+      else
+        puts "updating #{path}:"
+        Dir.chdir path do
+          puts `svn up .`
+        end
       end
     end
 
@@ -69,8 +91,6 @@ module Externals
       end
     end
 
-
-    protected
     def ignore_contains? path
       ignore_text(path) =~ Regexp.new("^\\s*#{File.basename(path)}\\s*$")
     end
@@ -107,7 +127,7 @@ module Externals
         end
       end
     end
-    
+
     def freeze_involves_branch?
       false
     end
