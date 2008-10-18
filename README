@@ -1,6 +1,9 @@
 Externals is a project that allows you to use the workflow normally made
 possible by svn:externals in an SCM independent manner.
 
+Please report bugs to either http://rubyforge.org/projects/ext or 
+http://ext.lighthouseapp.com
+
 I was inspired to create this project because I had several projects that had
 a mix of plugins managed by git and by svn.  Git's submodule feature is 
 not exactly like svn:externals.  Basically, I don't like how you have to manually 
@@ -48,6 +51,12 @@ install         Usage: ext install <repository> [-b <branch>] [path]
                 feature offered by the SCM of the main project.  If the SCM
                 type is not obvious from the repository URL, use the --scm,
                 --git, or --svn flags.
+
+freeze          ext freeze project [REVISION]
+                Locks a subproject into a specific revision/branch.  If no
+                revision is supplied, the current revision/branch of the
+                project will be used.  You can specify the project by name
+                or path.
 
 init            Creates a .externals file containing only [main]
                 It will try to determine the SCM used by the main project,
