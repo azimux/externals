@@ -477,9 +477,9 @@ that you are installing. Use an option to specify it
       raise "only makes sense for main project" unless project.main_project?
 
       subprojects.each do |subproject|
-        puts "about to add #{subproject.path} to ignore"
+        #puts "about to add #{subproject.path} to ignore"
         project.update_ignore subproject.path
-        puts "finished adding #{subproject.path}"
+        #puts "finished adding #{subproject.path}"
       end
     end
 

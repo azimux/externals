@@ -1,0 +1,1 @@
+update won't checkout newly added subprojects

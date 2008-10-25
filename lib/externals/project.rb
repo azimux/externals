@@ -1,11 +1,14 @@
 require 'extensions/symbol'
 
 module Externals
+  VALID_ATTRIB = [:name, :path, :repository, :branch, :type, :scm, :revision
+  ].map(&:to_s) unless const_defined?('VALID_ATTRIB')
+
   class Project
     def self.attr_attr_accessor *names
       names = [names].flatten
       names.each do |name|
-        define_method name do 
+        define_method name do
           attributes[name.to_sym]
         end
         define_method "#{name}=" do |value|
@@ -13,10 +16,9 @@ module Externals
         end
       end
     end
-    
-    VALID_ATTRIB = [:name, :path, :repository, :branch, :type, :scm, :revision].map(&:to_s)
-    
-    attr_attr_accessor VALID_ATTRIB
+
+
+    attr_attr_accessor Externals::VALID_ATTRIB
     def attributes
       @attributes ||= {}
     end
@@ -26,7 +28,7 @@ module Externals
     def main_project?
       path == '.'
     end
-    
+
     def freeze_involves_branch?
       true
     end
@@ -43,28 +45,28 @@ module Externals
     def default_branch
       self.class.default_branch
     end
-    
+
     def initialize hash
       raise "Abstract class" if self.class == Project
       raise "expected hash" unless hash.is_a? Hash
-      
+
       hash = hash.keys.inject({}) do |new_hash, key|
         new_hash[key.to_s] = hash[key]
         new_hash
       end
-      
-      inVALID_ATTRIB = hash.keys - VALID_ATTRIB
-      
+
+      inVALID_ATTRIB = hash.keys - Externals::VALID_ATTRIB
+
       if !inVALID_ATTRIB.empty?
         raise "invalid attribute(s): #{inVALID_ATTRIB.join(', ')}"
       end
 
       path = hash.delete('path')
-      
+
       hash.keys.each do |key|
         send("#{key}=", hash[key])
       end
-      
+
       if path && !path.is_a?(String)
         path = path.default_path(name)
       end
