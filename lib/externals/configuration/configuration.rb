@@ -21,7 +21,7 @@ module Externals
 
       SETTING_REGEX = /^\s*([\.\w_-]+)\s*=\s*([^#\n]*)(?:#[^\n]*)?$/
       SET_SETTING_REGEX = /^(\s*(?:[\.\w_-]+)\s*=\s*)(?:[^#\n]*)(#[^\n]*)?$/
-      
+
       def attributes
         retval = {}
         rows.each do |row|
@@ -60,7 +60,7 @@ module Externals
         end
         value
       end
-      
+
       def rm_setting key
         key = key.to_s
         found = nil
@@ -135,13 +135,20 @@ module Externals
         title = title.to_s
         sections.detect {|section| section.title == title}
       end
-      
+
       def []= title, hash
         add_empty_section title
         section = self[title]
         hash.each_pair do |key,value|
           section[key] = value
         end
+      end
+
+      def remove_section sec
+        sec = sections.detect{|section| section.title == sec}
+
+        raise "No section found in config file for #{sec}" unless sec
+        sections.delete(sec)
       end
 
       def add_empty_section  title
@@ -207,7 +214,7 @@ module Externals
           f.write to_s
         end
       end
-      
+
       def to_s
         sections.map(&:to_s).join("\n\n")
       end
