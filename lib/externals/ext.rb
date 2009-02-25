@@ -38,35 +38,41 @@ module Externals
     [:up, "Like update, but skips the main project."]
   ]
   MAIN_COMMANDS_HASH = [
-    [:update_ignore, "Adds all paths to subprojects that are
-      registered in .externals to the ignore feature of the
-      main project.  This is automatically performed by install,
-      and so you probably only will run this if you are manually
-      maintaining .externals"],
-    [:install, "ext install <repository> [-b <branch>] [path]",
-      "Registers <repository> in .externals under the appropriate
-      SCM.  Checks out the project, and also adds it to the ignore
-      feature offered by the SCM of the main project.  If the SCM
-      type is not obvious from the repository URL, use the --scm,
-      --git, or --svn flags."],
     [:freeze, "ext freeze project [REVISION]", %{
       Locks a subproject into a specific revision/branch.  If no
       revision is supplied, the current revision/branch of the
       project will be used.  You can specify the project by name
       or path.}],
+    [:help, "You probably just ran this command just now."],
     [:init, "Creates a .externals file containing only [main]
       It will try to determine the SCM used by the main project,
       as well as the project type.  You don't have to specify
       a project type if you don't want to or if your project type
       isn't supported.  It just means that when using 'install'
       that you'll want to specify the path."],
+    [:install, "ext install <repository> [-b <branch>] [path]",
+      "Registers <repository> in .externals under the appropriate
+      SCM.  Checks out the project, and also adds it to the ignore
+      feature offered by the SCM of the main project.  If the SCM
+      type is not obvious from the repository URL, use the --scm,
+      --git, or --svn flags."],
     [:touch_emptydirs, "Recurses through all directories from the
       top and adds a .emptydir file to any empty directories it
       comes across.  Useful for dealing with SCMs that refuse to
       track empty directories (such as git, for example)"],
-    [:help, "You probably just ran this command just now."],
+    [:uninstall, "ext uninstall [-f|--force_removal] <project>",
+      "Removes a subproject from being tracked by ext.  If you
+      want the files associated with this subproject deleted as well
+      (if, for example, you wish to reinstall it from a different
+      repository) then you can use the -f option to remove the files."],
+    [:update_ignore, "Adds all paths to subprojects that are
+      registered in .externals to the ignore feature of the
+      main project.  This is automatically performed by install,
+      and so you probably only will run this if you are manually
+      maintaining .externals"],
     [:upgrade_externals_file, "Converts the old format that stored
       as [main][svn][git] to [<path1>][<path2>]..."],
+
   ]
 
 
@@ -133,6 +139,8 @@ module Externals
         String) {|scm| sub_options[:scm] = main_options[:scm] = scm}
       opts.on("--branch BRANCH", "-b BRANCH", "The branch you want the subproject to checkout when doing 'ext install'",
         String) {|branch| sub_options[:branch] = main_options[:branch] = branch}
+      opts.on("--force_removal", "-f", "When doing an uninstall of a subproject, remove it's files and subfolders, too.",
+        String) {|branch| sub_options[:force_removal] = true}
       opts.on("--workdir DIR", "-w DIR", "The working directory to execute commands from.  Use this if for some reason you
         cannot execute ext from the main project's directory (or if it's just inconvenient, such as in a script
         or in a Capistrano task)",
@@ -286,7 +294,7 @@ module Externals
       configuration
     end
 
-    def initialize options
+    def initialize options = {}
       super()
 
       if options[:upgrade_externals_file]
@@ -456,6 +464,27 @@ that you are installing. Use an option to specify it
       project.co
 
       update_ignore args, orig_options
+    end
+
+    def uninstall args, options
+      #init args, options unless File.exists? '.externals'
+      raise "Hmm... there's no .externals file in this directory." if !File.exists? '.externals'
+
+      project = subproject_by_name_or_path(args[0])
+
+      raise "No such project named #{args[0]}" unless project
+
+      main_project.drop_from_ignore project.path
+
+
+      configuration.remove_section(project.path)
+      configuration.write '.externals'
+
+      if options[:force_removal]
+        Dir.chdir File.dirname(project.path) do
+          `rm -rf #{File.basename(project.path)}`
+        end
+      end
     end
 
     def update_ignore args, options
