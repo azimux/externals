@@ -110,7 +110,24 @@ module Externals
       line =~ PROJECT_LINE_REGEX
     end
 
+    #test helper method
+    def assert_e_dne_i_ni assert, exists, doesnt = [], ignored = exists, notignored = []
+      ignored.each do |proj|
+        assert.call(ignore_text("vendor/plugins/#{proj}") =~ /#{proj}$/)
+      end
 
+      notignored.each do |proj|
+        assert.call(ignore_text("vendor/plugins/#{proj}") !~ /#{proj}$/)
+      end
+
+      exists.each do |proj|
+        assert.call File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+      end
+
+      doesnt.each do |proj|
+        assert.call !File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+      end
+    end
 
     protected
     def trim_quotes value
