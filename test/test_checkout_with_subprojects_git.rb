@@ -5,8 +5,8 @@ require 'externals/ext'
 module Externals
   class TestCheckoutWithSubprojectsGit < TestCase
     include ExtTestCase
-    
-    
+
+
     def setup
       destroy_rails_application
       create_rails_application
@@ -52,12 +52,10 @@ module Externals
         end
         `rm -rf workdir`
       end
-      #      Dir.chdir File.join(root_dir, 'test') do
-      #        `rm -rf workdir`
-      #      end
-      #XXX
+      Dir.chdir File.join(root_dir, 'test') do
+        `rm -rf workdir`
+      end
     end
-
 
     def test_checkout_with_subproject
       Dir.chdir File.join(root_dir, 'test') do
@@ -65,21 +63,53 @@ module Externals
           `mkdir checkout`
           Dir.chdir 'checkout' do
             source = File.join(root_dir, 'test', 'workdir', 'rails_app')
-            puts "About to checkout #{ source}"
+            puts "About to checkout #{source}"
             Ext.run "checkout", "--git", source
 
             Dir.chdir 'rails_app' do
               assert File.exists?('.git')
 
               assert File.exists?('.gitignore')
+              mp = Ext.new.main_project
 
-              %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
-                assert(File.read('.gitignore') =~ /^vendor[\/\\]plugins[\/\\]#{proj}$/)
-              end
-              
-              %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
-                assert File.exists?(File.join('vendor', 'plugins',proj, 'lib'))
-              end
+              mp.assert_e_dne_i_ni proc{|a|assert(a)},%w(foreign_key_migrations redhillonrails_core acts_as_list)
+            end
+          end
+        end
+      end
+    end
+
+    def test_uninstall
+      Dir.chdir File.join(root_dir, 'test') do
+        Dir.chdir 'workdir' do
+          `mkdir checkout`
+          Dir.chdir 'checkout' do
+            source = File.join(root_dir, 'test', 'workdir', 'rails_app')
+            puts "About to checkout #{source}"
+            Ext.run "checkout", "--git", source
+
+            Dir.chdir 'rails_app' do
+              mp = Ext.new.main_project
+
+              projs = %w(foreign_key_migrations redhillonrails_core acts_as_list)
+              projs_i = projs.dup
+              projs_ni = []
+
+              #let's uninstall acts_as_list
+              Ext.run "uninstall", "acts_as_list"
+
+              projs_ni << projs_i.delete('acts_as_list')
+
+              mp.assert_e_dne_i_ni proc{|a|assert(a)}, projs, [], projs_i, projs_ni
+
+              Ext.run "uninstall", "-f", "foreign_key_migrations"
+
+              projs_ni << projs_i.delete('foreign_key_migrations')
+
+              projs_dne = []
+              projs_dne << projs.delete('foreign_key_migrations')
+
+              mp.assert_e_dne_i_ni proc{|a|assert(a)}, projs, projs_dne, projs_i, projs_ni
             end
           end
         end

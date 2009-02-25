@@ -5,7 +5,7 @@ require 'externals/ext'
 module Externals
   class TestCheckoutWithSubprojectsSvn < TestCase
     include ExtTestCase
-    
+
     def setup
       destroy_rails_application
       create_rails_application
@@ -75,10 +75,9 @@ module Externals
       end
 
 
-      #      Dir.chdir File.join(root_dir, 'test') do
-      #        `rm -rf workdir`
-      #      end
-      #XXX
+      Dir.chdir File.join(root_dir, 'test') do
+        `rm -rf workdir`
+      end
     end
 
 
@@ -109,15 +108,13 @@ module Externals
               puts(ignore_text = `svn propget svn:ignore vendor`)
               assert(ignore_text =~ /^rails$/)
 
-              Dir.chdir File.join('vendor', 'rails') do
-                assert `git show 92f944818eece9fe4bc62ffb39accdb71ebc32be` =~ /azimux/
-              end
-
               %w(foreign_key_migrations redhillonrails_core acts_as_list engines).each do |proj|
                 assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
               end
 
               assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+
+              assert File.exists?(File.join('vendor', 'rails', '.git'))
 
               assert File.exists?(File.join('modules', 'modules.txt'))
 
@@ -141,7 +138,7 @@ module Externals
             source = repository_dir('svn')
 
             if windows?
-              source = source.gsub(/\\/, "/")
+              source.gsub!(/\\/, "/")
             end
             source = "file:///#{source}"
 
@@ -179,6 +176,51 @@ module Externals
               end
 
               assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+            end
+          end
+        end
+      end
+    end
+
+    def test_uninstall
+      Dir.chdir File.join(root_dir, 'test') do
+        Dir.chdir 'workdir' do
+          `mkdir checkout`
+          Dir.chdir 'checkout' do
+            #source = File.join(root_dir, 'test', 'workdir', 'rails_app')
+            source = repository_dir('svn')
+
+            if windows?
+              source = source.gsub(/\\/, "/")
+              #source.gsub!(/^[A-Z]:[\/\\]/, "")
+            end
+            source = "file:///#{source}"
+
+            puts "About to checkout #{source}"
+            Ext.run "checkout", "--svn", source, "rails_app"
+
+            Dir.chdir 'rails_app' do
+              mp = Ext.new.main_project
+
+              projs = %w(foreign_key_migrations redhillonrails_core acts_as_list)
+              projs_i = projs.dup
+              projs_ni = []
+
+              #let's uninstall acts_as_list
+              Ext.run "uninstall", "acts_as_list"
+
+              projs_ni << projs_i.delete('acts_as_list')
+
+              mp.assert_e_dne_i_ni proc{|a|assert(a)}, projs, [], projs_i, projs_ni
+
+              Ext.run "uninstall", "-f", "foreign_key_migrations"
+
+              projs_ni << projs_i.delete('foreign_key_migrations')
+
+              projs_dne = []
+              projs_dne << projs.delete('foreign_key_migrations')
+
+              mp.assert_e_dne_i_ni proc{|a|assert(a)}, projs, projs_dne, projs_i, projs_ni
             end
           end
         end
