@@ -5,7 +5,7 @@ require 'externals/ext'
 module Externals
   class TestFreezeToRevision < TestCase
     include ExtTestCase
-    
+
     def setup
       destroy_rails_application
       create_rails_application
@@ -54,10 +54,9 @@ module Externals
         end
         `rm -rf workdir`
       end
-      #      Dir.chdir File.join(root_dir, 'test') do
-      #        `rm -rf workdir`
-      #      end
-      #XXX
+      Dir.chdir File.join(root_dir, 'test') do
+        `rm -rf workdir`
+      end
     end
 
 
