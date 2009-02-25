@@ -2,6 +2,7 @@ require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
+require 'find'
 
 root_dir = File.dirname(__FILE__)
 
@@ -10,7 +11,7 @@ If you plan on running the tests, you only need
  to run this once."
 task :prep_test do
   Dir.chdir File.join(root_dir, 'test') do
-    
+
     puts `rm -rf cleanreps`
     Dir.mkdir('cleanreps')
     Dir.chdir('cleanreps') do
@@ -21,11 +22,59 @@ task :prep_test do
         puts `svnadmin load #{p} < #{p}.svn`
       end
 
-      %w(acts_as_list rails).each do |p|
+      puts `git clone --bare git://github.com/azimux/engines.git engines.git`
+
+      %w(acts_as_list).each do |p|
         puts `git clone --bare git://github.com/rails/#{p}.git #{p}.git`
       end
-      
-      puts `git clone --bare git://github.com/azimux/engines.git engines.git`
+
+      if File.exists? 'C:\\tmp\\rails'
+        puts `cp -a C:\\tmp\\rails full_rails`
+      elsif File.exists? '/tmp/rails'
+        puts `cp -a /tmp/rails full_rails`
+      else
+        puts `git clone git://github.com/rails/rails.git full_rails`
+      end
+      puts `cp -a full_rails fake_rails`
+
+      #let's make the repo smaller by removing all but 1 file from each
+      #directory to save time
+      Dir.chdir 'fake_rails' do
+        puts `rm -rf .git`
+        raise "something wrong with rm" if File.exists? '.git'
+      end
+
+      dirs = []
+      Find.find('fake_rails') do |f|
+        dirs << f if File.directory?(f)
+      end
+
+      dirs.each do |dir|
+        files = Dir.entries(dir)
+
+        Dir.chdir(dir) do
+          files = files.select {|e|e != ".gitignore" && File.file?(e)}.sort
+          files.shift #let's keep the first file in the list.
+          files.each do |file|
+            File.delete(file)
+          end
+        end
+      end
+
+      raise "why is rails already here?" if File.exists? 'rails.git'
+
+      Dir.mkdir('rails.git')
+
+      Dir.chdir('rails.git') do
+        puts `git init --bare`
+      end
+
+      Dir.chdir 'fake_rails' do
+        puts `git init`
+        puts `git add .`
+        puts `git commit -m "rails with all but 1 file per directory deleted"`
+        puts `git push ../rails.git master`
+      end
     end
   end
 end
