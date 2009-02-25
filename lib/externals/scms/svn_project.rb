@@ -141,7 +141,7 @@ module Externals
     def ignore_text(path)
       ignore_text = ''
       Dir.chdir File.dirname(path) do
-        puts(ignore_text = `svn propget svn:ignore`)
+        ignore_text = `svn propget svn:ignore`
       end
       ignore_text
     end
