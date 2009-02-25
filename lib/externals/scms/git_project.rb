@@ -99,11 +99,11 @@ module Externals
     end
 
     def ignore_contains? path
-      text = ignore_text
+      text = ignore_text(path)
       text.split(/\n/).detect {|r| r.strip == path.strip}
     end
 
-    def ignore_text
+    def ignore_text(path)
       return '' unless File.exists? '.gitignore'
       retval = ''
       open('.gitignore') do |f|
@@ -112,16 +112,40 @@ module Externals
       retval
     end
 
-    def append_ignore path
-      rows = ignore_text || ''
-      return if rows.index path.strip
+    def ignore_rows(path)
+      rows = ignore_text(path) || ''
 
       rows = rows.split(/\n/)
-      rows << path.strip
 
       rows.delete_if {|row| row =~ /^\s*$/}
 
+      rows
+    end
 
+    def append_ignore path
+      rows = ignore_rows(path)
+
+      return if rows.index path.strip
+
+      rows << path.strip
+
+      open('.gitignore', 'w') do |f|
+        f.write "#{rows.compact.join("\n")}\n"
+      end
+    end
+
+    def drop_from_ignore path
+      ir = ignore_rows(path)
+      rows = ir.select {|row| row.strip != path.strip}
+
+      if rows.size == ir.size
+        raise "row not found matching #{path} in .gitignore"
+      end
+
+      if ir.size - rows.size != 1
+        raise "More than one row found matching #{path} in .gitignore"
+      end
+      
       open('.gitignore', 'w') do |f|
         f.write "#{rows.compact.join("\n")}\n"
       end

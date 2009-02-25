@@ -99,17 +99,43 @@ module Externals
       parent = File.dirname(path)
       child = File.basename(path)
 
-      rows = ignore_text(path).split(/\n/)
+      rows = ignore_rows(path)
 
       return if rows.detect {|row| row.strip == child.strip}
 
       rows << child.strip
 
-      rows.delete_if {|row| row =~ /^\s*$/}
-
       Dir.chdir(parent) do
         puts `svn propset svn:ignore "#{rows.compact.join("\n")}\n" .`
       end
+    end
+
+    def drop_from_ignore path
+      parent = File.dirname(path)
+      child = File.basename(path).strip
+
+      ir = ignore_rows(path)
+      rows = ir.select {|row| row.strip != child}
+
+      if rows.size == ir.size
+        raise "row not found matching #{path} in svn propget svn:ignore"
+      end
+
+      if ir.size - rows.size != 1
+        raise "More than one row found matching #{path} in svn propget svn:ignore"
+      end
+      
+      Dir.chdir(parent) do
+        puts `svn propset svn:ignore "#{rows.compact.join("\n")}\n" .`
+      end
+    end
+
+    def ignore_rows(path)
+      rows = ignore_text(path).split(/\n/)
+
+      rows.delete_if {|row| row =~ /^\s*$/}
+      
+      rows
     end
 
     def ignore_text(path)
