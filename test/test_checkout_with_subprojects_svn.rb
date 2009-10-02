@@ -130,6 +130,56 @@ module Externals
       end
     end
 
+    def test_update_with_missing_subproject
+      Dir.chdir File.join(root_dir, 'test') do
+        Dir.chdir 'workdir' do
+          `mkdir update`
+          Dir.chdir 'update' do
+            source = repository_dir('svn')
+
+            if windows?
+              source = source.gsub(/\\/, "/")
+            end
+            source = "file:///#{source}"
+
+
+            puts "About to checkout #{source}"
+            Ext.run "checkout", "--svn", source, 'rails_app'
+
+            Dir.chdir 'rails_app' do
+              pretests = proc do
+                assert File.exists?('.svn')
+                assert !File.exists?(File.join('vendor', 'plugins', 'ssl_requirement', 'lib'))
+                assert File.read(".externals") =~ /rails/
+                assert File.read(".externals") !~ /ssl_requirement/
+              end
+
+              pretests.call
+
+              #add a project
+              Dir.chdir File.join(root_dir, 'test') do
+                Dir.chdir File.join('workdir', "rails_app") do
+                  #install a new project
+                  Ext.run "install", File.join(root_dir, 'test', 'cleanreps', 'ssl_requirement.git')
+
+                  SvnProject.add_all
+
+                  puts `svn commit -m "added another subproject (ssl_requirement)"`
+                end
+              end
+
+              pretests.call
+
+              #update the project and make sure ssl_requirement was added and checked out
+              Ext.run "update"
+              assert File.read(".externals") =~ /ssl_requirement/
+              assert File.exists?(File.join('vendor', 'plugins', 'ssl_requirement', 'lib'))
+            end
+          end
+        end
+      end
+    end
+
     def test_export_with_subproject
       Dir.chdir File.join(root_dir, 'test') do
         Dir.chdir 'workdir' do

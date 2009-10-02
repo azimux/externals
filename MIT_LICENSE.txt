@@ -1,4 +1,4 @@
-Copyright (c) 2008 Miles Georgi, Azimux.com, nopugs.com Consulting
+Copyright (c) 2008-2009 Miles Georgi, Azimux.com, nopugs.com Consulting
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation

@@ -24,7 +24,7 @@ task :prep_test do
 
       puts `git clone --bare git://github.com/azimux/engines.git engines.git`
 
-      %w(acts_as_list).each do |p|
+      %w(acts_as_list ssl_requirement).each do |p|
         puts `git clone --bare git://github.com/rails/#{p}.git #{p}.git`
       end
 
