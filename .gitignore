@@ -1,7 +1,5 @@
 .svn
 test/workdir
-test/repositories/*
-test/repositories/*
 test/applications/rails_app
 nbproject/
 *~

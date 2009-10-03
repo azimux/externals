@@ -130,7 +130,7 @@ module Externals
       end
     end
 
-    def test_update_with_missing_subproject
+    def test_update_with_missing_subproject_git
       Dir.chdir File.join(root_dir, 'test') do
         Dir.chdir 'workdir' do
           `mkdir update`
@@ -174,6 +174,56 @@ module Externals
               Ext.run "update"
               assert File.read(".externals") =~ /ssl_requirement/
               assert File.exists?(File.join('vendor', 'plugins', 'ssl_requirement', 'lib'))
+            end
+          end
+        end
+      end
+    end
+
+    def test_update_with_missing_subproject_svn
+      Dir.chdir File.join(root_dir, 'test') do
+        Dir.chdir 'workdir' do
+          `mkdir update`
+          Dir.chdir 'update' do
+            source = repository_dir('svn')
+
+            if windows?
+              source = source.gsub(/\\/, "/")
+            end
+            source = "file:///#{source}"
+
+
+            puts "About to checkout #{source}"
+            Ext.run "checkout", "--svn", source, 'rails_app'
+
+            Dir.chdir 'rails_app' do
+              pretests = proc do
+                assert File.exists?('.svn')
+                assert !File.exists?(File.join('vendor', 'plugins', 'empty_plugin', 'lib'))
+                assert File.read(".externals") =~ /rails/
+                assert File.read(".externals") !~ /empty_plugin/
+              end
+
+              pretests.call
+
+              #add a project
+              Dir.chdir File.join(root_dir, 'test') do
+                Dir.chdir File.join('workdir', "rails_app") do
+                  #install a new project
+                  Ext.run "install", "--svn", "file:///#{File.join(root_dir, 'test', 'cleanreps', 'empty_plugin')}"
+
+                  SvnProject.add_all
+
+                  puts `svn commit -m "added another subproject (empty_plugin)"`
+                end
+              end
+
+              pretests.call
+
+              #update the project and make sure ssl_requirement was added and checked out
+              Ext.run "update"
+              assert File.read(".externals") =~ /empty_plugin/
+              assert File.exists?(File.join('vendor', 'plugins', 'empty_plugin', 'lib'))
             end
           end
         end
