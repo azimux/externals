@@ -87,7 +87,7 @@ end
 
 gem_specification = Gem::Specification.new do |specification|
   specification.name = 'ext'
-  specification.version = '0.1.3'
+  specification.version = '0.1.4'
   specification.platform = Gem::Platform::RUBY
   specification.rubyforge_project = 'ext'
 

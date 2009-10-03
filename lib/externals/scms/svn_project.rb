@@ -43,9 +43,13 @@ module Externals
       if revision
         change_to_revision
       else
-        puts "updating #{path}:"
-        Dir.chdir path do
-          puts `svn up .`
+        if File.exists? path
+          puts "updating #{path}:"
+          Dir.chdir path do
+            puts `svn up .`
+          end
+        else
+          co(*args)
         end
       end
     end
@@ -124,7 +128,7 @@ module Externals
       if ir.size - rows.size != 1
         raise "More than one row found matching #{path} in svn propget svn:ignore"
       end
-      
+
       Dir.chdir(parent) do
         puts `svn propset svn:ignore "#{rows.compact.join("\n")}\n" .`
       end
@@ -134,7 +138,7 @@ module Externals
       rows = ignore_text(path).split(/\n/)
 
       rows.delete_if {|row| row =~ /^\s*$/}
-      
+
       rows
     end
 

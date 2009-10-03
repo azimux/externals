@@ -62,9 +62,13 @@ module Externals
       if revision
         change_to_branch_revision
       else
-        puts "updating #{path}:"
-        Dir.chdir path do
-          puts `git pull`
+        if File.exists? path
+          puts "updating #{path}:"
+          Dir.chdir path do
+            puts `git pull`
+          end
+        else
+          co(*args)
         end
       end
     end
@@ -145,7 +149,7 @@ module Externals
       if ir.size - rows.size != 1
         raise "More than one row found matching #{path} in .gitignore"
       end
-      
+
       open('.gitignore', 'w') do |f|
         f.write "#{rows.compact.join("\n")}\n"
       end
