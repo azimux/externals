@@ -166,15 +166,8 @@ module Externals
         return if empty
         raise "I was given no file_string" unless file_string
 
-        #        if !externals_file && File.exists?('.externals')
-        #          open('.externals', 'r') do |f|
-        #            externals_file = f.read
-        #          end
-        #        end
-
-        #externals_file ||= ""
-
-        titles = file_string.grep SECTION_TITLE_REGEX
+        titles = []
+        file_string.each_line {|line| titles << line if line =~ SECTION_TITLE_REGEX}
         bodies = file_string.split SECTION_TITLE_REGEX_NO_GROUPS
 
         if titles.size > 0 && bodies.size > 0
@@ -189,24 +182,6 @@ module Externals
           end
         end
       end
-
-      #      def projects
-      #        retval = []
-      #        sections.each do |section|
-      #          retval += section.projects
-      #        end
-      #
-      #        retval
-      #      end
-
-      #      def subprojects
-      #        retval = []
-      #        sections.each do |section|
-      #          retval += section.projects unless section.main?
-      #        end
-      #
-      #        retval
-      #      end
 
       def write path  # = ".externals"
         raise "no path given" unless path

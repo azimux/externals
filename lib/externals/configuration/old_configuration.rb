@@ -17,7 +17,7 @@ module Externals
         self.scm = scm
 
         self.title = SECTION_TITLE_REGEX.match(title_string)[1]
-        
+
         self.scm ||= self.title
 
         raise "Invalid section title: #{title_string}" unless title
@@ -87,12 +87,12 @@ module Externals
         title = title.to_s
         sections.detect {|section| section.title == title}
       end
-      
+
       def add_empty_section  title
         raise "Section already exists" if self[title]
         sections << Section.new("\n\n[#{title.to_s}]\n", "")
       end
-      
+
       def self.new_empty
         new nil, true
       end
@@ -102,7 +102,7 @@ module Externals
           self.file_string = ''
           return
         end
-        
+
         if !externals_file && File.exists?('.externals')
           open('.externals', 'r') do |f|
             externals_file = f.read
@@ -113,7 +113,8 @@ module Externals
 
         self.file_string = externals_file
 
-        titles = externals_file.grep SECTION_TITLE_REGEX
+        titles = []
+        externals_file.each_line {|line| titles << line if line =~ SECTION_TITLE_REGEX}
         bodies = externals_file.split SECTION_TITLE_REGEX_NO_GROUPS
 
         if titles.size > 0 && bodies.size > 0
@@ -146,7 +147,7 @@ module Externals
 
         retval
       end
-      
+
       def main_project
         sections.each do |section|
           return section.projects.first if section.main?
