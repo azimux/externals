@@ -4,7 +4,7 @@ module Externals
       #obj.send(:extend, Externals::RailsProjectType::Project)
       Externals::OldProject.send(:include, Externals::RailsProjectType::Project)
     end
-    
+
     class DefaultPathCalculator
       def default_path name
         if name
@@ -14,7 +14,7 @@ module Externals
         end
       end
     end
-    
+
     module Project
       def default_path
         if name
@@ -25,8 +25,8 @@ module Externals
       end
     end
   end
-  
-  
+
+
   class RailsDetector
     def self.detected?
       boot_path = File.join('config','boot.rb')

@@ -90,34 +90,12 @@ module Externals
         set_setting(key, value)
       end
 
-
-      #      def projects
-      #        return @projects if @projects
-      #
-      #        @projects = []
-      #
-      #        if main?
-      #          @projects = [Ext.project_class(self['scm']).new(".", :is_main)]
-      #        else
-      #          rows.each do |row|
-      #            if Project.project_line?(row)
-      #              @projects << Ext.project_class(title).new(row)
-      #            end
-      #          end
-      #          @projects
-      #        end
-      #      end
-
       def add_row(row)
         rows << row
 
         self.body_string = body_string.chomp + "\n#{row}\n"
         #clear_caches
       end
-
-      #      def clear_caches
-      #        @projects = nil
-      #      end
 
       def to_s
         "[#{title}]\n#{rows.join("\n")}"
