@@ -59,17 +59,17 @@ module Externals
     end
 
     def up *args
-      if revision
-        change_to_branch_revision
-      else
-        if File.exists? path
+      if File.exists? path
+        if revision
+          change_to_branch_revision
+        else
           puts "updating #{path}:"
           Dir.chdir path do
             puts `git pull`
           end
-        else
-          co(*args)
         end
+      else
+        co(*args)
       end
     end
 

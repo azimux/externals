@@ -40,17 +40,17 @@ module Externals
     end
 
     def up *args
-      if revision
-        change_to_revision
-      else
-        if File.exists? path
+      if File.exists? path
+        if revision
+          change_to_revision
+        else
           puts "updating #{path}:"
           Dir.chdir path do
             puts `svn up .`
           end
-        else
-          co(*args)
         end
+      else
+        co(*args)
       end
     end
 
