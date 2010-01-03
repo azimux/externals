@@ -10,7 +10,7 @@ module Externals
   #exit status
   OBSOLETE_EXTERNALS_FILE = 15
 
-
+  VERSION = '0.1.6'
   PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
 
   # Full commands operate on the main project as well as the externals
@@ -72,7 +72,7 @@ module Externals
       maintaining .externals"],
     [:upgrade_externals_file, "Converts the old format that stored
       as [main][svn][git] to [<path1>][<path2>]..."],
-
+    [:version, "Displays the version number of externals and exits."],
   ]
 
 
@@ -150,10 +150,13 @@ module Externals
       }
       opts.on("--help", "does the same as 'ext help'  If you use this with a command
         it will ignore the command and run help instead.") {main_options[:help] = true}
+      opts.on("--version", "Displays the version number of externals and then exits.
+        Same as 'ext version'") {
+        main_options[:version] = true
+      }
     end
 
     def self.run *arguments
-
       main_options = {}
       sub_options = {}
 
@@ -169,6 +172,7 @@ module Externals
       command &&= command.to_sym
 
       command = :help if main_options[:help]
+      command = :version if main_options[:version]
 
       if !command || command.to_s == ''
         puts "hey... you didn't tell me what you want to do."
@@ -186,7 +190,7 @@ module Externals
       Dir.chdir(main_options[:workdir] || ".") do
         if command == :upgrade_externals_file
           main_options[:upgrade_externals_file] = true
-        elsif command != :help
+        elsif command != :help && command != :version
           if externals_file_obsolete?
             puts "your .externals file Appears to be in an obsolete format"
             puts "Please run 'ext upgrade_externals_file' to migrate it to the new format"
@@ -713,6 +717,10 @@ Please use the --type option to tell ext which to use."
       end
 
       config.write('.externals')
+    end
+
+    def version(args, options)
+      puts Externals::VERSION
     end
 
     def self.project_type_detector name

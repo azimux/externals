@@ -6,6 +6,8 @@ require 'find'
 
 root_dir = File.dirname(__FILE__)
 
+require File.join(root_dir, 'lib', 'externals', 'ext')
+
 desc "Creates the starting repositories needed to run the tests.
 If you plan on running the tests, you only need
  to run this once."
@@ -87,7 +89,7 @@ end
 
 gem_specification = Gem::Specification.new do |specification|
   specification.name = 'ext'
-  specification.version = '0.1.5'
+  specification.version = Externals::VERSION
   specification.platform = Gem::Platform::RUBY
   specification.rubyforge_project = 'ext'
 
@@ -134,7 +136,7 @@ the main project.}
   specification.executables = ['ext']
   specification.default_executable = "ext"
 
-  specification.files = ['Rakefile', 'README', 'MIT_LICENSE.txt'] +
+  specification.files = ['Rakefile', 'README', 'MIT_LICENSE.txt', 'CHANGELOG'] +
     FileList['lib/**/*.rb']
   #specification.require_path = 'lib'
 end
