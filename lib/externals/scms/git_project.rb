@@ -172,7 +172,7 @@ module Externals
     end
 
     def extract_name s
-      if s =~ /\/([\w_-]+)(?:\.git)?$/
+      if s =~ /([^\/:]+?)(?:\.git|\.bundle)?$/
         $1
       end
     end
