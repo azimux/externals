@@ -1,22 +1,22 @@
 Externals is a project that allows you to use the workflow normally made
 possible by svn:externals in an SCM independent manner.
 
-Please report bugs to either http://rubyforge.org/projects/ext or 
+Please report bugs to either http://rubyforge.org/projects/ext or
 http://ext.lighthouseapp.com
 
 I was inspired to create this project because I had several projects that had
-a mix of plugins managed by git and by svn.  Git's submodule feature is 
-not exactly like svn:externals.  Basically, I don't like how you have to manually 
-checkout a branch, and I don't like git status not propagating through the 
+a mix of plugins managed by git and by svn.  Git's submodule feature is
+not exactly like svn:externals.  Basically, I don't like how you have to manually
+checkout a branch, and I don't like git status not propagating through the
 submodules.  Also, the branch tip doesn't automatically move with git-submodule.
-Subversion always checks out the branch tip for subprojects when performing a 
+Subversion always checks out the branch tip for subprojects when performing a
 checkout or update.
 
-Externals is designed such that adding support for a new SCM, or new project 
+Externals is designed such that adding support for a new SCM, or new project
 types is easy.
 
-The externals executable is called ext.  Commands come in a long form and a 
-short form.  The longer form applies the action to the main project.  The short 
+The externals executable is called ext.  Commands come in a long form and a
+short form.  The longer form applies the action to the main project.  The short
 forms apply the action to all sub projects.
 
 The commands and usage are as follows (from 'ext help'):
@@ -31,18 +31,19 @@ ext [OPTIONS] <command> [repository] [-b <branch>] [path]
     -b, --branch BRANCH              The branch you want the subproject to checkout when doing 'ext install'
     -f, --force_removal              When doing an uninstall of a subproject, remove it's files and subfolders, too.
     -w, --workdir DIR                The working directory to execute commands from.  Use this if for some reason you
-        cannot execute ext from the main project's directory (or if it's just inconvenient, such as in a script
-        or in a Capistrano task)
+                                     cannot execute ext from the main project's directory (or if it's just inconvenient,
+                                     such as in a script or in a Capistrano task)
         --help                       does the same as 'ext help'  If you use this with a command
-        it will ignore the command and run help instead.
-
+                                     it will ignore the command and run help instead.
+        --version                    Displays the version number of externals and then exits.
+                                     Same as 'ext version'
 
 
 Commands that apply to the main project or the .externals file:
 freeze, help, init, install, touch_emptydirs, uninstall, update_ignore, upgrade_externals_file
 
 freeze          Usage: ext freeze project [REVISION]
-                
+
                 Locks a subproject into a specific revision/branch.  If no
                 revision is supplied, the current revision/branch of the
                 project will be used.  You can specify the project by name
@@ -84,28 +85,30 @@ update_ignore   Adds all paths to subprojects that are
 upgrade_externals_fileConverts the old format that stored
                 as [main][svn][git] to [<path1>][<path2>]...
 
+version         Displays the version number of externals and exits.
+
 
 
 Commands that apply to the main project and all subprojects:
 checkout, export, status, update
 
 checkout        Usage: ext checkout <repository>
-                
+
                 Checks out <repository>, and checks out any subprojects
                 registered in <repository>'s .externals file.
 
 export          Usage: ext export <repository>
-                
+
                 Like checkout except this command fetches as little
                 history as possible.
 
 status          Usage: ext status
-                
+
                 Prints out the status of the main project, followed by
                 the status of each subproject.
 
 update          Usage: ext update
-                
+
                 Brings the main project, and all subprojects, up to the
                 latest version.
 
@@ -124,7 +127,7 @@ st              Like status, but skips the main project.
 up              Like update, but skips the main project.
 
 The externals project is copyright 2008 by Miles Georgi, nopugs.com, azimux.com
-and is released under the MIT license.  
+and is released under the MIT license.
 
 The license is available in the same directory as this README
 file and is named MIT_LICENSE.txt

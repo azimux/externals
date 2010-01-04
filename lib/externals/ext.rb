@@ -10,7 +10,7 @@ module Externals
   #exit status
   OBSOLETE_EXTERNALS_FILE = 15
 
-  VERSION = '0.1.6'
+  VERSION = '0.1.7'
   PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
 
   # Full commands operate on the main project as well as the externals
