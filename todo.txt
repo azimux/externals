@@ -1,1 +1,5 @@
-update won't checkout newly added subprojects
+If the install fails, don't add the project to the .externals file
+Add CVS support
+Add documentation
+
+When revision is present, a pull should still be performed on git projects.

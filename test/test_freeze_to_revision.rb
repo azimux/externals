@@ -33,6 +33,10 @@ module Externals
             Ext.run "install", "--svn", 'file:///' + File.join(root_dir, 'test', 'cleanreps', proj)
           end
 
+          Dir.chdir File.join('vendor', 'plugins', 'foreign_key_migrations') do
+            assert `svn info` !~ /^.*:\s*2\s*$/i
+          end
+
           Ext.run "freeze", "foreign_key_migrations", "2"
           Ext.run "freeze", "acts_as_list", "9baff190a52c05cc542bfcaa7f77a91ce669f2f8"
 
@@ -91,12 +95,12 @@ module Externals
                 end
 
                 Dir.chdir 'foreign_key_migrations' do
-                  assert `svn info` =~ /^Revision:\s*2\s*$/i
+                  assert `svn info` =~ /^.*:\s*2\s*$/i
                 end
               end
 
               %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
-                assert File.exists?(File.join('vendor', 'plugins',proj, 'lib'))
+                assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
               end
             end
           end
