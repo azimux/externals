@@ -99,12 +99,18 @@ module Externals
     def create_rails_application
       Dir.mkdir applications_dir unless File.exists?(applications_dir)
       Dir.chdir applications_dir do
-        if windows?
-          puts `ruby C:\\ruby\\bin\\rails rails_app`
-        else
+        if rails_version =~ /^3([^\d]|$)/
+          puts `rails new rails_app`
+        elsif rails_version =~ /^2([^\d]|$)/
           puts `rails rails_app`
+        else
+          raise "can't determine rails version"
         end
       end
+    end
+
+    def rails_version
+      /[\d\.]+/.match(`rails --version`)[0]
     end
 
     def windows?
