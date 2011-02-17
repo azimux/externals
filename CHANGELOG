@@ -1,3 +1,8 @@
+February 17, 2011 Version 1.8 released
+- Fixes a compatibility issue with jruby (thanks to Patrik Sundberg)
+- Fixes some issues with recognizing rails 3 projects and testing with
+  rails 3 installed
+
 1/3/2010 Version 1.6 released
 - Fixes a problem that can occur if ext is symlinked (thanks to Olmo Maldonado)
 - Added --version command line option
