@@ -4,7 +4,7 @@ require 'externals/configuration/configuration'
 require 'externals/configuration/old_configuration'
 require 'optparse'
 require 'externals/command'
-require 'extensions/symbol'
+require 'externals/extensions/symbol'
 
 module Externals
   #exit status
@@ -84,8 +84,8 @@ module Externals
 
 
   class Ext
-    Dir.entries(File.join(File.dirname(__FILE__), '..', 'extensions')).each do |extension|
-      require "extensions/#{extension}" if extension =~ /.rb$/
+    Dir.entries(File.join(File.dirname(__FILE__), 'extensions')).each do |extension|
+      require "externals/extensions/#{extension}" if extension =~ /.rb$/
     end
 
     Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','scms')).each do |project|
@@ -198,7 +198,7 @@ module Externals
           end
         end
 
-        new(main_options).send(command, args, sub_options)
+        self.new(main_options).send(command, args, sub_options)
       end
     end
 

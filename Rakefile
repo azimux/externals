@@ -6,6 +6,8 @@ require 'find'
 
 root_dir = File.dirname(__FILE__)
 
+$LOAD_PATH << File.join(root_dir, 'lib')
+
 require File.join(root_dir, 'lib', 'externals', 'ext')
 
 desc "Creates the starting repositories needed to run the tests.

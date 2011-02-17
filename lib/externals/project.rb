@@ -1,4 +1,4 @@
-require 'extensions/symbol'
+require 'externals/extensions/symbol'
 
 module Externals
   VALID_ATTRIB = [:name, :path, :repository, :branch, :type, :scm, :revision
