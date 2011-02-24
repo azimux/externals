@@ -10,7 +10,7 @@ module Externals
   #exit status
   OBSOLETE_EXTERNALS_FILE = 15
 
-  VERSION = '0.1.84'
+  VERSION = '0.1.85'
   PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
 
   # Full commands operate on the main project as well as the externals
@@ -553,7 +553,7 @@ that you are installing. Use an option to specify it
       #path = "."
       #main_project = nil
       scm = options[:scm]
-      #scm ||= infer_scm(repository)
+      scm ||= infer_scm(repository)
 
       if !scm
         scm ||= configuration['.']

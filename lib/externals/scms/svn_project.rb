@@ -67,12 +67,17 @@ module Externals
 
     def self.scm_path? path
       return true if path =~ /^svn(\+ssh)?:/
+
+# Look for http(s)://svn.*/*
       if path =~ /^https?:\/\/([\w+\-_]+)\.(?:[\w+\-_]+\.)*[\w\-_]+(?:\/|$)/
         return true if $1.downcase == "svn"
+      end
 
-        if path =~ /^https?:\/\/(?:[\w_\-]+\.)*[\w\-_]+\/(\w+)\//
-          return true if $1.downcase == "svn"
-        end
+# Look for http(s)://*/svn/*
+#	test = path.sub(/^https?:\/\/(?:[\w+\-_]+\.?)+\/(\w+)/, "MATCHED")
+#	puts "RESULT: #{test} - #{$1}"
+      if path =~ /^https?:\/\/(?:[\w+\-_]+\.?)+\/(\w+)/
+        return true if $1.downcase == "svn"
       end
 
       false
