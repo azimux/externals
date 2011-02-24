@@ -9,18 +9,22 @@ module Externals
 
     def co *args
       (rmdircmd = "rmdir #{path}")
-
       `#{rmdircmd}` if File.exists? path
-      puts(svncocmd = "svn co #{repository} #{path}")
-      puts `#{svncocmd}`
 
-      change_to_revision
+      opts = ""
+      opts += args[1] if args[0] == "opts"
+
+      rev = ""
+      rev += "-r #{revision}" if revision
+
+      puts(svncocmd = "svn #{opts} co #{rev} #{repository} #{path}")
+      puts `#{svncocmd}`
     end
 
     def change_to_revision
       if revision
         Dir.chdir path do
-          puts `svn up -r #{revision}`
+          puts `svn --non-interactive --trust-server-cert up -r #{revision}`
         end
       end
     end
@@ -46,11 +50,11 @@ module Externals
         else
           puts "updating #{path}:"
           Dir.chdir path do
-            puts `svn up .`
+            puts `svn --non-interactive --trust-server-cert up .`
           end
         end
       else
-        co(*args)
+        co("opts","--non-interactive --trust-server-cert", *args)
       end
     end
 
