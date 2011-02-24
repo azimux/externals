@@ -553,7 +553,7 @@ that you are installing. Use an option to specify it
       #path = "."
       #main_project = nil
       scm = options[:scm]
-      scm ||= infer_scm(repository)
+      #scm ||= infer_scm(repository)
 
       if !scm
         scm ||= configuration['.']
