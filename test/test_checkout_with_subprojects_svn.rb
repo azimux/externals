@@ -220,7 +220,13 @@ module Externals
                   #freeze it to a revision
                   Ext.run "freeze", subproject,  revision
                   Dir.chdir File.join("vendor",'plugins', subproject) do
-                    assert `git show HEAD` =~ /^\s*commit\s*#{revision}\s*$/i
+                    regex = /^\s*commit\s*#{revision}\s*$/i
+                    output = `git show HEAD`
+                    result = output =~ regex
+                    unless result
+                      puts "Expecting output to match #{regex} but it was: #{output}"
+                    end
+                    assert result
                   end
 
                   SvnProject.add_all

@@ -3,12 +3,14 @@ require File.join(File.dirname(__FILE__), '..', 'project')
 
 module Externals
   class GitProject < Project
-
     def default_branch
       'master'
     end
 
-    def co *args
+    private
+    def co_or_up command
+      opts = resolve_opts(command)
+
       puts "path is #{path} repository is #{repository}"
       if path != '.'
         (rmdircmd = "rmdir #{path}")
@@ -19,22 +21,29 @@ module Externals
       dest = '' if dest == '.'
       dest = "\"#{dest}\"" if dest && !dest.empty?
 
-      puts(gitclonecmd = "git clone \"#{repository}\" #{dest}")
+      puts(gitclonecmd = "git #{opts} clone \"#{repository}\" #{dest}")
       puts `#{gitclonecmd}`
 
-      change_to_branch_revision
+      change_to_branch_revision(command)
     end
 
-    def change_to_branch_revision
+    public
+    def co *args
+      co_or_up "co"
+    end
+
+    def change_to_branch_revision command = ""
+      opts = resolve_opts(command)
+
       if branch
         Dir.chdir path do
-          puts `git checkout --track -b #{branch} origin/#{branch}`
+          puts `git #{opts} checkout --track -b #{branch} origin/#{branch}`
         end
       end
 
       if revision
         Dir.chdir path do
-          puts `git checkout #{revision}`
+          puts `git #{opts} checkout #{revision}`
         end
       end
     end
@@ -51,32 +60,32 @@ module Externals
 
       dest = "\"#{dest}\"" if dest && !dest.empty?
 
-      puts(gitclonecmd = "git clone --depth 1 \"#{repository}\" #{dest}")
+      puts(gitclonecmd = "git #{scm_opts_ex} clone --depth 1 \"#{repository}\" #{dest}")
 
       puts `#{gitclonecmd}`
 
-      change_to_branch_revision
+      change_to_branch_revision "ex"
     end
 
     def up *args
       if File.exists? path
         if revision
-          change_to_branch_revision
+          change_to_branch_revision "up"
         else
           puts "updating #{path}:"
           Dir.chdir path do
-            puts `git pull`
+            puts `git #{scm_opts_up} pull`
           end
         end
       else
-        co(*args)
+        co_or_up "up"
       end
     end
 
     def st *args
       puts "\nstatus for #{path}:"
       Dir.chdir path do
-        puts `git status`
+        puts `git #{scm_opts_st} status`
       end
     end
 
@@ -94,10 +103,13 @@ module Externals
       "git"
     end
 
+    install_scm_opts_methods
+
     def self.detected?
       File.exists? ".git"
     end
 
+    #this is a test helper method
     def self.add_all
       puts `git add .`
     end
@@ -157,7 +169,7 @@ module Externals
 
     def current_revision
       Dir.chdir path do
-        if `git show HEAD` =~ /^\s*commit\s*([0-9a-fA-F]*)\s*$/i
+        if `git #{scm_opts} show HEAD` =~ /^\s*commit\s*([0-9a-fA-F]*)\s*$/i
           $1
         end
       end
@@ -165,7 +177,7 @@ module Externals
 
     def current_branch
       Dir.chdir path do
-        if `git branch -a` =~ /^\s*\*\s*([^\s]*)\s*$/
+        if `git #{scm_opts} branch -a` =~ /^\s*\*\s*([^\s]*)\s*$/
           $1
         end
       end
