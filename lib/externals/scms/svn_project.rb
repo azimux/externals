@@ -84,7 +84,7 @@ module Externals
     end
 
     def self.fill_in_opts opts, main_options, sub_options
-      opts.on("--svn", "--subversion","-s", "same as '--scm svn'  Uses subversion to checkout/export the main project",
+      opts.on("--svn", "--subversion", "same as '--scm svn'  Uses subversion to checkout/export the main project",
         Integer) {sub_options[:scm] = main_options[:scm] = 'svn'}
     end
 
