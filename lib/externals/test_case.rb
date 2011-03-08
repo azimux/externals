@@ -100,9 +100,9 @@ module Externals
       Dir.mkdir applications_dir unless File.exists?(applications_dir)
       Dir.chdir applications_dir do
         if rails_version =~ /^3([^\d]|$)/
-          puts `rails new rails_app`
+          puts `#{rails_exe} new rails_app`
         elsif rails_version =~ /^2([^\d]|$)/
-          puts `rails rails_app`
+          puts `#{rails_exe} rails_app`
         else
           raise "can't determine rails version"
         end
@@ -110,7 +110,12 @@ module Externals
     end
 
     def rails_version
-      /[\d\.]+/.match(`rails --version`)[0]
+      /[\d\.]+/.match(`#{rails_exe} --version`)[0]
+    end
+
+    def rails_exe
+      "jruby -S rails"
+      "rails"
     end
 
     def windows?
