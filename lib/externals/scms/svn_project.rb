@@ -2,29 +2,34 @@ require File.join(File.dirname(__FILE__), '..', 'project')
 
 module Externals
   class SvnProject < Project
-
     def default_branch
       nil
     end
 
-    def co *args
+    private
+    def co_or_up command
+      opts = resolve_opts(command)
+
       (rmdircmd = "rmdir #{path}")
+
       `#{rmdircmd}` if File.exists? path
-
-      opts = ""
-      opts += args[1] if args[0] == "opts"
-
-      rev = ""
-      rev += "-r #{revision}" if revision
-
-      puts(svncocmd = "svn #{opts} co #{rev} #{repository} #{path}")
+      puts(svncocmd = "svn #{opts} co #{repository} #{path}")
       puts `#{svncocmd}`
+
+      change_to_revision command
     end
 
-    def change_to_revision
+    public
+    def co *args
+      co_or_up "co"
+    end
+
+    def change_to_revision command = ""
+      opts = resolve_opts(command)
+
       if revision
         Dir.chdir path do
-          puts `svn --non-interactive --trust-server-cert up -r #{revision}`
+          puts `svn #{opts} up -r #{revision}`
         end
       end
     end
@@ -39,29 +44,29 @@ module Externals
       end
 
       `#{rmdircmd}` if File.exists? path
-      puts(svncocmd = "svn export #{repository} #{path}")
+      puts(svncocmd = "svn #{scm_opts_ex} export #{repository} #{path}")
       puts `#{svncocmd}`
     end
 
     def up *args
       if File.exists? path
         if revision
-          change_to_revision
+          change_to_revision "up"
         else
           puts "updating #{path}:"
           Dir.chdir path do
-            puts `svn --non-interactive --trust-server-cert up .`
+            puts `svn #{scm_opts_up} up .`
           end
         end
       else
-        co("opts","--non-interactive --trust-server-cert", *args)
+        co_or_up "up"
       end
     end
 
     def st *args
       puts "\nstatus for #{path}:"
       Dir.chdir path do
-        puts `svn status`
+        puts `svn #{scm_opts_st} status`
       end
     end
 
@@ -73,9 +78,7 @@ module Externals
         return true if $1.downcase == "svn"
       end
 
-# Look for http(s)://*/svn*
-#	test = path.sub(/^https?:\/\/(?:[\w+\-_]+\.?)+\/(\w+)/, "MATCHED")
-#	puts "RESULT: #{test} - #{$1}"
+# Look for http(s)://*/svn/*
       if path =~ /^https?:\/\/(?:[\w+\-_]+\.?)+\/(\w+)/
         return true if $1.downcase.include? "svn"
       end
@@ -92,10 +95,13 @@ module Externals
       "svn"
     end
 
+    install_scm_opts_methods
+
     def self.detected?
       File.exists? ".svn"
     end
 
+    #this is a test helper method
     def self.add_all
       status = `svn st`
 
@@ -119,7 +125,7 @@ module Externals
       rows << child.strip
 
       Dir.chdir(parent) do
-        puts `svn propset svn:ignore "#{rows.compact.join("\n")}\n" .`
+        puts `svn #{scm_opts} propset svn:ignore "#{rows.compact.join("\n")}\n" .`
       end
     end
 
@@ -139,7 +145,7 @@ module Externals
       end
 
       Dir.chdir(parent) do
-        puts `svn propset svn:ignore "#{rows.compact.join("\n")}\n" .`
+        puts `svn #{scm_opts} propset svn:ignore "#{rows.compact.join("\n")}\n" .`
       end
     end
 
@@ -154,14 +160,14 @@ module Externals
     def ignore_text(path)
       ignore_text = ''
       Dir.chdir File.dirname(path) do
-        ignore_text = `svn propget svn:ignore`
+        ignore_text = `svn #{scm_opts} propget svn:ignore`
       end
       ignore_text
     end
 
     def current_revision
       Dir.chdir path do
-        if `svn info` =~ /Revision:\s*(\d+)\s*$/
+        if `svn #{scm_opts} info` =~ /Revision:\s*(\d+)\s*$/
           $1
         end
       end
