@@ -10,7 +10,7 @@ module Externals
   #exit status
   OBSOLETE_EXTERNALS_FILE = 15
 
-  VERSION = '0.1.85'
+  VERSION = '0.1.8'
   PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
 
   # Full commands operate on the main project as well as the externals
@@ -250,12 +250,16 @@ module Externals
     end
 
     def projects
-      p = []
+      return @projects if @projects
+      @projects = []
       configuration.sections.each do |section|
-        p << Ext.project_class(section[:scm]||infer_scm(section[:repository])).new(
+        @projects << Ext.project_class(section[:scm]||infer_scm(section[:repository])).new(
           section.attributes.merge(:path => section.title))
       end
-      p
+      #let's set the parents of these projects
+      main = main_project
+      subprojects.each {|subproject| subproject.parent = main}
+      @projects
     end
 
     def subproject_by_name_or_path name
@@ -295,6 +299,7 @@ module Externals
 
     def reload_configuration
       @configuration = nil
+      @projects = nil
       configuration
     end
 
@@ -427,6 +432,7 @@ Please use
       end
       section[:revision] = revision
       configuration.write '.externals'
+      reload_configuration
 
       subproject_by_name_or_path(args[0]).up
     end
@@ -483,6 +489,7 @@ that you are installing. Use an option to specify it
 
       configuration.remove_section(project.path)
       configuration.write '.externals'
+      reload_configuration
 
       if options[:force_removal]
         Dir.chdir File.dirname(project.path) do
@@ -717,6 +724,7 @@ Please use the --type option to tell ext which to use."
       end
 
       config.write('.externals')
+      reload_configuration
     end
 
     def version(args, options)
@@ -775,5 +783,3 @@ Please use the --type option to tell ext which to use."
     end
   end
 end
-
-
