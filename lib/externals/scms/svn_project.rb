@@ -78,9 +78,9 @@ module Externals
         return true if $1.downcase == "svn"
       end
 
-# Look for http(s)://*/svn/*
+# Look for http(s)://*/*svn*/
       if path =~ /^https?:\/\/(?:[\w+\-_]+\.?)+\/(\w+)/
-        return true if $1.downcase == "svn"
+        return true if $1.downcase.include? "svn"
       end
 
       false
