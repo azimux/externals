@@ -126,6 +126,50 @@ st              Like status, but skips the main project.
 
 up              Like update, but skips the main project.
 
+
+PASSING OPTIONS TO THE UNDERLYING SCM
+-------------------------------------
+Sometimes it's convenient to have options passed to the underlying scm
+executable, like --trust-certid to svn, etc.  This can be done by editing the
+.externals file.  You can put scm_opts = <options> under the project you want,
+and it will be passed whenever externals calls the executable. You can specify
+an option to only be ran when doing co/ex/st/up by adding _co/_ex/_st/_up to
+the scm_opts option.
+
+EXAMPLE:
+
+[.]
+scm = git
+scm_opts = --verbose
+
+[vendor/plugins/some_plugin]
+scm = svn
+scm_opts = --trust-certid
+scm_opts_co = --non-interactive
+
+This type of a .externals file tells externals to pass
+" --non-interactive --trust-certid" to svn when doing a checkout of some_plugin.
+"--trust-certid" will be sent to all other calls to svn dealing with
+some_plugin.  "--verbose" will be passed to git on all calls dealing with the
+main project.
+
+You can pass options globally by setting <scm_name>_opts in the main project.
+
+EXAMPLE:
+
+[.]
+scm = svn
+svn_opts = --trust-certid
+svn_opts_co = --non-interactive
+
+[vendor/plugins/some_plugin]
+scm = svn
+
+This will pass "--non-interactive --trust-certid" to all co calls dealing with
+subversion projects, regardless of which project it is.
+
+
+
 The externals project is copyright 2008 by Miles Georgi, nopugs.com, azimux.com
 and is released under the MIT license.
 
