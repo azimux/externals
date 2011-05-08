@@ -6,6 +6,14 @@ module Externals
   class TestProjects < TestCase
     include ExtTestCase
 
+    def test_project_scm
+      assert_equal "svn", SvnProject.scm
+      assert_equal "git", GitProject.scm
+      assert_raise RuntimeError do
+        Project.scm
+      end
+    end
+
     def test_svn_global_opts
       Dir.chdir File.join(root_dir, 'test') do
         `rm -rf test_svn_global_opts`

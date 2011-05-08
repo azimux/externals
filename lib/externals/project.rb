@@ -39,14 +39,19 @@ module Externals
     end
 
     def self.scm
-      raise "subclass responsibility"
+      if self == Project
+        raise "subclass responsibility"
+      end
     end
+
     def scm
       self.class.scm
     end
+
     def self.default_branch
       raise "subclass responsibility"
     end
+
     def default_branch
       self.class.default_branch
     end
@@ -177,10 +182,15 @@ module Externals
 
 
     def self.inherited child
-      #create the <scm_name>_opts_co/ex/st/up and <scm_opts>_opts setting
-      #such as svn_opts and svn_opts_co from the main project (stored
-      #in the parrent attribute.)
-      def child.install_scm_opts_methods
+      child.class_eval do
+        def self.scm
+          @scm ||= /^([^:]*::)*([^:]+)Project$/.match(name)[2].downcase
+        end
+
+        #create the <scm_name>_opts_co/ex/st/up and <scm_opts>_opts setting
+        #such as svn_opts and svn_opts_co from the main project (stored
+        #in the parrent attribute.)
+
         raise unless scm && scm != ""
 
         #first we create global <scm_name>_opts accessors that will apply to all
@@ -225,7 +235,6 @@ module Externals
             attributes[name.to_sym] = value
           end
         end
-
       end
     end
 

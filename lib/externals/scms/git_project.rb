@@ -98,13 +98,6 @@ module Externals
         Integer) {sub_options[:scm] = main_options[:scm] = 'git'}
     end
 
-
-    def self.scm
-      "git"
-    end
-
-    install_scm_opts_methods
-
     def self.detected?
       File.exists? ".git"
     end

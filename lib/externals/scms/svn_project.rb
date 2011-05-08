@@ -73,12 +73,12 @@ module Externals
     def self.scm_path? path
       return true if path =~ /^svn(\+ssh)?:/
 
-# Look for http(s)://svn.*/*
+      # Look for http(s)://svn.*/*
       if path =~ /^https?:\/\/([\w+\-_]+)\.(?:[\w+\-_]+\.)*[\w\-_]+(?:\/|$)/
         return true if $1.downcase == "svn"
       end
 
-# Look for http(s)://*/*svn*/
+      # Look for http(s)://*/*svn*/
       if path =~ /^https?:\/\/(?:[\w+\-_]+\.?)+\/(\w+)/
         return true if $1.downcase.include? "svn"
       end
@@ -90,12 +90,6 @@ module Externals
       opts.on("--svn", "--subversion", "same as '--scm svn'  Uses subversion to checkout/export the main project",
         Integer) {sub_options[:scm] = main_options[:scm] = 'svn'}
     end
-
-    def self.scm
-      "svn"
-    end
-
-    install_scm_opts_methods
 
     def self.detected?
       File.exists? ".svn"
