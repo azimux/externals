@@ -1,7 +1,5 @@
 require 'externals/project'
-require 'externals/old_project'
 require 'externals/configuration/configuration'
-require 'externals/configuration/old_configuration'
 require 'optparse'
 require 'externals/command'
 require 'externals/extensions/symbol'
@@ -70,8 +68,6 @@ module Externals
       main project.  This is automatically performed by install,
       and so you probably only will run this if you are manually
       maintaining .externals"],
-    [:upgrade_externals_file, "Converts the old format that stored
-      as [main][svn][git] to [<path1>][<path2>]..."],
     [:version, "Displays the version number of externals and exits."],
   ]
 
@@ -90,10 +86,6 @@ module Externals
 
     Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','scms')).each do |project|
       require "externals/scms/#{project}" if project =~ /_project.rb$/
-    end
-
-    Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','old_scms')).each do |project|
-      require "externals/old_scms/#{project}" if project =~ /_project.rb$/
     end
 
     Dir.entries(PROJECT_TYPES_DIRECTORY).each do |type|
@@ -188,25 +180,7 @@ module Externals
 
 
       Dir.chdir(main_options[:workdir] || ".") do
-        if command == :upgrade_externals_file
-          main_options[:upgrade_externals_file] = true
-        elsif command != :help && command != :version
-          if externals_file_obsolete?
-            puts "your .externals file Appears to be in an obsolete format"
-            puts "Please run 'ext upgrade_externals_file' to migrate it to the new format"
-            exit OBSOLETE_EXTERNALS_FILE
-          end
-        end
-
         self.new(main_options).send(command, args, sub_options)
-      end
-    end
-
-    def self.externals_file_obsolete?
-      return false if !File.exists?('.externals')
-
-      open('.externals', 'r') do |f|
-        f.read =~ /^\s*\[git\]\s*$|^\s*\[main\]\s*$|^\s*\[svn\]\s*$/
       end
     end
 
@@ -306,31 +280,6 @@ module Externals
     def initialize options = {}
       super()
 
-      if options[:upgrade_externals_file]
-        type ||= options[:type]
-
-
-        if type
-          install_project_type type
-        else
-
-          possible_project_types = self.class.project_types.select do |project_type|
-            self.class.project_type_detector(project_type).detected?
-          end
-
-          if possible_project_types.size > 1
-            raise "We found multiple project types that this could be: #{possible_project_types.join(',')}
-Please use
- the --type option to tell ext which to use."
-          elsif possible_project_types.empty?
-            install_project_type OldConfiguration::Configuration.new[:main][:type]
-          else
-            install_project_type possible_project_types.first
-          end
-        end
-        return
-      end
-
       scm = configuration['.']
       scm = scm['scm'] if scm
       scm ||= options[:scm]
@@ -374,10 +323,6 @@ Please use
     end
     def self.project_class(scm)
       Externals.module_eval("#{scm.to_s.cap_first}Project", __FILE__, __LINE__)
-    end
-
-    def self.old_project_class(scm)
-      Externals.module_eval("Old#{scm.to_s.cap_first}Project", __FILE__, __LINE__)
     end
 
     def self.project_classes
@@ -704,29 +649,6 @@ Please use the --type option to tell ext which to use."
       reload_configuration
     end
 
-    def upgrade_externals_file args, options = {}
-      old = OldConfiguration::Configuration.new
-
-      config = Configuration::Configuration.new_empty
-
-      main = old['main']
-      config.add_empty_section '.'
-
-      config['.'][:scm] = main[:scm]
-      config['.'][:type] = main[:type]
-
-      old.subprojects.each do |subproject|
-        path = subproject.path
-        config.add_empty_section path
-        config[path][:repository] = subproject.repository
-        config[path][:scm] = subproject.scm
-        config[path][:branch] = subproject.branch if subproject.branch
-      end
-
-      config.write('.externals')
-      reload_configuration
-    end
-
     def version(args, options)
       puts Externals::VERSION
     end
@@ -736,16 +658,8 @@ Please use the --type option to tell ext which to use."
     end
 
     def install_project_type name
-      Externals.module_eval("#{name.classify}ProjectType", __FILE__, __LINE__).install
       self.path_calculator = Externals.module_eval("#{name.classify}ProjectType::DefaultPathCalculator", __FILE__, __LINE__)
     end
-    #
-    #
-    #    def self.determine_project_type path = "."
-    #      Dir.chdir path do
-    #        raise "not done"
-    #      end
-    #    end
 
     protected
     def do_checkout_or_export repository, path, options, sym

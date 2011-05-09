@@ -82,9 +82,6 @@ update_ignore   Adds all paths to subprojects that are
                 and so you probably only will run this if you are manually
                 maintaining .externals
 
-upgrade_externals_fileConverts the old format that stored
-                as [main][svn][git] to [<path1>][<path2>]...
-
 version         Displays the version number of externals and exits.
 
 
