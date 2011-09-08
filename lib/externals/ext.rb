@@ -246,7 +246,7 @@ module Externals
         p.name == name
       end
     end
-    alias :subproject :subproject_by_name_or_path 
+    alias :subproject :subproject_by_name_or_path
 
     def subprojects
       s = []
@@ -682,8 +682,11 @@ Please use the --type option to tell ext which to use."
           (such as --git or --svn)"
         end
 
-        main_project = self.class.project_class(scm).new(:repository => repository,
-          :path => path)
+        main_project = self.class.project_class(scm).new(
+          :repository => repository,
+          :path => path,
+          :branch => options[:branch]
+        )
 
         main_project.send(sym)
         main_project

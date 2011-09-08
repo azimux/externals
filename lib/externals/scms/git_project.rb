@@ -1,6 +1,5 @@
 require File.join(File.dirname(__FILE__), '..', 'project')
 
-
 module Externals
   class GitProject < Project
     def default_branch
@@ -32,18 +31,57 @@ module Externals
       co_or_up "co"
     end
 
+    private
+    # make sure you have already entered Dir.chdir(path) in your calling code!
+    def branch_exists branch_name
+      opts = resolve_opts
+      `git #{opts} branch -a` =~ /^\s*#{branch_name}\s*$/
+    end
+
+    public
     def change_to_branch_revision command = ""
       opts = resolve_opts(command)
 
       if branch
-        Dir.chdir path do
-          puts `git #{opts} checkout --track -b #{branch} origin/#{branch}`
+        cb = current_branch
+
+        # This allows the main project to be checked out to a directory
+        # that doesn't match it's name.
+        project_path = if path == "."
+          name
+        else
+          path
+        end
+
+        Dir.chdir project_path do
+          if cb != branch
+            # let's see if the branch exists in the remote repository
+            # and if not, fetch it.
+            if !branch_exists("origin/#{branch}")
+              puts `git #{opts} fetch`
+            end
+
+            # if the local branch doens't exist, add --track -b
+            if branch_exists(branch)
+              puts `git #{opts} checkout #{branch}`
+            else
+              puts `git #{opts} checkout --track -b #{branch} origin/#{branch}`
+            end
+            unless $? == 0
+              raise "Could not checkout origin/#{branch}"
+            end
+          end
         end
       end
 
       if revision
         Dir.chdir path do
+          puts `git #{opts} fetch`
+          puts `git #{opts} pull`
           puts `git #{opts} checkout #{revision}`
+          unless $? == 0
+            raise "Could not checkout #{revision}"
+          end
         end
       end
     end
@@ -70,7 +108,7 @@ module Externals
     def up *args
       if File.exists? path
         puts "updating #{path}:"
-        if revision
+        if revision || branch
           change_to_branch_revision "up"
         else
           Dir.chdir path do

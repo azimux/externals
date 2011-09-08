@@ -1,9 +1,5 @@
 If the install fails, don't add the project to the .externals file
 Add CVS support
 Add documentation
-
-When revision is present, a fetch should still be performed on git projects.
-
-add unfreeze
-
-ext checkout -b should correctly set the branch of the main project
+Add Mercurial support
+add unfreeze feature
