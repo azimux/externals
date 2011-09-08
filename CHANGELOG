@@ -1,4 +1,8 @@
-March 29, 20011 Version 1.0.0 released
+July 19, 2011 Version 1.0.1 released
+- Fixed a small bug preventing subprojects with a revision associated with them
+  from having their name displayed when updating.
+
+March 29, 2011 Version 1.0.0 released
 - Added scm_opts and <scm_name>_opts .externals file options with
   (_co|_ex|_st|_up) suffixed versions for passing options to the underlying
   SCM executable.

@@ -6,7 +6,6 @@ module Externals
   class TestCheckoutWithSubprojectsGit < TestCase
     include ExtTestCase
 
-
     def setup
       destroy_rails_application
       create_rails_application
@@ -31,8 +30,12 @@ module Externals
 
           #install a couple svn managed subprojects
           %w(foreign_key_migrations redhillonrails_core).each do |proj|
-            Ext.run "install", "--svn", 'file:///' + File.join(root_dir, 'test', 'cleanreps', proj)
+            Ext.run "install", "--svn", 'file:///' +
+              File.join(root_dir, 'test', 'cleanreps', proj)
           end
+
+          #install project with a branch
+          Ext.run "install", File.join(root_dir, 'test', 'cleanreps', 'engines.git'), "-b", "edge"
 
           GitProject.add_all
           `git commit -m "created empty rails app with some subprojects"`
@@ -70,9 +73,76 @@ module Externals
               assert File.exists?('.git')
 
               assert File.exists?('.gitignore')
-              mp = Ext.new.main_project
 
-              mp.assert_e_dne_i_ni proc{|a|assert(a)},%w(foreign_key_migrations redhillonrails_core acts_as_list)
+              ext = Ext.new
+              main_project = ext.main_project
+              engines = ext.subproject("engines")
+
+              main_project.assert_e_dne_i_ni proc{|a|assert(a)},%w(foreign_key_migrations redhillonrails_core acts_as_list)
+
+              # let's test switching branches via altering .externals and running "ext up"
+              assert_equal "master", main_project.current_branch
+              assert_equal "edge", engines.current_branch
+              assert_equal "edge", ext.configuration["vendor/plugins/engines"]["branch"]
+
+              #let's create a branch for the main project called 'new_branch' and a
+              #branch for the engines subproject called 'new_branch' and make sure
+              #that checking one out and doing "ext up" correctly changes the branch
+              #of the subproject
+
+              #create a remote git branch...
+              make_new_branch = proc do
+                `git push origin master:new_branch`
+                raise unless $? == 0
+
+                `git fetch origin`
+                raise unless $? == 0
+
+                `git checkout --track -b new_branch origin/new_branch`
+                raise unless $? == 0
+              end
+
+              make_new_branch.call
+              assert_equal "new_branch", main_project.current_branch
+              assert_equal "edge", engines.current_branch
+
+              Dir.chdir File.join(%w(vendor plugins engines)) do
+                make_new_branch.call
+              end
+              assert_equal "new_branch", main_project.current_branch
+              assert_equal "new_branch", engines.current_branch
+
+              #update .externals
+              ext.configuration["vendor/plugins/engines"]["branch"] = "new_branch"
+              ext.configuration.write
+
+              ext = Ext.new
+              assert_equal "new_branch", ext.configuration["vendor/plugins/engines"]["branch"]
+
+              `git add .externals`
+              raise unless $? == 0
+              `git commit -m "changed branch on engines subproject"`
+              raise unless $? == 0
+              `git push`
+              raise unless $? == 0
+
+              `git checkout master`
+              raise unless $? == 0
+
+              assert_equal "master", main_project.current_branch
+              assert_equal "new_branch", engines.current_branch
+
+              Ext.run "up"
+              assert_equal "master", main_project.current_branch
+              assert_equal "edge", engines.current_branch
+
+              `git checkout new_branch`
+              assert_equal "new_branch", main_project.current_branch
+              assert_equal "edge", engines.current_branch
+
+              Ext.run "up"
+              assert_equal "new_branch", main_project.current_branch
+              assert_equal "new_branch", engines.current_branch
             end
           end
         end
@@ -115,5 +185,6 @@ module Externals
         end
       end
     end
+
   end
 end

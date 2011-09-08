@@ -50,10 +50,10 @@ module Externals
 
     def up *args
       if File.exists? path
+        puts "updating #{path}:"
         if revision
           change_to_revision "up"
         else
-          puts "updating #{path}:"
           Dir.chdir path do
             puts `svn #{scm_opts_up} up .`
           end

@@ -161,7 +161,7 @@ module Externals
         end
       end
 
-      def write path  # = ".externals"
+      def write path = ".externals"
         raise "no path given" unless path
         open(path, 'w') do |f|
           f.write to_s

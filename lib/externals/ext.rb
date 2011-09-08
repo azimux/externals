@@ -8,7 +8,7 @@ module Externals
   #exit status
   OBSOLETE_EXTERNALS_FILE = 15
 
-  VERSION = '1.0.0'
+  VERSION = '1.0.1'
   PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
 
   # Full commands operate on the main project as well as the externals
@@ -246,6 +246,7 @@ module Externals
         p.name == name
       end
     end
+    alias :subproject :subproject_by_name_or_path 
 
     def subprojects
       s = []
