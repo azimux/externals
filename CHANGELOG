@@ -1,3 +1,9 @@
+September 8, 2011 Version 1.0.2 released
+- For git, fixed bug preventing "ext up" from changing the branches of subprojects as expected.
+- For git, fixed bug preventing "ext checkout -b <branch_name>" from functioning as expected.
+- Updating with revisions/branches should now do a fetch when using git to make sure
+  that new tags and branches are added.
+
 July 19, 2011 Version 1.0.1 released
 - Fixed a small bug preventing subprojects with a revision associated with them
   from having their name displayed when updating.

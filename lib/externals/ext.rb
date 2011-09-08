@@ -5,10 +5,7 @@ require 'externals/command'
 require 'externals/extensions/symbol'
 
 module Externals
-  #exit status
-  OBSOLETE_EXTERNALS_FILE = 15
-
-  VERSION = '1.0.1'
+  VERSION = '1.0.2'
   PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
 
   # Full commands operate on the main project as well as the externals

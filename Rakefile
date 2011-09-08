@@ -1,7 +1,7 @@
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
-require 'rake/gempackagetask'
+require 'rdoc/task'
+require 'rubygems/package_task'
 require 'find'
 
 root_dir = File.dirname(__FILE__)
@@ -143,6 +143,6 @@ the main project.}
   #specification.require_path = 'lib'
 end
 
-Rake::GemPackageTask.new(gem_specification) do |package|
+Gem::PackageTask.new(gem_specification) do |package|
   package.need_zip = package.need_tar = false
 end
