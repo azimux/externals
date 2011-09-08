@@ -90,27 +90,23 @@ module Externals
               #that checking one out and doing "ext up" correctly changes the branch
               #of the subproject
 
-              #create a remote git branch...
-              make_new_branch = proc do
-                `git push origin master:new_branch`
-                raise unless $? == 0
+              `git push origin master:new_branch`
+              raise unless $? == 0
 
-                `git fetch origin`
-                raise unless $? == 0
+              `git fetch origin`
+              raise unless $? == 0
 
-                `git checkout --track -b new_branch origin/new_branch`
-                raise unless $? == 0
-              end
+              `git checkout --track -b new_branch origin/new_branch`
+              raise unless $? == 0
 
-              make_new_branch.call
               assert_equal "new_branch", main_project.current_branch
               assert_equal "edge", engines.current_branch
 
               Dir.chdir File.join(%w(vendor plugins engines)) do
-                make_new_branch.call
+                `git push origin master:new_branch`
+                raise unless $? == 0
               end
               assert_equal "new_branch", main_project.current_branch
-              assert_equal "new_branch", engines.current_branch
 
               #update .externals
               ext.configuration["vendor/plugins/engines"]["branch"] = "new_branch"
@@ -130,7 +126,7 @@ module Externals
               raise unless $? == 0
 
               assert_equal "master", main_project.current_branch
-              assert_equal "new_branch", engines.current_branch
+              assert_equal "edge", engines.current_branch
 
               Ext.run "up"
               assert_equal "master", main_project.current_branch
@@ -141,6 +137,24 @@ module Externals
               assert_equal "edge", engines.current_branch
 
               Ext.run "up"
+              assert_equal "new_branch", main_project.current_branch
+              assert_equal "new_branch", engines.current_branch
+
+              `git checkout master`
+              assert_equal "master", main_project.current_branch
+            end
+
+            #now let's check it out again to test "ext checkout -b new_branch"
+            `rm -rf rails_app`
+            raise unless $? == 0
+
+            Ext.run "checkout", "--git", "-b", "new_branch", source
+
+            Dir.chdir 'rails_app' do
+              ext = Ext.new
+              main_project = ext.main_project
+              engines = ext.subproject("engines")
+
               assert_equal "new_branch", main_project.current_branch
               assert_equal "new_branch", engines.current_branch
             end
