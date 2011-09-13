@@ -83,8 +83,6 @@ module Externals
     def destroy_test_modules_repository scm
       puts(rmcmd = "rm -rf #{modules_repository_dir(scm)}")
       puts `#{rmcmd}`
-      puts(rmcmd = "rm -rf #{modules_repository_dir(scm)}")
-      puts `#{rmcmd}`
     end
 
     def modules_repository_dir scm = nil

@@ -3,3 +3,5 @@ Add CVS support
 Add documentation
 Add Mercurial support
 add unfreeze feature
+fix rails3 project detection
+ext init --type=rails causes scm to be set to "rails" in .externals

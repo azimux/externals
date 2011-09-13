@@ -141,7 +141,9 @@ module Externals
               assert_equal "new_branch", engines.current_branch
 
               `git checkout master`
+              Ext.run "up"
               assert_equal "master", main_project.current_branch
+               assert_equal "edge", engines.current_branch
             end
 
             #now let's check it out again to test "ext checkout -b new_branch"
