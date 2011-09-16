@@ -120,6 +120,7 @@ module Externals
 
       Dir.chdir(parent) do
         puts `svn #{scm_opts} propset svn:ignore "#{rows.compact.join("\n")}\n" .`
+        raise "Could not ignore path, something went wrong in svn." unless $? == 0
       end
     end
 

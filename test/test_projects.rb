@@ -6,6 +6,16 @@ module Externals
   class TestProjects < TestCase
     include ExtTestCase
 
+    def setup
+      teardown
+    end
+
+    def teardown
+      Dir.chdir File.join(root_dir, 'test') do
+        `rm -rf test_svn_global_opts`
+      end
+    end
+
     def test_project_scm
       assert_equal "svn", SvnProject.scm
       assert_equal "git", GitProject.scm

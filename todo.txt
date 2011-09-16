@@ -5,3 +5,4 @@ Add Mercurial support
 add unfreeze feature
 fix rails3 project detection
 ext init --type=rails causes scm to be set to "rails" in .externals
+better organize tests in preparation for adding support for more SCMs

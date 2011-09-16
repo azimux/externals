@@ -6,111 +6,10 @@ module Externals
   class TestSvnBranches < TestCase
     include ExtTestCase
 
-    def setup
-      destroy_rails_application
-      create_rails_application
-      destroy_test_repository_with_branches 'svn'
-      initialize_test_repository_with_branches 'svn'
-      destroy_test_modules_repository_with_branches 'svn'
-      create_test_modules_repository_with_branches 'svn'
-
-
-      # this file doesn't delete properly in Windows for some reason when using rm.
-      Dir.chdir File.join(root_dir, 'test') do
-        parts = 'workdir/checkout/rails_app/vendor/plugins/foreign_key_migrations/lib/red_hill_consulting/foreign_key_migrations/active_record/connection_adapters/.svn/text-base/table_definition.rb.svn-base'.split('/')
-        if File.exists? File.join(*parts)
-          Dir.chdir File.join(*(parts[0..-2])) do
-            File.delete parts[-1]
-          end
-        end
-
-        `rm -rf workdir`
-        repo_url =
-          [
-          "file:///#{repository_dir_with_branches('svn')}",
-        ].join "/"
-        #        if windows?
-        #          repo_url = repo_url.gsub(/\\/, "/")
-        #        end
-
-        puts `svn co #{[repo_url, "current"].join("/")} rails_app`
-        raise unless $? == 0
-
-        Dir.chdir File.join('workdir', "rails_app") do
-          puts `cp -r #{rails_application_dir}/* .`
-          raise unless $? == 0
-
-          SvnProject.add_all
-
-          Ext.run "init"
-          raise " could not create .externals"  unless File.exists? '.externals'
-          %w(rails acts_as_list).each do |proj|
-            Ext.run "install", File.join(root_dir, 'test', 'cleanreps', "#{proj}.git")
-          end
-
-          #install a couple svn managed subprojects
-          %w(foreign_key_migrations redhillonrails_core).each do |proj|
-            Ext.run "install", "--svn", "file:///#{File.join(root_dir, 'test', 'cleanreps', proj)}"
-          end
-
-          #install project with a git branch
-          Ext.run "install", File.join(root_dir, 'test', 'cleanreps', 'engines.git'), "-b", "edge"
-
-          #install project with a non-default path and svn branching
-          Ext.run "install", "--svn",
-            "file:///#{modules_repository_dir_with_branches('svn')}",
-            "-b", "current"
-          "modules"
-
-          SvnProject.add_all
-
-          puts `svn commit -m "created empty rails app with some subprojects"`
-          raise unless $? == 0
-
-          # now let's make a branch in the main project called new_branch
-          `svn copy #{
-          [repo_url, "current"].join("/")
-} #{[repo_url, "branches", "new_branch"].join("/")}`
-          raise unless $? == 0
-
-          # let's make a branch in a git subproject:
-          Dir.chdir File.join(%w(vendor plugins engines)) do
-            `git push origin master:branch1`
-            raise unless $? == 0
-          end
-
-          # let's make a branch in an svn subproject:
-          `svn copy #{
-          [modules_repository_dir_with_branches('svn'), "current"].join("/")
-} #{[modules_repository_dir_with_branches('svn'), "branches", "branch2"].join("/")}`
-          raise unless $? == 0
-
-          # let's update the .externals file in new_branch to reflect these changes
-          `svn switch #{[repo_url, "branches", "new_branch"].join("/")}`
-          raise unless $? == 0
-
-          ext = Ext.new
-          ext.configuration["vendor/plugins/engines"]["branch1"] = "new_branch"
-          ext.configuration["vendor/plugins/modules"]["branch2"] = "new_branch"
-          ext.configuration.write
-
-          SvnProject.add_all
-          `svn commit -m "updated .externals to point to new branches."`
-          raise unless $? == 0
-
-          #let's modify a file in modules...
-          Dir.chdir "modules" do
-            `echo 'line 2 of modules.txt ... this is branch2!' > modules.txt`
-            raise unless $? == 0
-          end
-        end
-      end
-    end
-
     def teardown
       destroy_rails_application
-      destroy_test_repository_with_branches 'svn'
-      destroy_test_modules_repository_with_branches 'svn'
+      destroy_with_svn_branches_repository
+      destroy_with_svn_branches_modules_repository
 
       Dir.chdir File.join(root_dir, 'test') do
         parts = 'workdir/checkout/rails_app/vendor/plugins/foreign_key_migrations/lib/red_hill_consulting/foreign_key_migrations/active_record/connection_adapters/.svn/text-base/table_definition.rb.svn-base'.split('/')
@@ -121,20 +20,25 @@ module Externals
         end
         `rm -rf workdir`
       end
-
-
-      Dir.chdir File.join(root_dir, 'test') do
-        `rm -rf workdir`
-      end
     end
 
+    def setup
+      teardown
+
+      create_rails_application
+
+      create_with_svn_branches_repository
+      create_with_svn_branches_modules_repository
+      initialize_with_svn_branches_repository
+      initialize_with_svn_branches_modules_repository
+    end
 
     def test_checkout_with_subproject
       Dir.chdir File.join(root_dir, 'test') do
         Dir.chdir 'workdir' do
           `mkdir checkout`
           Dir.chdir 'checkout' do
-            source = "file:///#{repository_dir_with_branches('svn')}"
+            source = with_svn_branches_repository_url
             if windows?
               source = source.gsub(/\\/, "/")
             end
@@ -146,11 +50,11 @@ module Externals
               assert File.exists?('.svn')
 
               %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
-                puts(ignore_text = `svn propget svn:ignore vendor/plugins`)
+                ignore_text = `svn propget svn:ignore vendor/plugins`
                 assert(ignore_text =~ /^#{proj}$/)
               end
 
-              puts(ignore_text = `svn propget svn:ignore vendor`)
+              ignore_text = `svn propget svn:ignore vendor`
               assert(ignore_text =~ /^rails$/)
 
               %w(foreign_key_migrations redhillonrails_core acts_as_list engines).each do |proj|
@@ -234,12 +138,10 @@ module Externals
         Dir.chdir 'workdir' do
           `mkdir update`
           Dir.chdir 'update' do
-            source = repository_dir_with_branches('svn')
-
+            source = with_svn_branches_repository_url
             if windows?
               source = source.gsub(/\\/, "/")
             end
-            source = "file:///#{source}"
 
 
             puts "About to checkout #{source}"
@@ -287,12 +189,10 @@ module Externals
         Dir.chdir 'workdir' do
           `mkdir update`
           Dir.chdir 'update' do
-            source = repository_dir_with_branches('svn')
-
+            source = with_svn_branches_repository_url
             if windows?
               source = source.gsub(/\\/, "/")
             end
-            source = "file:///#{source}"
 
 
             puts "About to checkout #{source}"
@@ -356,14 +256,8 @@ module Externals
         Dir.chdir 'workdir' do
           `mkdir update`
           Dir.chdir 'update' do
-            source = repository_dir_with_branches('svn')
-
-            if windows?
-              source = source.gsub(/\\/, "/")
-            end
-            source = "file:///#{source}"
-
-
+            source = with_svn_branches_repository_url
+            
             puts "About to checkout #{source}"
             Ext.run "checkout", "--svn", "-b", "current", source, 'rails_app'
 
@@ -406,14 +300,8 @@ module Externals
         Dir.chdir 'workdir' do
           `mkdir export`
           Dir.chdir 'export' do
-            source = repository_dir_with_branches('svn')
-
-            if windows?
-              source.gsub!(/\\/, "/")
-            end
-            source = "file:///#{source}"
-
-
+            source = with_svn_branches_repository_url
+            
             puts "About to export #{source}"
             Ext.run "export", "--svn", "-b", "current", source, 'rails_app'
 
@@ -458,14 +346,8 @@ module Externals
         Dir.chdir 'workdir' do
           `mkdir checkout`
           Dir.chdir 'checkout' do
-            source = repository_dir_with_branches('svn')
-
-            if windows?
-              source = source.gsub(/\\/, "/")
-              #source.gsub!(/^[A-Z]:[\/\\]/, "")
-            end
-            source = "file:///#{source}"
-
+            source = with_svn_branches_repository_url
+           
             puts "About to checkout #{source}"
             Ext.run "checkout", "--svn", "-b", "current", source, "rails_app"
 
