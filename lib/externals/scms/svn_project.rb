@@ -13,7 +13,14 @@ module Externals
       (rmdircmd = "rmdir #{path}")
 
       `#{rmdircmd}` if File.exists? path
-      puts(svncocmd = "svn #{opts} co #{repository} #{path}")
+
+      url = repository
+
+      if branch
+        url = [url, branch].join("/")
+      end
+
+      puts(svncocmd = "svn #{opts} co #{url} #{path}")
       puts `#{svncocmd}`
 
       change_to_revision command

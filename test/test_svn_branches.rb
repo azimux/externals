@@ -51,6 +51,8 @@ module Externals
 
               %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
                 ignore_text = `svn propget svn:ignore vendor/plugins`
+                puts "ignore_text is:"
+                puts ignore_text
                 assert(ignore_text =~ /^#{proj}$/)
               end
 
@@ -190,10 +192,6 @@ module Externals
           `mkdir update`
           Dir.chdir 'update' do
             source = with_svn_branches_repository_url
-            if windows?
-              source = source.gsub(/\\/, "/")
-            end
-
 
             puts "About to checkout #{source}"
             Ext.run "checkout", "--svn", source, "-b", "current", 'rails_app'
@@ -210,27 +208,33 @@ module Externals
 
               #add a project
               Dir.chdir File.join(root_dir, 'test') do
-                Dir.chdir File.join('workdir', "rails_app") do
-                  #install a new project
-                  Ext.run "install", File.join(root_dir, 'test', 'cleanreps', "#{subproject}.git")
-                  Dir.chdir File.join("vendor",'plugins', subproject) do
-                    assert `git show HEAD` !~ /^\s*commit\s*#{revision}\s*$/i
-                  end
-                  #freeze it to a revision
-                  Ext.run "freeze", subproject,  revision
-                  Dir.chdir File.join("vendor",'plugins', subproject) do
-                    regex = /^\s*commit\s*#{revision}\s*$/i
-                    output = `git show HEAD`
-                    result = output =~ regex
-                    unless result
-                      puts "Expecting output to match #{regex} but it was: #{output}"
+                Dir.chdir File.join('workdir') do
+                  Ext.run "checkout", "--svn", source, "-b", "current", 'rails_app'
+
+                  Dir.chdir File.join("rails_app") do
+                    #install a new project
+                    Ext.run "install", File.join(root_dir, 'test', 'cleanreps', "#{subproject}.git")
+                    Dir.chdir File.join("vendor",'plugins', subproject) do
+                      assert `git show HEAD` !~ /^\s*commit\s*#{revision}\s*$/i
                     end
-                    assert result
+                    #freeze it to a revision
+                    Ext.run "freeze", subproject,  revision
+                    Dir.chdir File.join("vendor",'plugins', subproject) do
+                      regex = /^\s*commit\s*#{revision}\s*$/i
+                      output = `git show HEAD`
+                      result = output =~ regex
+                      unless result
+                        puts "Expecting output to match #{regex} but it was: #{output}"
+                      end
+                      assert result
+                    end
+
+                    SvnProject.add_all
+
+                    puts `svn commit -m "added another subproject (#{subproject}) frozen to #{revision}"`
                   end
 
-                  SvnProject.add_all
-
-                  puts `svn commit -m "added another subproject (#{subproject}) frozen to #{revision}"`
+                  `rm -rf rails_app`
                 end
               end
 
@@ -257,7 +261,7 @@ module Externals
           `mkdir update`
           Dir.chdir 'update' do
             source = with_svn_branches_repository_url
-            
+
             puts "About to checkout #{source}"
             Ext.run "checkout", "--svn", "-b", "current", source, 'rails_app'
 
@@ -301,7 +305,7 @@ module Externals
           `mkdir export`
           Dir.chdir 'export' do
             source = with_svn_branches_repository_url
-            
+
             puts "About to export #{source}"
             Ext.run "export", "--svn", "-b", "current", source, 'rails_app'
 
@@ -347,7 +351,7 @@ module Externals
           `mkdir checkout`
           Dir.chdir 'checkout' do
             source = with_svn_branches_repository_url
-           
+
             puts "About to checkout #{source}"
             Ext.run "checkout", "--svn", "-b", "current", source, "rails_app"
 

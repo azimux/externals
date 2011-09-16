@@ -243,10 +243,10 @@ module Externals
 
             Ext.run "init"
 
-#            #this line is necessary as ext can't perform the necessary
-#            ignores otherwise.
-#            SvnProject.add_all
-#
+            # this line is necessary as ext can't perform the necessary
+            # ignores otherwise if vendor and vendor/plugins haven't been added
+            SvnProject.add_all
+
             raise " could not create .externals"  unless File.exists? '.externals'
             %w(rails acts_as_list).each do |proj|
               Ext.run "install", File.join(root_dir, 'test', 'cleanreps', "#{proj}.git")
