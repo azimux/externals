@@ -241,7 +241,7 @@ module Externals
             puts `cp -r #{rails_application_dir}/* .`
             raise unless $? == 0
 
-            Ext.run "init"
+            Ext.run "init", "-b", "current"
 
             # this line is necessary as ext can't perform the necessary
             # ignores otherwise if vendor and vendor/plugins haven't been added
@@ -288,8 +288,8 @@ module Externals
             raise unless $? == 0
 
             ext = Ext.new
-            ext.configuration["vendor/plugins/engines"]["branch1"] = "new_branch"
-            ext.configuration["modules"]["branch2"] = "new_branch"
+            ext.configuration["vendor/plugins/engines"]["branch"] = "branch1"
+            ext.configuration["modules"]["branch"] = "branches/branch2"
             ext.configuration.write
 
             SvnProject.add_all
@@ -329,7 +329,8 @@ module Externals
             puts `svn switch #{
             [repo_url, "branches", "branch2"].join("/")
 }`
-            `echo 'line 1 of modules.txt ... this is branch2!' > modules.txt`
+            raise unless $? == 0
+            `echo 'line 2 of modules.txt ... this is branch2!' > modules.txt`
             SvnProject.add_all
             puts `svn commit -m "changed modules.txt"`
             raise unless $? == 0

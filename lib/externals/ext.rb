@@ -635,10 +635,22 @@ Please use the --type option to tell ext which to use."
       end
 
       config = Configuration::Configuration.new_empty
-
       raise ".externals already exists" if File.exists?('.externals')
 
       config.add_empty_section '.'
+
+      # If we are using subversion, we should warn about not setting a branch
+      if scm == "svn"
+        if options[:branch]
+          config['.'][:repository] = SvnProject.extract_repository(
+            SvnProject.info_url,
+            options[:branch]
+            )
+        elsif args[0]
+          config['.'][:repository] = args[0].strip
+        else
+        end
+      end
 
       config['.'][:scm] = scm
       config['.'][:type] = type if type

@@ -85,14 +85,18 @@ module Externals
               assert_equal "current", ext.configuration["modules"]["branch"]
 
               `svn switch #{[source, "branches", "new_branch"].join("/")}`
+              ext = Ext.new
+              main_project = ext.main_project
+              engines = ext.subproject("engines")
+              modules = ext.subproject("modules")
 
               assert_equal "branches/new_branch", main_project.current_branch
 
               assert_equal "edge", engines.current_branch
-              assert_equal "edge", ext.configuration["vendor/plugins/engines"]["branch"]
+              assert_equal "branch1", ext.configuration["vendor/plugins/engines"]["branch"]
 
               assert_equal "current", modules.current_branch
-              assert_equal "current", ext.configuration["modules"]["branch"]
+              assert_equal "branches/branch2", ext.configuration["modules"]["branch"]
 
               Ext.run "up"
 
@@ -101,20 +105,25 @@ module Externals
               assert_equal "branch1", engines.current_branch
               assert_equal "branch1", ext.configuration["vendor/plugins/engines"]["branch"]
 
-              assert_equal "branch2", modules.current_branch
-              assert_equal "branch2", ext.configuration["modules"]["branch"]
+              assert_equal "branches/branch2", modules.current_branch
+              assert_equal "branches/branch2", ext.configuration["modules"]["branch"]
 
               assert File.read(File.join('modules', 'modules.txt')) =~
                 /line 2 of modules.txt ... this is branch2!/
 
               `svn switch #{[source, "current"].join("/")}`
+              ext = Ext.new
+              main_project = ext.main_project
+              engines = ext.subproject("engines")
+              modules = ext.subproject("modules")
+
               assert_equal "current", main_project.current_branch
 
               assert_equal "branch1", engines.current_branch
-              assert_equal "branch1", ext.configuration["vendor/plugins/engines"]["branch"]
+              assert_equal "edge", ext.configuration["vendor/plugins/engines"]["branch"]
 
-              assert_equal "branch2", modules.current_branch
-              assert_equal "branch2", ext.configuration["modules"]["branch"]
+              assert_equal "branches/branch2", modules.current_branch
+              assert_equal "current", ext.configuration["modules"]["branch"]
               assert File.read(File.join('modules', 'modules.txt')) =~
                 /line 2 of modules.txt ... this is branch2!/
 
@@ -161,13 +170,18 @@ module Externals
 
               #add a project
               Dir.chdir File.join(root_dir, 'test') do
-                Dir.chdir File.join('workdir', "rails_app") do
-                  #install a new project
-                  Ext.run "install", File.join(root_dir, 'test', 'cleanreps', 'ssl_requirement.git')
+                `mkdir rails_app`
+                Dir.chdir 'workdir' do
+                  Ext.run "checkout", "--svn", "-b", "current", source, 'rails_app'
 
-                  SvnProject.add_all
+                  Dir.chdir "rails_app" do
+                    #install a new project
+                    Ext.run "install", File.join(root_dir, 'test', 'cleanreps', 'ssl_requirement.git')
 
-                  puts `svn commit -m "added another subproject (ssl_requirement)"`
+                    SvnProject.add_all
+
+                    puts `svn commit -m "added another subproject (ssl_requirement)"`
+                  end
                 end
               end
 
@@ -277,13 +291,19 @@ module Externals
 
               #add a project
               Dir.chdir File.join(root_dir, 'test') do
-                Dir.chdir File.join('workdir', "rails_app") do
-                  #install a new project
-                  Ext.run "install", "--svn", "file:///#{File.join(root_dir, 'test', 'cleanreps', 'empty_plugin')}"
+                `mkdir rails_app`
+                Dir.chdir 'workdir' do
+                  Ext.run "checkout", "--svn", "-b", "current", source, 'rails_app'
 
-                  SvnProject.add_all
+                  Dir.chdir "rails_app" do
+                    #install a new project
+                    Ext.run "install", "--svn",
+                      "file:///#{File.join(root_dir, 'test', 'cleanreps', 'empty_plugin')}"
 
-                  puts `svn commit -m "added another subproject (empty_plugin)"`
+                    SvnProject.add_all
+
+                    puts `svn commit -m "added another subproject (empty_plugin)"`
+                  end
                 end
               end
 

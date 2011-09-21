@@ -3,32 +3,33 @@ require File.join(File.dirname(__FILE__), '..', 'project')
 module Externals
   class SvnProject < Project
     def default_branch
-      nil
-    end
-
-    private
-    def co_or_up command
-      opts = resolve_opts(command)
-
-      (rmdircmd = "rmdir #{path}")
-
-      `#{rmdircmd}` if File.exists? path
-
-      url = repository
-
-      if branch
-        url = [url, branch].join("/")
-      end
-
-      puts(svncocmd = "svn #{opts} co #{url} #{path}")
-      puts `#{svncocmd}`
-
-      change_to_revision command
+      raise "There is no default_branch for SvnProject"
     end
 
     public
     def co *args
-      co_or_up "co"
+      # delete path if not empty
+      rmdircmd = "rmdir #{path}"
+      `#{rmdircmd}` if File.exists? path
+
+      if File.exists? path
+        up
+      else
+        opts = resolve_opts "co"
+
+        url = repository
+
+        if branch
+          require_repository
+          url = [url, branch].join("/")
+        end
+
+        puts(svncocmd = "svn #{opts} co #{url} #{path}")
+        puts `#{svncocmd}`
+        raise unless $? == 0
+
+        change_to_revision "co"
+      end
     end
 
     def change_to_revision command = ""
@@ -42,9 +43,16 @@ module Externals
     end
 
     def ex *args
+      # delete path if not empty
       (rmdircmd = "rmdir #{path}")
+      `#{rmdircmd}`
 
       url = repository
+
+      if branch
+        require_repository
+        url = [url, branch].join("/")
+      end
 
       if revision
         url += "@#{revision}"
@@ -55,9 +63,31 @@ module Externals
       puts `#{svncocmd}`
     end
 
+    def switch branch_name
+      require_repository
+      if current_branch != branch_name
+        Dir.chdir path do
+          `svn #{scm_opts} switch #{[repository, branch_name].join("/")}`
+          unless $? == 0
+            raise
+          end
+        end
+      end
+    end
+
     def up *args
+      # delete path if not empty
+      rmdircmd = "rmdir #{path}"
+      `#{rmdircmd}` if File.exists? path
+
+
       if File.exists? path
         puts "updating #{path}:"
+
+        if branch
+          switch branch
+        end
+
         if revision
           change_to_revision "up"
         else
@@ -66,7 +96,7 @@ module Externals
           end
         end
       else
-        co_or_up "up"
+        co
       end
     end
 
@@ -113,6 +143,54 @@ module Externals
 
     def ignore_contains? path
       ignore_text(path) =~ Regexp.new("^\\s*#{File.basename(path)}\\s*$")
+    end
+
+    def current_branch
+      require_repository
+      branch = info_url.gsub(repository, "")
+      if branch == repository
+        raise "Could not determine branch from URL #{info_url}.
+    Does not appear have a substring of #{repository}"
+      end
+      if branch !~ /^\//
+        raise "Was expecting the branch and repository to be separated by '/'
+      Please file an issue about this at http://github.com/azimux/externals"
+      end
+      branch.gsub(/^\//, "")
+    end
+
+    def self.extract_repository url, branch
+      repository = url.gsub(branch, "")
+      if url == repository
+        raise "Could not determine repository from URL #{info_url}.
+    Does not appear to have the branch #{branch} as a substring"
+      end
+      if repository !~ /\/$/
+        raise "Was expecting the branch and repository to be separated by '/'
+      Please file an issue about this at http://github.com/azimux/externals"
+      end
+      repository.gsub(/\/$/, "")
+    end
+
+    def require_repository
+      if repository.nil? || repository.empty?
+        url = info_url
+        url = "svn+ssh://server/path/repository" unless url
+        puts "to use any branching features with a subversion project, the
+repository must be present in the .externals file.
+
+See http://nopugs.com/ext-svn-branches for more info
+
+The name of the branch should be excluded from the repository URL.
+
+You might need to change your .externals file to contain something like this:
+
+[.]
+scm = svn
+repository = #{info_url}
+        "
+        raise "Cannot use subversion branching features without a repository in .externals file"
+      end
     end
 
     def append_ignore path
@@ -172,6 +250,18 @@ module Externals
         if `svn #{scm_opts} info` =~ /Revision:\s*(\d+)\s*$/
           $1
         end
+      end
+    end
+
+    def self.info_url scm_opts = ""
+      if `svn #{scm_opts} info` =~ /^\s*URL:\s*([^\s]+)\s*$/
+        $1
+      end
+    end
+
+    def info_url
+      Dir.chdir path do
+        self.class.info_url scm_opts
       end
     end
 
