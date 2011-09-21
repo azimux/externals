@@ -86,18 +86,16 @@ module Externals
     def with_svn_branches_modules_repository_url
       url = "file:///#{with_svn_branches_modules_repository_dir}"
       if windows?
-        url.gsub(/\\/, "/")
-      else
-        url
+        url.gsub!(/\\/, "/")
       end
+      url.gsub("file:////", 'file:///')
     end
     def with_svn_branches_repository_url
       url = "file:///#{with_svn_branches_repository_dir}"
       if windows?
-        url.gsub(/\\/, "/")
-      else
-        url
+        url.gsub!(/\\/, "/")
       end
+      url.gsub("file:////", 'file:///')
     end
 
     def with_svn_branches_modules_repository_name
