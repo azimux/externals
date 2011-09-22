@@ -285,6 +285,9 @@ module Externals
             `svn switch #{[repo_url, "branches", "new_branch"].join("/")}`
             raise unless $? == 0
 
+            # let's remove rails from this branch
+            Ext.run "uninstall", "-f", "rails"
+
             ext = Ext.new
             ext.configuration["vendor/plugins/engines"]["branch"] = "branch1"
             ext.configuration["modules"]["branch"] = "branches/branch2"

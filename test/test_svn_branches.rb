@@ -85,6 +85,10 @@ module Externals
               assert_equal "current", ext.configuration["modules"]["branch"]
 
               `svn switch #{[source, "branches", "new_branch"].join("/")}`
+              unless $? == 0
+                raise
+              end
+
               ext = Ext.new
               main_project = ext.main_project
               engines = ext.subproject("engines")
@@ -128,6 +132,15 @@ module Externals
                 /line 2 of modules.txt ... this is branch2!/
 
               Ext.run "up"
+              ext = Ext.new
+              main_project = ext.main_project
+              engines = ext.subproject("engines")
+              modules = ext.subproject("modules")
+
+              assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+
+              assert File.exists?(File.join('vendor', 'rails', '.git'))
+
               assert_equal "current", main_project.current_branch
 
               assert_equal "edge", engines.current_branch
@@ -135,6 +148,80 @@ module Externals
 
               assert_equal "current", modules.current_branch
               assert_equal "current", ext.configuration["modules"]["branch"]
+              assert File.read(File.join('modules', 'modules.txt')) !~
+                /line 2 of modules.txt ... this is branch2!/
+              assert File.read(File.join('modules', 'modules.txt')) =~ /line1 of/
+
+              # let's test the switch command.
+              capture = StringIO.new
+              begin
+                $stdout = capture
+
+                Ext.run "switch", "branches/new_branch"
+
+                ext = Ext.new
+                main_project = ext.main_project
+                engines = ext.subproject("engines")
+                modules = ext.subproject("modules")
+
+              ensure
+                $stdout = STDOUT
+              end
+              capture = capture.string
+
+              assert_equal "branches/new_branch", main_project.current_branch
+
+              assert_equal "branch1", engines.current_branch
+              assert_equal "branch1", ext.configuration["vendor/plugins/engines"]["branch"]
+
+              assert_equal "branches/branch2", modules.current_branch
+              assert_equal "branches/branch2", ext.configuration["modules"]["branch"]
+
+              assert capture =~ /WARNING:/
+              assert capture =~ /rm\s+-rf?\s+vendor.rails/
+              assert capture.scan(/rm/).size == 1
+
+              `rm -rf vendor/rails`
+              unless $? == 0
+                raise
+              end
+
+              assert File.read(File.join('modules', 'modules.txt')) =~
+                /line 2 of modules.txt ... this is branch2!/
+
+              capture = StringIO.new
+              begin
+                $stdout = capture
+
+                Ext.run "switch", "current"
+                ext = Ext.new
+                main_project = ext.main_project
+                engines = ext.subproject("engines")
+                modules = ext.subproject("modules")
+
+              ensure
+                $stdout = STDOUT
+              end
+
+              capture = capture.string
+
+              assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+
+              assert File.exists?(File.join('vendor', 'rails', '.git'))
+
+
+              assert_equal "current", main_project.current_branch
+
+              assert_equal "edge", engines.current_branch
+              assert_equal "edge", ext.configuration["vendor/plugins/engines"]["branch"]
+
+              assert_equal "current", modules.current_branch
+              assert_equal "current", ext.configuration["modules"]["branch"]
+
+              assert capture !~ /WARNING:/
+              assert capture !~ /rm\s+-rf?\s+vendor.rails/
+              assert capture.scan(/rm/).size == 0
+
               assert File.read(File.join('modules', 'modules.txt')) !~
                 /line 2 of modules.txt ... this is branch2!/
               assert File.read(File.join('modules', 'modules.txt')) =~ /line1 of/

@@ -51,6 +51,10 @@ module Externals
       feature offered by the SCM of the main project.  If the SCM
       type is not obvious from the repository URL, use the --scm,
       --git, or --svn flags."],
+    [:switch, "ext switch <branch_name>",
+      "Changes to the named branch <branch_name> and updates any
+      subprojects and applies any changes that have been made to the
+      .externals file."],
     [:touch_emptydirs, "Recurses through all directories from the
       top and adds a .emptydir file to any empty directories it
       comes across.  Useful for dealing with SCMs that refuse to
@@ -75,20 +79,19 @@ module Externals
 
   COMMANDS = FULL_COMMANDS + SHORT_COMMANDS + MAIN_COMMANDS
 
+  Dir.entries(File.join(File.dirname(__FILE__), 'extensions')).each do |extension|
+    require "externals/extensions/#{extension}" if extension =~ /.rb$/
+  end
+
+  Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','scms')).each do |project|
+    require "externals/scms/#{project}" if project =~ /_project.rb$/
+  end
+
+  Dir.entries(PROJECT_TYPES_DIRECTORY).each do |type|
+    require File.join(PROJECT_TYPES_DIRECTORY, type) if type =~ /\.rb$/
+  end
 
   class Ext
-    Dir.entries(File.join(File.dirname(__FILE__), 'extensions')).each do |extension|
-      require "externals/extensions/#{extension}" if extension =~ /.rb$/
-    end
-
-    Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','scms')).each do |project|
-      require "externals/scms/#{project}" if project =~ /_project.rb$/
-    end
-
-    Dir.entries(PROJECT_TYPES_DIRECTORY).each do |type|
-      require File.join(PROJECT_TYPES_DIRECTORY, type) if type =~ /\.rb$/
-    end
-
     attr_accessor :path_calculator
 
     def self.project_types
@@ -539,6 +542,70 @@ by creating the .externals file manually"
       self.class.new({}).st [], {} #args, options
     end
 
+    def switch args, options
+      branch = args[0]
+
+      options ||= {}
+      scm = options[:scm]
+
+      if !scm
+        scm ||= configuration['.']
+        scm &&= scm['scm']
+      end
+
+      if !scm
+        possible_project_classes = self.class.project_classes.select do |project_class|
+          project_class.detected?
+        end
+
+        raise "Could not determine this projects scm" if  possible_project_classes.empty?
+        if possible_project_classes.size > 1
+          raise "This project appears to be managed by multiple SCMs: #{
+          possible_project_classes.map(&:to_s).join(',')}
+Please explicitly declare the SCM (by using --git or --svn, or,
+by creating the .externals file manually"
+        end
+
+        scm = possible_project_classes.first.scm
+      end
+
+      unless scm
+        raise "You need to either specify the scm as the first line in .externals, or use an option to specify it
+          (such as --git or --svn)"
+      end
+
+      old_config = configuration
+      project = main_project
+      project.scm ||= scm
+
+      if project.current_branch == branch
+        puts "Already on branch #{branch}"
+      else
+        project.switch branch, options
+        project.up
+
+        reload_configuration
+
+        #update subprojects
+        self.class.new({}).up [], {} #args, options
+
+        removed_project_paths = old_config.removed_project_paths(
+          configuration
+        ).select{|path| File.exists?(path)}
+
+        if !removed_project_paths.empty?
+          puts "WARNING: The following subprojects are no longer being maintained in the
+.externals file.  You might want to remove them.  You can copy and paste the
+commands below if you actually wish to delete them."
+          removed_project_paths.each do |path|
+            if File.exists? path
+              puts "  rm -r #{path}"
+            end
+          end
+        end
+      end
+    end
+
     def update args, options
       options ||= {}
       #repository = args[0]
@@ -645,7 +712,7 @@ Please use the --type option to tell ext which to use."
           config['.'][:repository] = SvnProject.extract_repository(
             SvnProject.info_url,
             options[:branch]
-            )
+          )
         elsif args[0]
           config['.'][:repository] = args[0].strip
         else

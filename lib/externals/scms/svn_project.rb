@@ -63,13 +63,14 @@ module Externals
       puts `#{svncocmd}`
     end
 
-    def switch branch_name
+    def switch branch_name, options = {}
       require_repository
       if current_branch != branch_name
         Dir.chdir path do
-          `svn #{scm_opts} switch #{[repository, branch_name].join("/")}`
+          url = [repository, branch_name].join("/")
+          `svn #{scm_opts} switch #{url}`
           unless $? == 0
-            raise
+            raise "Could not switch to #{url}"
           end
         end
       end
@@ -256,6 +257,8 @@ repository = #{info_url}
     def self.info_url scm_opts = ""
       if `svn #{scm_opts} info` =~ /^\s*URL:\s*([^\s]+)\s*$/
         $1
+      else
+        raise "Could not get URL from svn info"
       end
     end
 

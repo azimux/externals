@@ -134,6 +134,14 @@ module Externals
         sections << Section.new("[#{title.to_s}]", "")
       end
 
+      def removed_project_paths other_config
+        all_paths - other_config.all_paths
+      end
+
+      def all_paths
+        sections.map(&:title)
+      end
+
       def self.new_empty
         new nil, true
       end

@@ -56,6 +56,10 @@ module Externals
       self.class.default_branch
     end
 
+    def switch branch_name, options = {}
+      raise "subclass responsibility"
+    end
+
     def initialize hash
       raise "Abstract class" if self.class == Project
       raise "expected hash" unless hash.is_a? Hash
