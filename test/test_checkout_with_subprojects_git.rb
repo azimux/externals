@@ -143,7 +143,16 @@ module Externals
               `git checkout master`
               Ext.run "up"
               assert_equal "master", main_project.current_branch
-               assert_equal "edge", engines.current_branch
+              assert_equal "edge", engines.current_branch
+
+              #let's test the switch command!
+              Ext.run "switch", "new_branch"
+              assert_equal "new_branch", main_project.current_branch
+              assert_equal "new_branch", engines.current_branch
+
+              Ext.run "switch", "master"
+              assert_equal "master", main_project.current_branch
+              assert_equal "edge", engines.current_branch
             end
 
             #now let's check it out again to test "ext checkout -b new_branch"

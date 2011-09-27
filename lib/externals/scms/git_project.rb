@@ -87,35 +87,27 @@ module Externals
     end
 
     def switch branch_name, options = {}
-      opts = resolve_opts(command)
-
       cb = current_branch
       if cb == branch_name
         puts "Already on branch #{branch_name}"
       else
         # This allows the main project to be checked out to a directory
         # that doesn't match it's name.
-        project_path = if path == "."
-          name
-        else
-          path
-        end
-
-        Dir.chdir project_path do
+        Dir.chdir path do
           # let's see if the branch exists in the remote repository
           # and if not, fetch it.
-          if !branch_exists("origin/#{branch_namee}")
-            puts `git #{opts} fetch`
+          if !branch_exists("origin/#{branch_name}")
+            puts `git #{scm_opts} fetch`
           end
 
           # if the local branch doens't exist, add --track -b
-          if branch_exists(branch)
-            puts `git #{opts} checkout #{branch}`
+          if branch_exists(branch_name)
+            puts `git #{scm_opts} checkout #{branch_name}`
           else
-            puts `git #{opts} checkout --track -b #{branch} origin/#{branch}`
+            puts `git #{resolve_opts("co")} checkout --track -b #{branch_name} origin/#{branch_name}`
           end
           unless $? == 0
-            raise "Could not checkout origin/#{branch}"
+            raise "Could not checkout origin/#{branch_name}"
           end
         end
       end
