@@ -117,35 +117,52 @@ module Externals
     end
 
     def self.new_opts main_options, sub_options
-      opts = OptionParser.new
-
-      opts.banner = "ext [OPTIONS] <command> [repository] [-b <branch>] [path]"
+      opts = OptionParser.new(
+        "ext [OPTIONS] <command> [repository] [-b <branch>] [path]"
+      )
+      opts.summary_indent = '  '
+      opts.summary_width = 24
+      summary_width = 53
 
       project_classes.each do |project_class|
-        project_class.fill_in_opts(opts, main_options, sub_options)
+        project_class.fill_in_opts(opts, main_options, sub_options,
+          :summary_width => summary_width)
       end
 
-      opts.on("--type TYPE", "-t TYPE", "The type of project the main project is.  For example, 'rails'.",
-        String) {|type| sub_options[:scm] = main_options[:type] = type}
-      opts.on("--scm SCM", "-s SCM", "The SCM used to manage the main project.  For example, '--scm svn'.",
-        String) {|scm| sub_options[:scm] = main_options[:scm] = scm}
-      opts.on("--branch BRANCH", "-b BRANCH", "The branch you want the subproject to checkout when doing 'ext install'",
-        String) {|branch| sub_options[:branch] = main_options[:branch] = branch}
-      opts.on("--force_removal", "-f", "When doing an uninstall of a subproject, remove it's files and subfolders, too.",
-        String) {|branch| sub_options[:force_removal] = true}
-      opts.on("--workdir DIR", "-w DIR", "The working directory to execute commands from.  Use this if for some reason you
+      opts.on("--type TYPE", "-t TYPE",
+        String,
+        *"The type of project the main project is.
+          For example, 'rails'.".lines_by_width(summary_width)
+      ) {|type| sub_options[:scm] = main_options[:type] = type}
+      opts.on("--scm SCM", "-s SCM",
+        String,
+        *"The SCM used to manage the main project.  For example, '--scm svn'.".lines_by_width(summary_width)
+      ) {|scm| sub_options[:scm] = main_options[:scm] = scm}
+      opts.on("--branch BRANCH", "-b BRANCH",
+        String,
+        *"The branch you want the
+        subproject to checkout when doing 'ext install'".lines_by_width(summary_width)
+      ) {|branch| sub_options[:branch] = main_options[:branch] = branch}
+      opts.on("--force_removal", "-f",
+        String,
+        *"When doing an uninstall of a subproject,
+        remove it's files and subfolders, too.".lines_by_width(summary_width)
+      ) {|branch| sub_options[:force_removal] = true}
+      opts.on("--workdir DIR", "-w DIR", String, *"The working directory to execute commands from.  Use this if for some reason you
         cannot execute ext from the main project's directory (or if it's just inconvenient, such as in a script
-        or in a Capistrano task)",
-        String) {|dir|
+        or in a Capistrano task)".lines_by_width(summary_width)) {|dir|
         raise "No such directory: #{dir}" unless File.exists?(dir) && File.directory?(dir)
         main_options[:workdir] = dir
       }
-      opts.on("--help", "does the same as 'ext help'  If you use this with a command
-        it will ignore the command and run help instead.") {main_options[:help] = true}
-      opts.on("--version", "Displays the version number of externals and then exits.
-        Same as 'ext version'") {
+      opts.on(
+        "--help", *"does the same as 'ext help'  If you use this with a command
+        it will ignore the command and run help instead.".lines_by_width(summary_width)
+      ) {main_options[:help] = true}
+      opts.on("--version", *"Displays the version number of externals and then exits.
+        Same as 'ext version'".lines_by_width(summary_width)) {
         main_options[:version] = true
       }
+      opts
     end
 
     def self.run *arguments

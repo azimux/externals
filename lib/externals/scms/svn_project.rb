@@ -124,9 +124,12 @@ module Externals
       false
     end
 
-    def self.fill_in_opts opts, main_options, sub_options
-      opts.on("--svn", "--subversion", "same as '--scm svn'  Uses subversion to checkout/export the main project",
-        Integer) {sub_options[:scm] = main_options[:scm] = 'svn'}
+    def self.fill_in_opts opts, main_options, sub_options, options = {}
+      opts.on("--svn", "--subversion",
+        Integer,
+        *"same as '--scm svn'  Uses subversion to
+        checkout/export the main project".lines_by_width(options[:summary_width])
+        ) {sub_options[:scm] = main_options[:scm] = 'svn'}
     end
 
     def self.detected?

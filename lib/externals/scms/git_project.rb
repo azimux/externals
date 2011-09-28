@@ -158,9 +158,12 @@ module Externals
       path =~ /^git:/ || path =~ /.git$/
     end
 
-    def self.fill_in_opts opts, main_options, sub_options
-      opts.on("--git", "-g", "same as '--scm git'  Uses git to checkout/export the main project",
-        Integer) {sub_options[:scm] = main_options[:scm] = 'git'}
+    def self.fill_in_opts opts, main_options, sub_options, options
+      opts.on("--git", "-g", 
+        Integer,
+        *"same as '--scm git'  Uses git to
+        checkout/export the main project".lines_by_width(options[:summary_width])
+        ) {sub_options[:scm] = main_options[:scm] = 'git'}
     end
 
     def self.detected?

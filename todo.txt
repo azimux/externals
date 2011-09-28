@@ -1,14 +1,9 @@
-If the install fails, don't add the project to the .externals file
 Add CVS support
 Add documentation
 Add Mercurial support
 add unfreeze feature
-fix rails3 project detection
 ext init --type=rails causes scm to be set to "rails" in .externals
 better organize tests in preparation for adding support for more SCMs
-
-Require "repository" property for main projects managed by SVN.  This is
-  necessary to facilitate branching features for subversion.
 
 move all calls to `<scm> <cmd>....` to methods called "issue_<cmd>..."
 add exception classes
