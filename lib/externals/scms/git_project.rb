@@ -22,6 +22,9 @@ module Externals
 
       puts(gitclonecmd = "git #{opts} clone \"#{repository}\" #{dest}")
       puts `#{gitclonecmd}`
+      unless $? == 0
+        raise "git clone of #{repository} failed."
+      end
 
       change_to_branch_revision(command)
     end
@@ -159,11 +162,11 @@ module Externals
     end
 
     def self.fill_in_opts opts, main_options, sub_options, options
-      opts.on("--git", "-g", 
+      opts.on("--git", "-g",
         Integer,
         *"same as '--scm git'  Uses git to
         checkout/export the main project".lines_by_width(options[:summary_width])
-        ) {sub_options[:scm] = main_options[:scm] = 'git'}
+      ) {sub_options[:scm] = main_options[:scm] = 'git'}
     end
 
     def self.detected?
@@ -180,7 +183,7 @@ module Externals
       text.split(/\n/).detect {|r| r.strip == path.strip}
     end
 
-    def ignore_text(path)
+    def ignore_text(path = nil)
       return '' unless File.exists? '.gitignore'
       retval = ''
       open('.gitignore') do |f|

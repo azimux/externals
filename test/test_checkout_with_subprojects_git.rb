@@ -34,8 +34,30 @@ module Externals
               File.join(root_dir, 'test', 'cleanreps', proj)
           end
 
+          ext = Ext.new
+          main_project = ext.main_project
+
+          unless !main_project.ignore_contains? "vendor/plugins/engines"
+            raise
+          end
           #install project with a branch
           Ext.run "install", File.join(root_dir, 'test', 'cleanreps', 'engines.git'), "-b", "edge"
+          unless main_project.ignore_contains? "vendor/plugins/engines"
+            raise
+          end
+
+          #install fake_rails
+          unless !main_project.ignore_contains? "vendor/rails"
+            raise
+          end
+          Ext.run "install",
+            "--git",
+            File.join(root_dir, 'test', 'cleanreps', 'fake_rails'),
+            "vendor/rails"
+          unless main_project.ignore_contains? "vendor/rails"
+            raise
+          end
+
 
           GitProject.add_all
           `git commit -m "created empty rails app with some subprojects"`
@@ -115,7 +137,12 @@ module Externals
               ext = Ext.new
               assert_equal "new_branch", ext.configuration["vendor/plugins/engines"]["branch"]
 
-              `git add .externals`
+              assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+              #let's uninstall rails
+              Ext.run "uninstall", "-f", "rails"
+              assert !File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+
+              GitProject.add_all
               raise unless $? == 0
               `git commit -m "changed branch on engines subproject"`
               raise unless $? == 0
@@ -131,6 +158,7 @@ module Externals
               Ext.run "up"
               assert_equal "master", main_project.current_branch
               assert_equal "edge", engines.current_branch
+              assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
               `git checkout new_branch`
               assert_equal "new_branch", main_project.current_branch
@@ -145,14 +173,26 @@ module Externals
               assert_equal "master", main_project.current_branch
               assert_equal "edge", engines.current_branch
 
+              assert main_project.ignore_contains?("vendor/rails")
+
               #let's test the switch command!
               Ext.run "switch", "new_branch"
               assert_equal "new_branch", main_project.current_branch
               assert_equal "new_branch", engines.current_branch
 
+              assert !main_project.ignore_contains?("vendor/rails")
+              assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+              `rm -rf vendor/rails`
+              assert !File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+              raise unless $? == 0
+
               Ext.run "switch", "master"
               assert_equal "master", main_project.current_branch
               assert_equal "edge", engines.current_branch
+
+              assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+
+              assert main_project.ignore_contains?("vendor/rails")
             end
 
             #now let's check it out again to test "ext checkout -b new_branch"

@@ -89,6 +89,8 @@ module Externals
                 raise
               end
 
+              assert !main_project.ignore_contains?("vendor/rails")
+
               ext = Ext.new
               main_project = ext.main_project
               engines = ext.subproject("engines")
@@ -152,6 +154,8 @@ module Externals
                 /line 2 of modules.txt ... this is branch2!/
               assert File.read(File.join('modules', 'modules.txt')) =~ /line1 of/
 
+              assert main_project.ignore_contains?("vendor/rails")
+
               # let's test the switch command.
               capture = StringIO.new
               begin
@@ -180,6 +184,8 @@ module Externals
               assert capture =~ /WARNING:/
               assert capture =~ /rm\s+-rf?\s+vendor.rails/
               assert capture.scan(/rm/).size == 1
+
+              assert !main_project.ignore_contains?("vendor/rails")
 
               `rm -rf vendor/rails`
               unless $? == 0
@@ -220,6 +226,7 @@ module Externals
 
               assert capture !~ /WARNING:/
               assert capture !~ /rm\s+-rf?\s+vendor.rails/
+              assert main_project.ignore_contains?("vendor/rails")
               assert capture.scan(/rm/).size == 0
 
               assert File.read(File.join('modules', 'modules.txt')) !~
