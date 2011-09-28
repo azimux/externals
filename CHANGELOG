@@ -1,3 +1,8 @@
+September 28, 2011 Version 1.0.3 released
+- "up" now changes branches of subprojects
+- Subversion branch support added
+- "switch" command added.
+
 September 8, 2011 Version 1.0.2 released
 - For git, fixed bug preventing "ext up" from changing the branches of subprojects as expected.
 - For git, fixed bug preventing "ext checkout -b <branch_name>" from functioning as expected.
