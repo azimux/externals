@@ -5,6 +5,33 @@ module Externals
   module ExtTestCase
     protected
 
+    def mark_dirty file
+      File.open working_file_name(file), "w" do |file|
+        file.puts "dirty"
+      end
+    end
+
+    def unmark_dirty file
+      File.delete working_file_name(file)
+    end
+
+    def working_file_name file
+      ".working_#{file}"
+    end
+
+    def dirty?(file)
+      File.exists? working_file_name(file)
+    end
+
+    def delete_if_dirty file
+      if File.exists? file
+        if dirty?(file)
+          `rm -r #{file}`
+          raise unless $? == 0
+        end
+      end
+    end
+
     def initialize_test_git_repository
       scm = 'git'
       Dir.chdir(File.join(File.dirname(__FILE__), '..', '..', 'test')) do
@@ -231,7 +258,7 @@ module Externals
     def initialize_with_svn_branches_repository
       Dir.chdir File.join(root_dir, 'test') do
         repo_url = with_svn_branches_repository_url
-        
+
         Dir.chdir 'workdir' do
           puts `svn co #{[repo_url, "current"].join("/")} rails_app`
           raise unless $? == 0
@@ -339,7 +366,6 @@ module Externals
         end
       end
     end
-
 
   end
 end
