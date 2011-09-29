@@ -23,11 +23,12 @@ module Externals
     class Repository
       include ExtTestCase
 
-      attr_accessor :name, :subpath
+      attr_accessor :name, :subpath, :dependents
 
       def initialize name, subpath = ""
         self.subpath = subpath
         self.name = name
+        self.dependents ||= {}
 
         [
           clean_dir_parent,
@@ -77,6 +78,8 @@ module Externals
 
       # builds/copies the test repository if needed
       def prepare
+        dependents.values.each {|child| child.prepare}
+
         if dirty?
           delete_clean_dir
         end
