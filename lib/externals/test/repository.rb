@@ -127,15 +127,19 @@ module Externals
 
       def delete_clean_dir
         Dir.chdir clean_dir_parent do
-          `rm -r #{name}`
-          raise unless $? == 0
+          if File.exists?(name)
+            `rm -r #{name}`
+            raise unless $? == 0
+          end
         end
       end
 
       def delete_pristine_dir
         Dir.chdir pristine_dir_parent do
-          `rm -r #{name}`
-          raise unless $? == 0
+          if File.exists?(name)
+            `rm -r #{name}`
+            raise unless $? == 0
+          end
         end
       end
 

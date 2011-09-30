@@ -4,15 +4,17 @@ require 'externals/ext'
 require 'stringio'
 
 module Externals
-  class TestGitProjectExtractName < TestCase
-    include ExtTestCase
+  module Test
+    class TestGitProjectExtractName < TestCase
+      include ExtTestCase
 
-    def test_extract_name
-      project = Externals::GitProject.new({})
-      assert_equal "test", project.extract_name("git://domain.com/test.git")
-      assert_equal "test", project.extract_name("git@domain.com:test.git")
-      assert_equal "test", project.extract_name("test.git")
-      assert_equal "test", project.extract_name("test")
+      def test_extract_name
+        project = Externals::GitProject.new({})
+        assert_equal "test", project.extract_name("git://domain.com/test.git")
+        assert_equal "test", project.extract_name("git@domain.com:test.git")
+        assert_equal "test", project.extract_name("test.git")
+        assert_equal "test", project.extract_name("test")
+      end
     end
   end
 end
