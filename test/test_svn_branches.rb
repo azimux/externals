@@ -35,10 +35,15 @@ module Externals
         repository = RailsAppSvnBranches.new
         repository.prepare
 
-        assert File.exists?(File.join(repository.clean_dir, ".git"))
+        assert File.exists?(File.join(repository.clean_dir, "db"))
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir","checkout","svn","branches")
         FileUtils.mkdir_p workdir
+
+        if File.exists?(File.join(workdir,"rails_app"))
+          `rm -r #{File.join(workdir,"rails_app")}`
+          raise unless $? == 0
+        end
 
         Dir.chdir workdir do
           source = repository.clean_url
@@ -52,7 +57,7 @@ module Externals
           Dir.chdir 'rails_app' do
             assert File.exists?('.svn')
 
-            %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
+            %w(redhillonrails_core acts_as_list).each do |proj|
               ignore_text = `svn propget svn:ignore vendor/plugins`
               puts "ignore_text is:"
               puts ignore_text
@@ -62,7 +67,7 @@ module Externals
             ignore_text = `svn propget svn:ignore vendor`
             assert(ignore_text =~ /^rails$/)
 
-            %w(foreign_key_migrations redhillonrails_core acts_as_list engines).each do |proj|
+            %w(redhillonrails_core acts_as_list engines).each do |proj|
               assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
             end
 

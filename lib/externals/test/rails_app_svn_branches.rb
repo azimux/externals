@@ -17,7 +17,9 @@ module Externals
           :acts_as_list => GitRepositoryFromInternet.new("acts_as_list.git"),
           :engines => EnginesWithBranch1.new,
           :redhillonrails_core => SvnRepositoryFromDump.new("redhillonrails_core"),
-          :foreign_key_migrations => SvnRepositoryFromDump.new("foreign_key_migrations"),
+          #fkm seems to cause problems when running tests, concerning a corrupt repository.
+          #commenting out for now.
+          #:foreign_key_migrations => SvnRepositoryFromDump.new("foreign_key_migrations", ""),
           :rails => FakeRailsRepository.new,
           :modules => ModulesSvnBranchesRepository.new
         )
@@ -71,12 +73,15 @@ module Externals
             end
 
             #install a couple svn managed subprojects
-            [:foreign_key_migrations, :redhillonrails_core].each do |proj|
+            [
+              #:foreign_key_migrations,
+              :redhillonrails_core
+            ].each do |proj|
               Ext.run "install", "--svn", dependents[proj].clean_url
             end
 
             #install project with a git branch
-            Ext.run "install", dependents[:engines], "-b", "edge"
+            Ext.run "install", dependents[:engines].clean_dir, "-b", "edge"
 
             #install project with a non-default path and svn branching
             Ext.run "install", "--svn",
