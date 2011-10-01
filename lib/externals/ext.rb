@@ -143,6 +143,11 @@ module Externals
         *"The branch you want the
         subproject to checkout when doing 'ext install'".lines_by_width(summary_width)
       ) {|branch| sub_options[:branch] = main_options[:branch] = branch}
+      opts.on("--revision REVISION", "-r REVISION",
+        String,
+        *"The revision you want the
+        subproject to checkout when doing 'ext install'".lines_by_width(summary_width)
+      ) {|revision| sub_options[:revision] = main_options[:revision] = revision}
       opts.on("--force_removal", "-f",
         String,
         *"When doing an uninstall of a subproject,
@@ -427,6 +432,7 @@ that you are installing. Use an option to specify it
       raise "already exists" if configuration[path]
 
       project.branch = options[:branch] if options[:branch]
+      project.revision = options[:revision] if options[:revision]
 
       attributes = project.attributes.dup
       attributes.delete(:path)
@@ -670,7 +676,7 @@ commands below if you actually wish to delete them."
       repository = args[0]
       path = args[1] || "."
 
-      main_project = do_checkout_or_export repository, path, options, :checkout
+      main_project = do_checkout_or_export repository, path, options, :export
 
       if path == "."
         path = main_project.name

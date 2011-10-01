@@ -33,6 +33,8 @@ ext [OPTIONS] <command> [repository] [-b <branch>] [path]
                            '--scm svn'.
   -b, --branch BRANCH      The branch you want the subproject to checkout when
                            doing 'ext install'
+  -r, --revision REVISION  The revision you want the subproject to checkout when
+                           doing 'ext install'
   -f, --force_removal      When doing an uninstall of a subproject, remove it's
                            files and subfolders, too.
   -w, --workdir DIR        The working directory to execute commands from. Use
