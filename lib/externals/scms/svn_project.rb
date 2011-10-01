@@ -59,7 +59,7 @@ module Externals
       end
 
       `#{rmdircmd}` if File.exists? path
-      puts(svncocmd = "svn #{scm_opts_ex} export #{repository} #{path}")
+      puts(svncocmd = "svn #{scm_opts_ex} export #{url} #{path}")
       puts `#{svncocmd}`
     end
 

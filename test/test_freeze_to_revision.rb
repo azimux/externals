@@ -39,15 +39,26 @@ module Externals
                   9baff190a52c05cc542bfcaa7f77a91ce669f2f8
                 ).each do |hash|
                   assert `git show #{hash}` =~ /^commit\s*#{hash}$/i
+                  raise unless $? == 0
                 end
-                assert `git show HEAD` !~ /^\s*commit\s*8771a632dc26a7782800347993869c964133ea29\s*$/i
-                assert `git show HEAD` =~ /^\s*commit\s*9baff190a52c05cc542bfcaa7f77a91ce669f2f8\s*$/i
               end
 
               Dir.chdir 'foreign_key_migrations' do
                 assert `svn info` =~ /^.*:\s*2\s*$/i
               end
             end
+
+            ext = Ext.new
+            acts_as_list = ext.subproject("acts_as_list")
+
+            assert `git show HEAD` !~ /^\s*commit\s*8771a632dc26a7782800347993869c964133ea29\s*$/i
+            raise unless $? == 0
+            r = repository.dependents[:acts_as_list].attributes[:revision]
+            assert r =~ /^[a-f0-9]{40}$/
+            assert_equal r,
+              acts_as_list.current_revision
+            `git show HEAD` =~ /^\s*commit\s*#{r}\s*$/i
+            raise unless $? == 0
 
             %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
               assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))

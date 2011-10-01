@@ -31,8 +31,10 @@ module Externals
             raise unless $? == 0
           end
         end
-        `rm -r workdir`
-        raise unless $? == 0
+        puts `rm -r workdir`
+        unless $? == 0
+          raise
+        end
       end
 
     end

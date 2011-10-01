@@ -23,12 +23,13 @@ module Externals
     class Repository
       include ExtTestCase
 
-      attr_accessor :name, :subpath, :dependents
+      attr_accessor :name, :subpath, :dependents, :attributes
 
       def initialize name, subpath = ""
         self.subpath = subpath
         self.name = name
         self.dependents ||= {}
+        self.attributes ||= {}
 
         [
           clean_dir_parent,
@@ -110,7 +111,9 @@ module Externals
           pristine_mark_dirty
           Dir.chdir pristine_dir_parent do
             `cp -a #{clean_dir} .`
-            raise unless $? == 0
+            unless $? == 0
+              raise
+            end
           end
           pristine_unmark_dirty
         end
@@ -128,7 +131,7 @@ module Externals
       def delete_clean_dir
         Dir.chdir clean_dir_parent do
           if File.exists?(name)
-            `rm -r #{name}`
+            `rm -rf #{name}`
             raise unless $? == 0
           end
         end
@@ -137,7 +140,7 @@ module Externals
       def delete_pristine_dir
         Dir.chdir pristine_dir_parent do
           if File.exists?(name)
-            `rm -r #{name}`
+            `rm -rf #{name}`
             raise unless $? == 0
           end
         end

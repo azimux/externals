@@ -12,6 +12,9 @@ module Externals
           :redhillonrails_core => SvnRepositoryFromDump.new("redhillonrails_core"),
           :foreign_key_migrations => SvnRepositoryFromDump.new("foreign_key_migrations")
         )
+        dependents[:foreign_key_migrations].attributes[:revision] = "2"
+        dependents[:acts_as_list].attributes[:revision] =
+          "9baff190a52c05cc542bfcaa7f77a91ce669f2f8"
       end
 
       def build_here
@@ -58,7 +61,7 @@ module Externals
           raise unless $? == 0
         end
       end
-      
+
     end
   end
 end

@@ -319,15 +319,7 @@ module Externals
             Ext.run "export", "--svn", source, 'rails_app'
 
             Dir.chdir 'rails_app' do
-              assert File.exists?('.svn')
-
-              %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
-                puts(ignore_text = `svn propget svn:ignore vendor/plugins`)
-                assert(ignore_text =~ /^#{proj}$/)
-              end
-
-              puts(ignore_text = `svn propget svn:ignore vendor`)
-              assert(ignore_text =~ /^rails$/)
+              assert !File.exists?('.svn')
 
               Dir.chdir File.join('vendor', 'rails') do
                 #can't check this if it's local.  It seems --depth 1 is ignored for

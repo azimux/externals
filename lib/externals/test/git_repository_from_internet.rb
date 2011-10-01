@@ -11,7 +11,7 @@ module Externals
 
       #builds the test repository in the current directory
       def build_here
-        puts `git clone --bare #{url}/#{name}`
+        puts `git clone --bare #{url}/#{name} #{name}`
       end
     end
   end

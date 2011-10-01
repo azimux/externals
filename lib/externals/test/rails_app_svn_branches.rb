@@ -15,14 +15,19 @@ module Externals
         super "rails_app_svn_branches", "svn"
         dependents.merge!(
           :acts_as_list => GitRepositoryFromInternet.new("acts_as_list.git"),
+          :ssl_requirement => GitRepositoryFromInternet.new("ssl_requirement.git"),
           :engines => EnginesWithBranch1.new,
           :redhillonrails_core => SvnRepositoryFromDump.new("redhillonrails_core"),
+          :empty_plugin => SvnRepositoryFromDump.new("empty_plugin"),
           #fkm seems to cause problems when running tests, concerning a corrupt repository.
           #commenting out for now.
           #:foreign_key_migrations => SvnRepositoryFromDump.new("foreign_key_migrations", ""),
           :rails => FakeRailsRepository.new,
           :modules => ModulesSvnBranchesRepository.new
         )
+
+        dependents[:ssl_requirement].attributes[:revision] =
+          "aa2dded823f8a9b378c22ba0159971508918928a"
       end
 
       def build_here
@@ -106,6 +111,13 @@ module Externals
 
             # let's remove rails from this branch
             Ext.run "uninstall", "-f", "rails"
+
+            # add a git managed project...
+            Ext.run "install", dependents[:ssl_requirement].clean_dir,
+              "-r", dependents[:ssl_requirement].attributes[:revision]
+
+            # add a svn managed project
+            Ext.run "install", "--svn", dependents[:empty_plugin].clean_url
 
             ext = Ext.new
             ext.configuration["vendor/plugins/engines"]["branch"] = "branch1"
