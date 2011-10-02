@@ -19,8 +19,7 @@ module Externals
 
         Dir.chdir workdir do
           if File.exists?(repository.name)
-            `rm -r #{repository.name}`
-            raise unless $? == 0
+            rm_r repository.name
           end
 
           Ext.run "checkout", "--git", repository.clean_dir

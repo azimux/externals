@@ -15,12 +15,11 @@ module Externals
 
         assert File.exists?(File.join(repository.clean_dir, "db"))
 
-        workdir = File.join(root_dir, 'test', "tmp", "workdir",mode,"svn","branches")
-        FileUtils.mkdir_p workdir
+        workdir = File.join(root_dir, 'test', "tmp", "workdir", mode, "svn", "branches")
+        mkdir_p workdir
 
-        if File.exists?(File.join(workdir,"rails_app"))
-          `rm -rf #{File.join(workdir,"rails_app")}`
-          raise unless $? == 0
+        if File.exists?(File.join(workdir, "rails_app"))
+          rm_r File.join(workdir, "rails_app")
         end
 
         Dir.chdir workdir do
@@ -193,7 +192,7 @@ module Externals
               %w(vendor plugins ssl_requirement),
               %w(vendor plugins empty_plugin)
             ].each do |dir|
-              `rm -rf #{File.join(*dir)}`
+              rm_r File.join(*dir)
               unless $? == 0
                 raise
               end
@@ -251,12 +250,11 @@ module Externals
 
         assert File.exists?(File.join(repository.clean_dir, "db"))
 
-        workdir = File.join(root_dir, 'test', "tmp", "workdir",mode,"svn","branch_test")
-        FileUtils.mkdir_p workdir
+        workdir = File.join(root_dir, 'test', "tmp", "workdir", mode, "svn", "branch_test")
+        mkdir_p workdir
 
         if File.exists?(File.join(workdir,"rails_app"))
-          `rm -rf #{File.join(workdir,"rails_app")}`
-          raise unless $? == 0
+          rm_r File.join(workdir, "rails_app")
         end
 
         Dir.chdir workdir do
@@ -304,11 +302,10 @@ module Externals
         assert File.exists?(File.join(repository.clean_dir, "db"))
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir","uninstall","svn","branches")
-        FileUtils.mkdir_p workdir
+        mkdir_p workdir
 
         if File.exists?(File.join(workdir,"rails_app"))
-          `rm -rf #{File.join(workdir,"rails_app")}`
-          raise unless $? == 0
+          rm_r File.join(workdir, "rails_app")
         end
 
         Dir.chdir workdir do

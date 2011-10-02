@@ -14,11 +14,11 @@ module Externals
 
         assert File.exists?(File.join(repository.clean_dir, ".git"))
 
-        workdir = File.join(root_dir, 'test', "tmp", "workdir","checkout","git")
-        FileUtils.mkdir_p workdir
+        workdir = File.join(root_dir, 'test', "tmp", "workdir", "checkout", "git")
+        mkdir_p workdir
 
         Dir.chdir workdir do
-          `rm -rf #{repository.name}`
+          rm_r repository.name if File.exists? repository.name
           source = repository.clean_dir
           puts "About to checkout #{source}"
           Ext.run "checkout", "--git", source

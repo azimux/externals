@@ -15,12 +15,13 @@ module Externals
 
         `mkdir workdir` unless File.exists? 'workdir'
         Dir.chdir 'workdir' do
+          `rm -rf #{name}`
+
           cmd = "svn checkout \"#{clean_url}\""
           puts "about to run #{cmd}"
           puts `#{cmd}`
           raise unless $? == 0
 
-          `rm -r name`
           Dir.chdir name do
             `mkdir branches`
             raise unless $? == 0
@@ -62,7 +63,7 @@ module Externals
             raise unless $? == 0
           end
 
-          `rm -r #{name}`
+          `rm -rf #{name}`
           raise unless $? == 0
         end
       end

@@ -1,5 +1,6 @@
 require 'externals/test/repository'
 require 'find'
+require 'externals/test/git_repository_from_internet'
 
 module Externals
   module Test
@@ -9,26 +10,17 @@ module Externals
       end
 
       def build_here
-        `rm -r fake_rails`
-        `rm -r full_rails`
-        if File.exists? 'C:\\tmp\\rails'
-          puts `cp -a C:\\tmp\\rails full_rails`
-          raise unless $? == 0
-        elsif File.exists? '/tmp/rails'
-          puts `cp -a /tmp/rails full_rails`
-          raise unless $? == 0
-        else
-          puts `git clone git://github.com/rails/rails.git full_rails`
-          raise unless $? == 0
-        end
-        puts `cp -a full_rails fake_rails`
-        raise unless $? == 0
+        repository = GitRepositoryFromInternet.new("rails")
+        repository.prepare
 
+        rm_rf "fake_rails"
+
+        `git clone #{repository.clean_dir} fake_rails`
+        
         #let's make the repo smaller by removing all but 1 file from each
         #directory to save time
         Dir.chdir 'fake_rails' do
-          puts `rm -rf .git`
-          raise unless $? == 0
+          rm_rf ".git"
         end
 
         dirs = []
@@ -62,8 +54,7 @@ module Externals
           puts `git commit -m "rails with all but 1 file per directory deleted"`
           puts `git push ../rails.git master`
         end
-        `rm -r fake_rails`
-        `rm -r full_rails`
+        rm_rf "fake_rails"
       end
 
     end

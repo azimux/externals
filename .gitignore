@@ -9,3 +9,4 @@ test/repositories/
 test/cleanreps/
 test/test_svn_global_opts/
 test/tmp
+doc/*
