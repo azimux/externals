@@ -176,6 +176,7 @@ module Externals
     #this is a test helper method
     def self.add_all
       puts `git add .`
+      raise unless $? == 0
     end
 
     def ignore_contains? path

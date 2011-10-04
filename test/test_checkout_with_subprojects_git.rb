@@ -58,7 +58,7 @@ module Externals
 
             assert !main_project.ignore_contains?("vendor/rails")
 
-            rm_rf File.join('vendor', 'rails')
+            rm_rf "vendor/rails"
             raise if File.exists?(File.join("vendor", "rails"))
 
             `git checkout master`

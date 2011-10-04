@@ -26,7 +26,9 @@ module Externals
 
         puts(svncocmd = "svn #{opts} co #{url} #{path}")
         puts `#{svncocmd}`
-        raise unless $? == 0
+        unless $? == 0
+          raise
+        end
 
         change_to_revision "co"
       end
@@ -142,6 +144,7 @@ module Externals
 
       status.split("\n").grep(/^\?/).each do |to_add|
         puts `svn add #{to_add.gsub(/^\?\s*/,"")}`
+        raise unless $? == 0
       end
     end
 

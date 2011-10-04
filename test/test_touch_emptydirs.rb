@@ -9,17 +9,19 @@ module Externals
       include ExtTestCase
 
       def setup
+        teardown
+
         Dir.chdir File.join(root_dir, 'test') do
-          `mkdir workdir`
+          mkdir "workdir"
 
           Dir.chdir 'workdir' do
-            `mkdir notempty1`
+            mkdir "notempty1"
             Dir.chdir 'notempty1' do
-              `mkdir notempty2`
-              `mkdir empty1`
+              mkdir "notempty2"
+              mkdir "empty1"
               Dir.chdir 'notempty2' do
-                `mkdir empty2`
-                `mkdir notempty3`
+                mkdir "empty2"
+                mkdir "notempty3"
                 Dir.chdir 'notempty3' do
                   File.open('readme.txt', 'w') do |f|
                     f.write "some text\n"
@@ -33,7 +35,7 @@ module Externals
 
       def teardown
         Dir.chdir File.join(root_dir, 'test') do
-          `rm -rf workdir`
+          rm_rf "workdir"
         end
       end
 
@@ -51,6 +53,7 @@ module Externals
           end
         end
       end
+
     end
   end
 end

@@ -17,8 +17,8 @@ module Externals
 
       def test_svn_global_opts
         Dir.chdir File.join(root_dir, 'test') do
-          `rm -r test_svn_global_opts`
-          `mkdir test_svn_global_opts`
+          rm_rf "test_svn_global_opts" if File.exists? "test_svn_global_opts"
+          mkdir "test_svn_global_opts"
 
           begin
             Dir.chdir 'test_svn_global_opts' do
@@ -138,7 +138,7 @@ repository = svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/for
 
             end
           ensure
-            `rm -r test_svn_global_opts`
+            rm_rf "test_svn_global_opts" if File.exists? "test_svn_global_opts"
           end
 
         end

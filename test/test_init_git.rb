@@ -15,13 +15,12 @@ module Externals
         assert File.exists?(File.join(repository.clean_dir, ".git"))
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir")
-        FileUtils.mkdir_p workdir
+        mkdir_p workdir
 
         Dir.chdir workdir do
           delete_if_dirty(repository.name)
           if !File.exists?(repository.name)
-            `cp -a #{repository.clean_dir} .`
-            raise unless $? == 0
+            cp_a repository.clean_dir, "."
           end
 
           mark_dirty(repository.name)

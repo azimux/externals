@@ -3,6 +3,7 @@ require 'externals/test/git_repository_from_internet'
 require 'externals/test/svn_repository_from_dump'
 require 'externals/test/engines_with_branch1'
 require 'externals/test/fake_rails_repository'
+require 'externals/test/rails_app_unmanaged'
 
 module Externals
   module Test
@@ -14,7 +15,8 @@ module Externals
           :redhillonrails_core => SvnRepositoryFromDump.new("redhillonrails_core"),
           :foreign_key_migrations => SvnRepositoryFromDump.new("foreign_key_migrations"),
           :engines => EnginesWithBranch1.new,
-          :rails => FakeRailsRepository.new
+          :rails => FakeRailsRepository.new,
+          :rails_app_unmanaged => RailsAppUnmanaged.new
         )
         dependents[:foreign_key_migrations].attributes[:revision] = "2"
         dependents[:acts_as_list].attributes[:revision] =
@@ -22,15 +24,7 @@ module Externals
       end
 
       def build_here
-        if rails_version =~ /^3([^\d]|$)/
-          puts `#{rails_exe} new #{name}`
-          raise unless $? == 0
-        elsif rails_version =~ /^2([^\d]|$)/
-          puts `#{rails_exe} #{name}`
-          raise unless $? == 0
-        else
-          raise "can't determine rails version"
-        end
+        cp_a dependents[:rails_app_unmanaged].clean_dir, name
 
         Dir.chdir name do
           Ext.run "touch_emptydirs"

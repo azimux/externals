@@ -15,7 +15,7 @@ module Externals
         assert File.exists?(File.join(repository.clean_dir, ".git"))
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir")
-        FileUtils.mkdir_p workdir
+        mkdir_p workdir
 
         Dir.chdir workdir do
           if File.exists?(repository.name)

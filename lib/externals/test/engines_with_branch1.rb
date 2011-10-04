@@ -1,4 +1,5 @@
 require 'externals/test/repository'
+require 'externals/test/engines'
 
 module Externals
   module Test
@@ -6,23 +7,19 @@ module Externals
       def initialize
         super "engines.git", File.join("git", "with_branch1")
         dependents.merge!(
-          :other_engines => GitRepositoryFromInternet.new(
-            "engines.git",
-            nil,
-            "git://github.com/azimux"
-          )
+          :other_engines => Engines.new
         )
       end
 
       #builds the test repository in the current directory
       def build_here
-        `rm -r #{name}`
-        
+        rm_rf_ie name
+
         puts `git clone --bare #{dependents[:other_engines].clean_dir} #{name}`
         raise unless $? == 0
 
-        `rm -r workdir`
-        `mkdir workdir`
+        rm_rf_ie "workdir"
+        mkdir "workdir"
         Dir.chdir 'workdir' do
           `git clone #{clean_dir}`
           raise unless $? == 0
@@ -31,10 +28,7 @@ module Externals
             raise unless $? == 0
           end
         end
-        puts `rm -r workdir`
-        unless $? == 0
-          raise
-        end
+        rm_rf_ie "workdir"
       end
 
     end

@@ -2,7 +2,9 @@ require 'externals/project'
 require 'externals/configuration/configuration'
 require 'optparse'
 require 'externals/command'
-require 'externals/extensions/symbol'
+Dir.entries(File.join(File.dirname(__FILE__), 'extensions')).each do |extension|
+  require "externals/extensions/#{extension}" if extension =~ /.rb$/
+end
 
 module Externals
   VERSION = '1.0.3'
@@ -78,10 +80,6 @@ module Externals
   MAIN_COMMANDS = MAIN_COMMANDS_HASH.map(&:first)
 
   COMMANDS = FULL_COMMANDS + SHORT_COMMANDS + MAIN_COMMANDS
-
-  Dir.entries(File.join(File.dirname(__FILE__), 'extensions')).each do |extension|
-    require "externals/extensions/#{extension}" if extension =~ /.rb$/
-  end
 
   Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','scms')).each do |project|
     require "externals/scms/#{project}" if project =~ /_project.rb$/
