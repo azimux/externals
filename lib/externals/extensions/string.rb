@@ -8,7 +8,6 @@ String.class_eval do
   end
 
   #avoid collision
-  raise unless instance_methods.include?("lines")
   raise if instance_methods.include?("lines_by_width")
   def lines_by_width(width = 32)
     width ||= 32
@@ -36,4 +35,5 @@ String.class_eval do
 
     lines
   end
+
 end

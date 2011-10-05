@@ -89,7 +89,7 @@ module Externals
         repository = RailsAppSvnRepository.new
         repository.prepare
 
-        workdir = File.join(root_dir, 'test', "workdir", "checkout")
+        workdir = File.join(root_dir, 'test', "tmp", "workdir", "checkout")
         rm_rf_ie workdir
         mkdir_p workdir
         Dir.chdir workdir do
@@ -130,124 +130,133 @@ module Externals
       end
 
       def test_update_with_missing_subproject_git
-        return
-        Dir.chdir File.join(root_dir, 'test') do
-          Dir.chdir 'workdir' do
-            `mkdir update`
-            Dir.chdir 'update' do
-              source = repository_dir('svn')
+        repository = RailsAppSvnRepository.new
+        repository.prepare
 
-              if windows?
-                source = source.gsub(/\\/, "/")
-              end
-              source = "file:///#{source}"
+        workdir = File.join(root_dir, 'test', "tmp", "workdir", "checkout")
+        rm_rf_ie workdir
+        mkdir_p workdir
+        Dir.chdir workdir do
+          source = repository.clean_url
 
+          puts "About to checkout #{source}"
+          Ext.run "checkout", "--svn", source, 'rails_app'
 
+          Dir.chdir 'rails_app' do
+            pretests = proc do
+              assert File.exists?('.svn')
+              assert !File.exists?(File.join('vendor', 'plugins', 'ssl_requirement', 'lib'))
+              assert File.read(".externals") =~ /rails/
+              assert File.read(".externals") !~ /ssl_requirement/
+            end
+
+            pretests.call
+
+            #add a project
+            workdir2 = File.join("workdir2")
+            rm_rf_ie workdir2
+            mkdir_p workdir2
+
+            Dir.chdir workdir2 do
               puts "About to checkout #{source}"
               Ext.run "checkout", "--svn", source, 'rails_app'
 
-              Dir.chdir 'rails_app' do
-                pretests = proc do
-                  assert File.exists?('.svn')
-                  assert !File.exists?(File.join('vendor', 'plugins', 'ssl_requirement', 'lib'))
-                  assert File.read(".externals") =~ /rails/
-                  assert File.read(".externals") !~ /ssl_requirement/
-                end
+              Dir.chdir "rails_app" do
+                #install a new project
+                subproject = GitRepositoryFromInternet.new("ssl_requirement.git")
+                Ext.run "install", subproject.clean_dir
 
-                pretests.call
+                SvnProject.add_all
 
-                #add a project
-                Dir.chdir File.join(root_dir, 'test') do
-                  Dir.chdir File.join('workdir', "rails_app") do
-                    #install a new project
-                    Ext.run "install", File.join(root_dir, 'test', 'cleanreps', 'ssl_requirement.git')
-
-                    SvnProject.add_all
-
-                    puts `svn commit -m "added another subproject (ssl_requirement)"`
-                  end
-                end
-
-                pretests.call
-
-                #update the project and make sure ssl_requirement was added and checked out
-                Ext.run "update"
-                assert File.read(".externals") =~ /ssl_requirement/
-                assert File.exists?(File.join('vendor', 'plugins', 'ssl_requirement', 'lib'))
+                repository.mark_dirty
+                puts `svn commit -m "added another subproject (ssl_requirement)"`
               end
             end
+
+            pretests.call
+
+            #update the project and make sure ssl_requirement was added and checked out
+            Ext.run "update"
+            assert File.read(".externals") =~ /ssl_requirement/
+            assert File.exists?(File.join('vendor', 'plugins', 'ssl_requirement', 'lib'))
           end
         end
       end
 
       def test_update_with_missing_subproject_by_revision_git
-        return
-        subproject = "ssl_requirement"
+        repository = RailsAppSvnRepository.new
+        repository.prepare
+        subproject = GitRepositoryFromInternet.new("ssl_requirement.git")
+        subproject.prepare
         revision = "aa2dded823f8a9b378c22ba0159971508918928a"
+        subproject_name = subproject.name.gsub(".git", "")
 
-        Dir.chdir File.join(root_dir, 'test') do
-          Dir.chdir 'workdir' do
-            `mkdir update`
-            Dir.chdir 'update' do
-              source = repository_dir('svn')
+        workdir = File.join(root_dir, 'test', "tmp", "workdir", "checkout")
+        rm_rf_ie workdir
+        mkdir_p workdir
+        Dir.chdir workdir do
+          source = repository.clean_url
 
-              if windows?
-                source = source.gsub(/\\/, "/")
-              end
-              source = "file:///#{source}"
+          puts "About to checkout #{source}"
+          Ext.run "checkout", "--svn", source, 'rails_app'
 
+          Dir.chdir 'rails_app' do
 
+            pretests = proc do
+              assert File.exists?('.svn')
+              assert !File.exists?(File.join('vendor', 'plugins', subproject_name, 'lib'))
+              assert File.read(".externals") =~ /rails/
+              assert File.read(".externals") !~ /#{subproject}/
+            end
+
+            pretests.call
+
+            #add a project
+            workdir2 = "workdir2"
+            rm_rf_ie workdir2
+            mkdir_p workdir2
+
+            Dir.chdir workdir2 do
+
+              #install a new project
               puts "About to checkout #{source}"
               Ext.run "checkout", "--svn", source, 'rails_app'
 
-              Dir.chdir 'rails_app' do
-                pretests = proc do
-                  assert File.exists?('.svn')
-                  assert !File.exists?(File.join('vendor', 'plugins', subproject, 'lib'))
-                  assert File.read(".externals") =~ /rails/
-                  assert File.read(".externals") !~ /#{subproject}/
+              Dir.chdir "rails_app" do
+                Ext.run "install", subproject.clean_dir
+
+                Dir.chdir File.join("vendor", 'plugins', subproject_name) do
+                  assert `git show HEAD` !~ /^\s*commit\s*#{revision}\s*$/i
                 end
-
-                pretests.call
-
-                #add a project
-                Dir.chdir File.join(root_dir, 'test') do
-                  Dir.chdir File.join('workdir', "rails_app") do
-                    #install a new project
-                    Ext.run "install", File.join(root_dir, 'test', 'cleanreps', "#{subproject}.git")
-                    Dir.chdir File.join("vendor",'plugins', subproject) do
-                      assert `git show HEAD` !~ /^\s*commit\s*#{revision}\s*$/i
-                    end
-                    #freeze it to a revision
-                    Ext.run "freeze", subproject,  revision
-                    Dir.chdir File.join("vendor",'plugins', subproject) do
-                      regex = /^\s*commit\s*#{revision}\s*$/i
-                      output = `git show HEAD`
-                      result = output =~ regex
-                      unless result
-                        puts "Expecting output to match #{regex} but it was: #{output}"
-                      end
-                      assert result
-                    end
-
-                    SvnProject.add_all
-
-                    puts `svn commit -m "added another subproject (#{subproject}) frozen to #{revision}"`
+                #freeze it to a revision
+                Ext.run "freeze", subproject_name, revision
+                Dir.chdir File.join("vendor", 'plugins', subproject_name) do
+                  regex = /^\s*commit\s*#{revision}\s*$/i
+                  output = `git show HEAD`
+                  result = output =~ regex
+                  unless result
+                    puts "Expecting output to match #{regex} but it was: #{output}"
                   end
+                  assert result
                 end
 
-                pretests.call
+                SvnProject.add_all
 
-                #update the project and make sure ssl_requirement was added and checked out at the right revision
-                Ext.run "update"
-                assert File.read(".externals") =~ /ssl_requirement/
-
-                assert File.exists?(File.join('vendor', 'plugins', subproject, 'lib'))
-
-                Dir.chdir File.join("vendor",'plugins', subproject) do
-                  assert `git show HEAD` =~ /^\s*commit\s*#{revision}\s*$/i
-                end
+                repository.mark_dirty
+                puts `svn commit -m "added another subproject (#{subproject}) frozen to #{revision}"`
               end
+            end
+
+            pretests.call
+
+            #update the project and make sure ssl_requirement was added and checked out at the right revision
+            Ext.run "update"
+            assert File.read(".externals") =~ /ssl_requirement/
+
+            assert File.exists?(File.join('vendor', 'plugins', subproject_name, 'lib'))
+
+            Dir.chdir File.join("vendor",'plugins', subproject_name) do
+              assert `git show HEAD` =~ /^\s*commit\s*#{revision}\s*$/i
             end
           end
         end
@@ -394,6 +403,7 @@ module Externals
           end
         end
       end
+
     end
   end
 end
