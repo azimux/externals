@@ -9,82 +9,6 @@ module Externals
     class TestCheckoutWithSubprojectsSvn < TestCase
       include ExtTestCase
 
-      def setup
-        return
-        destroy_rails_application
-        create_rails_application
-        destroy_test_repository 'svn'
-        initialize_test_svn_repository
-        destroy_test_modules_repository 'svn'
-        create_test_modules_repository 'svn'
-
-        Dir.chdir File.join(root_dir, 'test') do
-          parts = 'workdir/checkout/rails_app/vendor/plugins/foreign_key_migrations/lib/red_hill_consulting/foreign_key_migrations/active_record/connection_adapters/.svn/text-base/table_definition.rb.svn-base'.split('/')
-          if File.exists? File.join(*parts)
-            Dir.chdir File.join(*(parts[0..-2])) do
-              File.delete parts[-1]
-            end
-          end
-
-          `rm -rf workdir`
-          repo_url = repository_dir('svn')
-          if windows?
-            repo_url = repo_url.gsub(/\\/, "/")
-          end
-
-          puts `svn co file:///#{repository_dir('svn')} #{File.join("workdir","rails_app")}`
-          Dir.chdir File.join('workdir', "rails_app") do
-            puts `cp -r #{rails_application_dir}/* .`
-
-            SvnProject.add_all
-
-            Ext.run "init"
-            raise " could not create .externals"  unless File.exists? '.externals'
-            %w(rails acts_as_list).each do |proj|
-              Ext.run "install", File.join(root_dir, 'test', 'cleanreps', "#{proj}.git")
-            end
-
-            #install a couple svn managed subprojects
-            %w(foreign_key_migrations redhillonrails_core).each do |proj|
-              Ext.run "install", "--svn", "file:///#{File.join(root_dir, 'test', 'cleanreps', proj)}"
-            end
-
-            #install project with a branch
-            Ext.run "install", File.join(root_dir, 'test', 'cleanreps', 'engines.git'), "-b", "edge"
-
-            #install project with a non-default path
-            Ext.run "install", "--svn", "file:///#{modules_repository_dir('svn')}", "modules"
-
-            SvnProject.add_all
-
-            puts `svn commit -m "created empty rails app with some subprojects"`
-          end
-        end
-      end
-
-      def teardown
-        return
-        destroy_rails_application
-        destroy_test_repository 'svn'
-        destroy_test_modules_repository 'svn'
-
-
-        Dir.chdir File.join(root_dir, 'test') do
-          parts = 'workdir/checkout/rails_app/vendor/plugins/foreign_key_migrations/lib/red_hill_consulting/foreign_key_migrations/active_record/connection_adapters/.svn/text-base/table_definition.rb.svn-base'.split('/')
-          if File.exists? File.join(*parts)
-            Dir.chdir File.join(*(parts[0..-2])) do
-              File.delete parts[-1]
-            end
-          end
-          `rm -rf workdir`
-        end
-
-
-        Dir.chdir File.join(root_dir, 'test') do
-          `rm -rf workdir`
-        end
-      end
-
       def test_checkout_with_subproject
         repository = RailsAppSvnRepository.new
         repository.prepare
@@ -116,6 +40,17 @@ module Externals
             assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
             assert File.exists?(File.join('vendor', 'rails', '.git'))
+
+            Dir.chdir File.join('vendor', 'rails') do
+              heads = File.readlines("heads").map(&:strip)
+              assert_equal 3, heads.size
+              heads.each do |head|
+                assert head =~ /^[0-9a-f]{40}$/
+              end
+
+              assert `git show #{heads[0]}` =~
+                /^\s*commit\s+#{heads[0]}\s*$/
+            end
 
             assert File.exists?(File.join('modules', 'modules.txt'))
 
@@ -263,97 +198,100 @@ module Externals
       end
 
       def test_update_with_missing_subproject_svn
-        return
-        Dir.chdir File.join(root_dir, 'test') do
-          Dir.chdir 'workdir' do
-            `mkdir update`
-            Dir.chdir 'update' do
-              source = repository_dir('svn')
+        repository = RailsAppSvnRepository.new
+        repository.prepare
+        subproject = SvnRepositoryFromDump.new("empty_plugin")
+        subproject.prepare
 
-              if windows?
-                source = source.gsub(/\\/, "/")
-              end
-              source = "file:///#{source}"
+        workdir = File.join(root_dir, 'test', "tmp", "workdir", "checkout")
+        rm_rf_ie workdir
+        mkdir_p workdir
+        Dir.chdir workdir do
+          source = repository.clean_url
 
+          puts "About to checkout #{source}"
+          Ext.run "checkout", "--svn", source, 'rails_app'
 
+          Dir.chdir 'rails_app' do
+            pretests = proc do
+              assert File.exists?('.svn')
+              assert !File.exists?(File.join('vendor', 'plugins', subproject.name, 'lib'))
+              assert File.read(".externals") =~ /rails/
+              assert File.read(".externals") !~ /empty_plugin/
+            end
+
+            pretests.call
+
+            #add a project
+            workdir2 = File.join "workdir2", "svn"
+            rm_rf_ie workdir2
+            mkdir_p workdir2
+
+            Dir.chdir workdir2 do
               puts "About to checkout #{source}"
               Ext.run "checkout", "--svn", source, 'rails_app'
 
               Dir.chdir 'rails_app' do
-                pretests = proc do
-                  assert File.exists?('.svn')
-                  assert !File.exists?(File.join('vendor', 'plugins', 'empty_plugin', 'lib'))
-                  assert File.read(".externals") =~ /rails/
-                  assert File.read(".externals") !~ /empty_plugin/
-                end
+                #install a new project
+                Ext.run "install", "--svn", subproject.clean_url
 
-                pretests.call
+                SvnProject.add_all
 
-                #add a project
-                Dir.chdir File.join(root_dir, 'test') do
-                  Dir.chdir File.join('workdir', "rails_app") do
-                    #install a new project
-                    Ext.run "install", "--svn", "file:///#{File.join(root_dir, 'test', 'cleanreps', 'empty_plugin')}"
-
-                    SvnProject.add_all
-
-                    puts `svn commit -m "added another subproject (empty_plugin)"`
-                  end
-                end
-
-                pretests.call
-
-                #update the project and make sure ssl_requirement was added and checked out
-                Ext.run "update"
-                assert File.read(".externals") =~ /empty_plugin/
-                assert File.exists?(File.join('vendor', 'plugins', 'empty_plugin', 'lib'))
+                repository.mark_dirty
+                puts `svn commit -m "added another subproject (#{subproject.name})"`
               end
             end
+
+            pretests.call
+
+            #update the project and make sure ssl_requirement was added and checked out
+            Ext.run "update"
+            assert File.read(".externals") =~ /empty_plugin/
+            assert File.exists?(File.join('vendor', 'plugins', subproject.name, 'lib'))
           end
         end
       end
 
       def test_export_with_subproject
-        return
-        Dir.chdir File.join(root_dir, 'test') do
-          Dir.chdir 'workdir' do
-            `mkdir export`
-            Dir.chdir 'export' do
-              source = repository_dir('svn')
+        repository = RailsAppSvnRepository.new
+        repository.prepare
 
-              if windows?
-                source.gsub!(/\\/, "/")
+        workdir = File.join(root_dir, 'test', "tmp", "workdir", "export")
+        rm_rf_ie workdir
+        mkdir_p workdir
+        Dir.chdir workdir do
+          source = repository.clean_url
+
+          puts "About to export #{source}"
+          Ext.run "export", "--svn", source, 'rails_app'
+
+          Dir.chdir 'rails_app' do
+            assert !File.exists?('.svn')
+
+            Dir.chdir File.join('vendor', 'rails') do
+              heads = File.readlines("heads").map(&:strip)
+              assert_equal 3, heads.size
+              heads.each do |head|
+                assert head =~ /^[0-9a-f]{40}$/
               end
-              source = "file:///#{source}"
 
-
-              puts "About to export #{source}"
-              Ext.run "export", "--svn", source, 'rails_app'
-
-              Dir.chdir 'rails_app' do
-                assert !File.exists?('.svn')
-
-                Dir.chdir File.join('vendor', 'rails') do
-                  #can't check this if it's local.  It seems --depth 1 is ignored for
-                  #repositories on the local machine.
-                  #assert `git show 92f944818eece9fe4bc62ffb39accdb71ebc32be` !~ /azimux/
-                end
-
-                %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
-                  puts "filethere? #{proj}: #{File.exists?(File.join('vendor', 'plugins', proj, 'lib'))}"
-                  if !File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
-                    puts "here"
-                  end
-                  assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
-                end
-
-                %w(foreign_key_migrations redhillonrails_core).each do |proj|
-                  assert !File.exists?(File.join('vendor', 'plugins',proj, '.svn'))
-                end
-
-                assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
-              end
+              assert `git show #{heads[0]}` !~
+                /^\s*commit\s+#{heads[0]}\s*$/
             end
+
+            %w(redhillonrails_core acts_as_list).each do |proj|
+              puts "filethere? #{proj}: #{File.exists?(File.join('vendor', 'plugins', proj, 'lib'))}"
+              if !File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+                puts "here"
+              end
+              assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+            end
+
+            %w(redhillonrails_core).each do |proj|
+              assert !File.exists?(File.join('vendor', 'plugins',proj, '.svn'))
+            end
+
+            assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
           end
         end
       end

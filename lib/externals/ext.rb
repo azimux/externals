@@ -81,6 +81,9 @@ module Externals
 
   COMMANDS = FULL_COMMANDS + SHORT_COMMANDS + MAIN_COMMANDS
 
+  COULD_NOT_DETERMINE_SCM = 1
+  NO_EXTERNALS_FILE = 2
+
   Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','scms')).each do |project|
     require "externals/scms/#{project}" if project =~ /_project.rb$/
   end
@@ -404,7 +407,10 @@ Please use
     end
 
     def install args, options
-      init args, options unless File.exists? '.externals'
+      if !File.exists? '.externals'
+        STDERR.puts "This project does not appear to be managed by externals.  Try 'ext init' first"
+        exit NO_EXTERNALS_FILE
+      end
       repository = args[0]
       path = args[1]
 
@@ -415,10 +421,11 @@ Please use
       scm ||= infer_scm(repository)
 
       unless scm
-        raise "Unable to determine SCM from the repository name.
+        STDERR.puts "Unable to determine SCM from the repository name.
 You need to either specify the scm used to manage the subproject
 that you are installing. Use an option to specify it
 (such as --git or --svn)"
+        exit COULD_NOT_DETERMINE_SCM
       end
 
       project = self.class.project_class(scm).new(:repository => repository,

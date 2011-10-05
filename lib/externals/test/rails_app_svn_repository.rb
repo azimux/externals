@@ -13,7 +13,7 @@ module Externals
       include SvnRepositoryHelper
 
       def initialize
-        super "rails_app", "svn"
+        super "rails_app", "svn2"
         dependents.merge!(
           :acts_as_list => GitRepositoryFromInternet.new("acts_as_list.git"),
           :ssl_requirement => GitRepositoryFromInternet.new("ssl_requirement.git"),
@@ -68,9 +68,10 @@ module Externals
             #            raise unless $? == 0
 
             #install some git subprojects
-            [:rails, :acts_as_list].each do |proj|
-              Ext.run "install", dependents[proj].clean_dir
-            end
+            Ext.run "install", dependents[:acts_as_list].clean_dir
+            #we have to use file:// to test export, because without that
+            #git clone optimizes by copying and igores --depth
+            Ext.run "install", "file://#{dependents[:rails].clean_dir}"
 
             #install a couple svn managed subprojects
             [

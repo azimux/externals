@@ -1,12 +1,7 @@
 .svn
-test/workdir
-test/applications/rails_app
 nbproject/
 *~
 tmp/*
 pkg/
-test/repositories/
-test/cleanreps/
-test/test_svn_global_opts/
 test/tmp
 doc/*

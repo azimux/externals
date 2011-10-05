@@ -79,6 +79,10 @@ module Externals
 
       # builds/copies the test repository if needed
       def prepare
+        #let's mark ourselves as dirty if any of our dependents are dirty
+        if dependents.values.detect(&:'dirty?')
+          mark_dirty
+        end
         dependents.values.each {|child| child.prepare}
 
         if dirty?
