@@ -1,4 +1,5 @@
 require 'externals/extensions/symbol'
+require 'fileutils'
 
 module Externals
   OPTS_SUFFIXES = ["co", "up", "st", "ex"]  unless const_defined?('OPTS_SUFFIXES')
@@ -9,6 +10,8 @@ module Externals
 
   class Project
     attr_accessor :parent
+    include FileUtils
+    extend FileUtils
 
     def self.attr_attr_accessor *names
       names = [names].flatten

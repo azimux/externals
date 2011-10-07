@@ -29,8 +29,7 @@ module Externals
     def delete_if_dirty file
       if File.exists? file
         if dirty?(file)
-          `rm -r #{file}`
-          raise unless $? == 0
+          rm_r file
         end
       end
     end

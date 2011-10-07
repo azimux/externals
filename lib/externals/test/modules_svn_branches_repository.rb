@@ -13,9 +13,9 @@ module Externals
       def build_here
         puts `svnadmin create #{name}`
 
-        `mkdir workdir` unless File.exists? 'workdir'
+        mkdir_p 'workdir'
         Dir.chdir 'workdir' do
-          `rm -rf #{name}`
+          rm_rf name
 
           cmd = "svn checkout \"#{clean_url}\""
           puts "about to run #{cmd}"
@@ -23,10 +23,8 @@ module Externals
           raise unless $? == 0
 
           Dir.chdir name do
-            `mkdir branches`
-            raise unless $? == 0
-            `mkdir current`
-            raise unless $? == 0
+            mkdir "branches"
+            mkdir "current"
 
             SvnProject.add_all
             puts `svn commit -m "created branch directory structure"`
@@ -63,8 +61,7 @@ module Externals
             raise unless $? == 0
           end
 
-          `rm -rf #{name}`
-          raise unless $? == 0
+          rm_rf name
         end
       end
 

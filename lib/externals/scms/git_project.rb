@@ -12,8 +12,7 @@ module Externals
 
       puts "path is #{path} repository is #{repository}"
       if path != '.'
-        (rmdircmd = "rmdir #{path}")
-        `#{rmdircmd}` if File.exists?(path)
+        rmdir_ie path
       end
 
       dest = path
@@ -118,8 +117,7 @@ module Externals
 
     def ex *args
       if path != '.'
-        (rmdircmd = "rmdir #{path}")
-        `#{rmdircmd}` if File.exists? path
+        rmdir_ie path
       end
 
       dest = path

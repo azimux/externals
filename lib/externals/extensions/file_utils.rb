@@ -11,6 +11,16 @@ FileUtils.class_eval do
     rm_rf file, options if File.exists? file
   end
 
+  # calls rmdir if the file exists and is empty
+  def rmdir_if_empty_ie path
+    rmdir path if File.exists?(path) && dir_empty?(path)
+  end
+
+  # calls rmdir if the file exists
+  def rmdir_ie path
+    rmdir path if File.exists?(path)
+  end
+
   alias rm_rf_old rm_rf
   #going to try to give a delay after calling rm if necessary...
   def rm_rf *args
@@ -20,5 +30,11 @@ FileUtils.class_eval do
       sleep 1
       tries += 1
     end
+  end
+
+  def dir_empty? path
+    File.directory?(path) && 
+      File.exists?(path) &&
+      !Dir.entries(path).detect{|entry| !["..","."].include?(entry)}
   end
 end

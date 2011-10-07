@@ -9,8 +9,7 @@ module Externals
     public
     def co *args
       # delete path if not empty
-      rmdircmd = "rmdir #{path}"
-      `#{rmdircmd}` if File.exists? path
+      rmdir_ie path
 
       if File.exists? path
         up
@@ -46,8 +45,7 @@ module Externals
 
     def ex *args
       # delete path if not empty
-      (rmdircmd = "rmdir #{path}")
-      `#{rmdircmd}`
+      rmdir_ie path
 
       url = repository
 
@@ -60,7 +58,6 @@ module Externals
         url += "@#{revision}"
       end
 
-      `#{rmdircmd}` if File.exists? path
       puts(svncocmd = "svn #{scm_opts_ex} export #{url} #{path}")
       puts `#{svncocmd}`
     end
@@ -79,10 +76,8 @@ module Externals
     end
 
     def up *args
-      # delete path if not empty
-      rmdircmd = "rmdir #{path}"
-      `#{rmdircmd}` if File.exists? path
-
+      # delete path if empty
+      rmdir_if_empty_ie path
 
       if File.exists? path
         puts "updating #{path}:"

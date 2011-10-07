@@ -114,18 +114,14 @@ module Externals
         if !File.exists? pristine_dir
           pristine_mark_dirty
           Dir.chdir pristine_dir_parent do
-            `cp -a #{clean_dir} .`
-            unless $? == 0
-              raise
-            end
+            cp_a clean_dir, "."
           end
           pristine_unmark_dirty
         end
       end
 
       def copy_pristine_here
-        `cp -a #{pristine_dir} .`
-        raise unless $? == 0
+        cp_a pristine_dir, "."
       end
 
       def pristine_exists?
@@ -134,19 +130,13 @@ module Externals
 
       def delete_clean_dir
         Dir.chdir clean_dir_parent do
-          if File.exists?(name)
-            `rm -rf #{name}`
-            raise unless $? == 0
-          end
+          rm_rf_ie name
         end
       end
 
       def delete_pristine_dir
         Dir.chdir pristine_dir_parent do
-          if File.exists?(name)
-            `rm -rf #{name}`
-            raise unless $? == 0
-          end
+          rm_rf_ie name
         end
       end
 

@@ -2,6 +2,8 @@ require 'externals/project'
 require 'externals/configuration/configuration'
 require 'optparse'
 require 'externals/command'
+require 'fileutils'
+
 Dir.entries(File.join(File.dirname(__FILE__), 'extensions')).each do |extension|
   require "externals/extensions/#{extension}" if extension =~ /.rb$/
 end
@@ -93,6 +95,9 @@ module Externals
   end
 
   class Ext
+    include FileUtils
+    extend FileUtils
+
     attr_accessor :path_calculator
 
     def self.project_types
@@ -467,7 +472,7 @@ that you are installing. Use an option to specify it
 
       if options[:force_removal]
         Dir.chdir File.dirname(project.path) do
-          `rm -rf #{File.basename(project.path)}`
+          rm_rf File.basename(project.path)
         end
       end
     end

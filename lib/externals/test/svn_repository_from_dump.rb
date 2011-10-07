@@ -12,11 +12,8 @@ module Externals
 
       #builds the test repository in the current directory
       def build_here
-        puts `cp #{
-        File.join root_dir, "test", "setup", "#{name}.svn.gz"
-} .`
+        cp_a File.join(root_dir, "test", "setup", "#{name}.svn.gz"), "."
 
-        raise unless $? == 0
         puts `gzip -d #{name}.svn.gz`
         raise unless $? == 0
         puts `svnadmin create #{name}`

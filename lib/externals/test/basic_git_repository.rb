@@ -8,8 +8,7 @@ module Externals
       end
 
       def build_here
-        `mkdir #{name}`
-        raise unless $? == 0
+        mkdir name
 
         Dir.chdir("#{name}") do
           `git init`
