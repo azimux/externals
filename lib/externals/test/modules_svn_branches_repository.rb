@@ -17,10 +17,12 @@ module Externals
         Dir.chdir 'workdir' do
           rm_rf name
 
-          cmd = "svn checkout \"#{clean_url}\""
+          cmd = "svn checkout \'#{clean_url}\'"
           puts "about to run #{cmd}"
           puts `#{cmd}`
-          raise unless $? == 0
+          unless $? == 0
+            raise
+          end
 
           Dir.chdir name do
             mkdir "branches"

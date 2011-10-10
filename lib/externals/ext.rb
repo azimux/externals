@@ -9,7 +9,7 @@ Dir.entries(File.join(File.dirname(__FILE__), 'extensions')).each do |extension|
 end
 
 module Externals
-  VERSION = '1.0.3'
+  VERSION = '1.0.4'
   PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
 
   # Full commands operate on the main project as well as the externals

@@ -1,3 +1,10 @@
+October 9, 2011 Version 1.0.4 released
+- Dependency on programs such as rm, rmdir, cp, etc, removed.  Now only
+  dependent on the actual SCM executables (and gzip to run the tests.)
+- Tests have been restructured and now take significantly much less time to run.
+- Fixed a bug caused by a file failing to be packaged with the rest of the
+  1.0.3 gem.
+
 September 28, 2011 Version 1.0.3 released
 - "up" now changes branches of subprojects
 - Subversion branch support added

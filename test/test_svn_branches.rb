@@ -68,7 +68,7 @@ module Externals
 
             assert_equal "current", modules.current_branch
             assert_equal "current", ext.configuration["modules"]["branch"]
-
+gi
             assert !File.exists?(File.join(%w(vendor plugins ssl_requirement)))
             assert !File.exists?(File.join(%w(vendor plugins empty_plugin)))
 

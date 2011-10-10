@@ -59,7 +59,7 @@ the main project.}
   specification.email = "azimux@gmail.com"
   specification.homepage = "http://nopugs.com/ext-tutorial"
 
-  specification.test_files = FileList['test/test_*.rb']
+  specification.test_files = FileList['test/test_*.rb', 'test/setup/*.gz']
 
   specification.bindir = "bin"
   specification.executables = ['ext']

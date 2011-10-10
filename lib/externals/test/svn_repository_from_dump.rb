@@ -14,7 +14,7 @@ module Externals
       def build_here
         cp_a File.join(root_dir, "test", "setup", "#{name}.svn.gz"), "."
 
-        puts `gzip -d #{name}.svn.gz`
+        puts `gzip -f -d #{name}.svn.gz`
         raise unless $? == 0
         puts `svnadmin create #{name}`
         raise unless $? == 0
