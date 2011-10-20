@@ -17,7 +17,7 @@ module Externals
         Dir.chdir 'workdir' do
           rm_rf name
 
-          cmd = "svn checkout \'#{clean_url}\'"
+          cmd = "svn checkout \"#{clean_url}\""
           puts "about to run #{cmd}"
           puts `#{cmd}`
           unless $? == 0

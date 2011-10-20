@@ -7,7 +7,7 @@ module Externals
     end
 
     private
-    def co_or_up command
+    def do_clone command, extra_opts = ""
       opts = resolve_opts(command)
 
       puts "path is #{path} repository is #{repository}"
@@ -19,18 +19,16 @@ module Externals
       dest = '' if dest == '.'
       dest = "\"#{dest}\"" if dest && !dest.empty?
 
-      puts(gitclonecmd = "git #{opts} clone \"#{repository}\" #{dest}")
+      puts(gitclonecmd = "git #{opts} clone #{extra_opts} \"#{repository}\" #{dest}")
       puts `#{gitclonecmd}`
       unless $? == 0
         raise "git clone of #{repository} failed."
       end
-
-      change_to_branch_revision(command)
     end
 
     public
     def co *args
-      co_or_up "co"
+      do_up "co"
     end
 
     private
@@ -40,27 +38,37 @@ module Externals
       `git #{opts} branch -a` =~ /^\s*#{branch_name}\s*$/
     end
 
+    # make sure you have already entered Dir.chdir(path) in your calling code!
+
     public
+    # this method fetches/pulls/changes branches/changes revisions/changes the oil in your geo metro/brings world peace
     def change_to_branch_revision command = ""
       opts = resolve_opts(command)
+
+      pulled = false
+
+      project_path = if path == "."
+        name || "."
+      else
+        path
+      end
+
+      Dir.chdir project_path do
+        do_fetch command
+      end
+
 
       if branch
         cb = current_branch
 
         # This allows the main project to be checked out to a directory
         # that doesn't match it's name.
-        project_path = if path == "."
-          name
-        else
-          path
-        end
-
         Dir.chdir project_path do
           if cb != branch
             # let's see if the branch exists in the remote repository
             # and if not, fetch it.
             if !branch_exists("origin/#{branch}")
-              puts `git #{opts} fetch`
+              do_fetch command
             end
 
             # if the local branch doens't exist, add --track -b
@@ -74,15 +82,27 @@ module Externals
             end
           end
         end
+
+        # on the right branch, let's pull
+        Dir.chdir project_path do
+          `git #{opts} pull`
+          raise unless $? == 0
+          pulled = true
+        end
       end
 
       if revision
-        Dir.chdir path do
-          puts `git #{opts} fetch`
-          puts `git #{opts} pull`
+        Dir.chdir project_path do
           puts `git #{opts} checkout #{revision}`
           unless $? == 0
             raise "Could not checkout #{revision}"
+          end
+        end
+      else
+        unless pulled
+          Dir.chdir project_path do
+            `git #{opts} pull`
+            raise unless $? == 0
           end
         end
       end
@@ -116,38 +136,46 @@ module Externals
     end
 
     def ex *args
-      if path != '.'
-        rmdir_ie path
-      end
+      do_clone "ex", "--depth 1"
 
-      dest = path
-
-      dest = '' if dest == '.'
-
-      dest = "\"#{dest}\"" if dest && !dest.empty?
-
-      puts(gitclonecmd = "git #{scm_opts_ex} clone --depth 1 \"#{repository}\" #{dest}")
-
-      puts `#{gitclonecmd}`
-
+      puts "Exporting #{path}..."
       change_to_branch_revision "ex"
     end
 
     def up *args
-      if File.exists? path
-        puts "updating #{path}:"
-        if revision || branch
-          change_to_branch_revision "up"
-        else
-          Dir.chdir path do
-            puts `git #{scm_opts_up} pull`
-          end
-        end
-      else
-        co_or_up "up"
-      end
+      do_up "up"
     end
 
+    private
+    def do_fetch command
+      opts = resolve_opts(command)
+      `git #{opts} fetch`
+      raise unless $? == 0
+    end
+
+    def do_up command
+      opts = resolve_opts(command)
+
+      project_path = if path == "."
+        name || "." # if no name is specified then we are expected to already be in the right path.
+        # this is a little confusing and should be cleaned up.
+        # When we are doing a checkout, the name is set manually in Ext.checkout.
+        # we are then in the parent directory.
+        # When we are doing an update, the main project has no name.
+        # we are then in the correct directory.
+      else
+        path
+      end
+
+      puts "Updating #{path}..."
+
+      if !File.exists? project_path
+        do_clone command
+      end
+      change_to_branch_revision command
+    end
+
+    public
     def st *args
       puts "\nstatus for #{path}:"
       Dir.chdir path do

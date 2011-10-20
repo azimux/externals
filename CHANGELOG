@@ -1,3 +1,10 @@
+October 19, 2011 Version 1.0.6 released
+- Replaced some useful program output that was removed in 1.0.5
+
+October 19, 2011 Version 1.0.5 released
+- Fixed a small bug preventing subprojects managed under git to update if they
+  have a branch set in .externals.
+
 October 9, 2011 Version 1.0.4 released
 - Dependency on programs such as rm, rmdir, cp, etc, removed.  Now only
   dependent on the actual SCM executables (and gzip to run the tests.)

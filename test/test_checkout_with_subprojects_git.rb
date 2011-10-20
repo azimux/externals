@@ -107,7 +107,9 @@ module Externals
 
           #now let's check it out again to test "ext checkout -b new_branch"
           rm_rf "rails_app"
-          raise if File.exists?("rails_app")
+          if File.exists?("rails_app")
+            raise
+          end
 
           Ext.run "checkout", "--git", "-b", "new_branch", source
 

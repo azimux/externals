@@ -8,7 +8,7 @@ module Externals
     class TestOutOfDateGitSubproject < TestCase
       include ExtTestCase
 
-      def test_checkout
+      def test_out_of_date_sub
         repository = SimpleGitWithSub.new
         repository.prepare
 
@@ -42,6 +42,7 @@ module Externals
           # let's update the subproject and make sure that ext update works.
 
           tmp = "tmp_update_sub"
+          rm_rf tmp
           mkdir tmp
           Dir.chdir tmp do
             `git clone #{repository.dependents[:basic].clean_dir}`

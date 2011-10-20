@@ -68,9 +68,12 @@ module Externals
 
             assert_equal "current", modules.current_branch
             assert_equal "current", ext.configuration["modules"]["branch"]
-gi
+
             assert !File.exists?(File.join(%w(vendor plugins ssl_requirement)))
             assert !File.exists?(File.join(%w(vendor plugins empty_plugin)))
+
+            #let's run update.  This can expose certain errors.
+            Ext.run "update"
 
             `svn switch #{[source, "branches", "new_branch"].join("/")}`
             unless $? == 0
@@ -116,6 +119,9 @@ gi
 
             assert File.read(File.join('modules', 'modules.txt')) =~
               /line 2 of modules.txt ... this is branch2!/
+
+            #let's run update.  This can expose certain errors.
+            Ext.run "update"
 
             `svn switch #{[source, "current"].join("/")}`
             ext = Ext.new
