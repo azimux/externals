@@ -1,8 +1,7 @@
 Externals is a project that allows you to use the workflow normally made
 possible by svn:externals in an SCM independent manner.
 
-Please report bugs to either http://rubyforge.org/projects/ext or
-http://ext.lighthouseapp.com
+Please report bugs to https://github.com/azimux/externals/issues
 
 I was inspired to create this project because I had several projects that had
 a mix of plugins managed by git and by svn.  Git's submodule feature is
