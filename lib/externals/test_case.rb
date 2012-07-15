@@ -29,7 +29,7 @@ module Externals
     def delete_if_dirty file
       if File.exists? file
         if dirty?(file)
-          rm_r file
+          rm_rf file
         end
       end
     end

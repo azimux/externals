@@ -12,7 +12,7 @@ module Externals
         repository = BasicGitRepository.new
         repository.prepare
 
-        assert File.exists?(File.join(repository.clean_dir, ".git"))
+        assert File.exists?(repository.clean_dir)
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir")
         mkdir_p workdir

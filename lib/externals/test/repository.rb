@@ -129,15 +129,13 @@ module Externals
       end
 
       def delete_clean_dir
-        Dir.chdir clean_dir_parent do
-          rm_rf_ie name
-        end
+        raise "hmmm... too scared to delete #{clean_dir}" unless clean_dir =~ /[\/\\]test[\/\\]tmp[\/\\]/
+        rm_rf_ie clean_dir
       end
 
       def delete_pristine_dir
-        Dir.chdir pristine_dir_parent do
-          rm_rf_ie name
-        end
+        raise "hmmm... too scared to delete #{pristine_dir}" unless clean_dir =~ /[\/\\]test[\/\\]tmp[\/\\]/
+        rm_rf_ie pristine_dir
       end
 
       def dirty?

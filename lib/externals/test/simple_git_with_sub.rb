@@ -1,9 +1,9 @@
-require 'externals/test/repository'
+require 'externals/test/git_repository'
 require 'externals/test/basic_git_repository'
 
 module Externals
   module Test
-    class SimpleGitWithSub < Repository
+    class SimpleGitWithSub < GitRepository
       def initialize
         super "simple_wth_sub", File.join("git", "5")
         dependents.merge!(
@@ -12,9 +12,15 @@ module Externals
       end
 
       def build_here
-        mkdir name
+        mkdir "#{name}.git"
+        Dir.chdir "#{name}.git" do
+          `git init --bare`
+          raise unless $? == 0
+        end
 
-        Dir.chdir("#{name}") do
+        mkdir "#{name}.working"
+
+        Dir.chdir("#{name}.working") do
           `git init`
           raise unless $? == 0
 
@@ -54,7 +60,11 @@ module Externals
           raise unless $? == 0
           `git commit -m "added basic subproject under subs"`
           raise unless $? == 0
+          `git push ../#{name}.git HEAD:master`
+          raise unless $? == 0
         end
+
+        rm_rf "#{name}.working"
       end
 
     end

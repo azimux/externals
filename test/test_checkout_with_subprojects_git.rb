@@ -12,8 +12,6 @@ module Externals
         repository = RailsAppGitBranches.new
         repository.prepare
 
-        assert File.exists?(File.join(repository.clean_dir, "db"))
-
         workdir = File.join(root_dir, 'test', "tmp", "workdir", "branches", "git")
         mkdir_p workdir
 
@@ -127,8 +125,6 @@ module Externals
       def test_uninstall
         repository = RailsAppGitBranches.new
         repository.prepare
-
-        assert File.exists?(File.join(repository.clean_dir, "db"))
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir", "branches", "uninstall", "git")
         mkdir_p workdir

@@ -1,11 +1,11 @@
-require 'externals/test/repository'
+require 'externals/test/git_repository'
 require 'externals/test/engines'
 
 module Externals
   module Test
-    class EnginesWithBranch1 < Repository
+    class EnginesWithBranch1 < GitRepository
       def initialize
-        super "engines.git", File.join("git", "with_branch1")
+        super "engines", File.join("git", "with_branch1")
         dependents.merge!(
           :other_engines => Engines.new
         )
@@ -15,7 +15,7 @@ module Externals
       def build_here
         rm_rf_ie name
 
-        puts `git clone --bare #{dependents[:other_engines].clean_dir} #{name}`
+        puts `git clone --bare #{dependents[:other_engines].clean_dir} #{name}.git`
         raise unless $? == 0
 
         rm_rf_ie "workdir"

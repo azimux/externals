@@ -12,7 +12,7 @@ module Externals
         repository = BasicGitRepository.new
         repository.prepare
 
-        assert File.exists?(File.join(repository.clean_dir, ".git"))
+        assert File.exists?(repository.clean_dir)
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir")
         mkdir_p workdir
@@ -20,7 +20,8 @@ module Externals
         Dir.chdir workdir do
           delete_if_dirty(repository.name)
           if !File.exists?(repository.name)
-            cp_a repository.clean_dir, "."
+            `git clone #{repository.clean_dir} #{repository.name}`
+            raise unless $? == 0
           end
 
           mark_dirty(repository.name)

@@ -1,12 +1,12 @@
-require 'externals/test/repository'
+require 'externals/test/git_repository'
 require 'find'
 require 'externals/test/git_repository_from_internet'
 
 module Externals
   module Test
-    class FakeRailsRepository < Repository
+    class FakeRailsRepository < GitRepository
       def initialize
-        super "rails.git", "fake3"
+        super "rails", "fake3"
       end
 
       def build_here
@@ -57,7 +57,7 @@ module Externals
           raise unless $? == 0
           puts `git commit -m "rails with all but 1 file per directory deleted"`
           raise unless $? == 0
-          puts `git push ../rails.git master`
+          puts `git push ../rails.git HEAD:master`
           raise unless $? == 0
 
           head1 = nil
@@ -73,7 +73,7 @@ module Externals
           raise unless $? == 0
           puts `git commit -m "dummy commit 1"`
           raise unless $? == 0
-          puts `git push ../rails.git master`
+          puts `git push ../rails.git HEAD:master`
           raise unless $? == 0
 
           open "heads", "a" do |file|
@@ -87,7 +87,7 @@ module Externals
           raise unless $? == 0
           puts `git commit -m "dummy commit 2"`
           raise unless $? == 0
-          puts `git push ../rails.git master`
+          puts `git push ../rails.git HEAD:master`
           raise unless $? == 0
 
           open "heads", "a" do |file|
@@ -101,7 +101,7 @@ module Externals
           raise unless $? == 0
           puts `git commit -m "dummy commit 3"`
           raise unless $? == 0
-          puts `git push ../rails.git master`
+          puts `git push ../rails.git HEAD:master`
           raise unless $? == 0
         end
         rm_rf "fake_rails"

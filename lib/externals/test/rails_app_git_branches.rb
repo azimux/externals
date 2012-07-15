@@ -1,4 +1,4 @@
-require 'externals/test/repository'
+require 'externals/test/git_repository'
 require 'externals/test/git_repository_from_internet'
 require 'externals/test/svn_repository_from_dump'
 require 'externals/test/engines_with_branch1'
@@ -7,11 +7,11 @@ require 'externals/test/rails_app_unmanaged'
 
 module Externals
   module Test
-    class RailsAppGitBranches < Repository
+    class RailsAppGitBranches < GitRepository
       def initialize
         super "rails_app", File.join("git", "branches")
         dependents.merge!(
-          :acts_as_list => GitRepositoryFromInternet.new("acts_as_list.git"),
+          :acts_as_list => GitRepositoryFromInternet.new("acts_as_list"),
           :redhillonrails_core => SvnRepositoryFromDump.new("redhillonrails_core"),
           :foreign_key_migrations => SvnRepositoryFromDump.new("foreign_key_migrations"),
           :engines => EnginesWithBranch1.new,
@@ -24,9 +24,15 @@ module Externals
       end
 
       def build_here
-        cp_a dependents[:rails_app_unmanaged].clean_dir, name
+        mkdir "#{name}.git"
+        Dir.chdir "#{name}.git" do
+          `git init --bare`
+          raise unless $? == 0
+        end
 
-        Dir.chdir name do
+        cp_a dependents[:rails_app_unmanaged].clean_dir, "#{name}.working"
+
+        Dir.chdir "#{name}.working" do
           Ext.run "touch_emptydirs"
 
           `git init`
@@ -66,6 +72,9 @@ module Externals
           `git commit -m "created empty rails app with some subprojects"`
           raise unless $? == 0
 
+          `git push ../#{name}.git HEAD:master`
+          raise unless $? == 0
+
           #let's create a branch for the main project called 'new_branch' and a
           #branch for the engines subproject called 'new_branch' and make sure
           #that checking one out and doing "ext up" correctly changes the branch
@@ -88,11 +97,11 @@ module Externals
           raise unless $? == 0
           `git commit -m "changed branch on engines subproject, removed rails"`
           raise unless $? == 0
-
-          #switch back to master...
-          `git checkout master`
+          `git push ../#{name}.git HEAD:new_branch`
           raise unless $? == 0
         end
+
+        rm_rf "#{name}.working"
       end
 
     end

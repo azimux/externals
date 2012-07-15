@@ -708,7 +708,7 @@ commands below if you actually wish to delete them."
           project_class.detected?
         end
 
-        raise "Could not determine this projects scm" if  possible_project_classes.empty?
+        raise "Could not determine this project's scm" if  possible_project_classes.empty?
         if possible_project_classes.size > 1
           raise "This project appears to be managed by multiple SCMs: #{
           possible_project_classes.map(&:to_s).join(',')}
