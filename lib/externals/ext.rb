@@ -392,12 +392,10 @@ Please use
 
       revision = args[1] || project.current_revision
 
-      branch = if project.freeze_involves_branch?
-        project.current_branch
-      end
-
       section = configuration[project.path]
+
       if section[:branch]
+        branch = project.current_branch
         if branch
           section[:branch] = branch
         else

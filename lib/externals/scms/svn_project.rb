@@ -39,6 +39,7 @@ module Externals
       if revision
         Dir.chdir path do
           puts `svn #{opts} up -r #{revision}`
+          raise unless $? == 0
         end
       end
     end
@@ -64,6 +65,7 @@ module Externals
 
     def switch branch_name, options = {}
       require_repository
+
       if current_branch != branch_name
         Dir.chdir path do
           url = [repository, branch_name].join("/")
@@ -149,6 +151,7 @@ module Externals
 
     def current_branch
       require_repository
+
       branch = info_url.gsub(/\/+/, "/").gsub(repository.gsub(/\/+/, "/"), "")
       if branch == repository
         raise "Could not determine branch from URL #{info_url}.
@@ -177,7 +180,7 @@ module Externals
     def require_repository
       if repository.nil? || repository.empty?
         url = info_url
-        url = "svn+ssh://server/path/repository" unless url
+        info_url = "svn+ssh://server/path/repository" unless url
         puts "to use any branching features with a subversion project, the
 repository must be present in the .externals file.
 
@@ -267,10 +270,6 @@ repository = #{info_url}
       Dir.chdir path do
         self.class.info_url scm_opts
       end
-    end
-
-    def freeze_involves_branch?
-      false
     end
 
   end

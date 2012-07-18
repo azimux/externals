@@ -134,7 +134,7 @@ module Externals
             subproject = ext.subproject_by_name_or_path("modules")
 
             assert_equal subproject.current_branch, "branches/branch2"
-            assert_equal subproject.current_revision, "4"
+            assert_equal subproject.current_revision, "3"
           end
         end
       end

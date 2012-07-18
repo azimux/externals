@@ -37,10 +37,6 @@ module Externals
       path == '.'
     end
 
-    def freeze_involves_branch?
-      true
-    end
-
     def self.scm
       if self == Project
         raise "subclass responsibility"
