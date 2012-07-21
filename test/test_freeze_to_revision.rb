@@ -135,6 +135,38 @@ module Externals
 
             assert_equal subproject.current_branch, "branches/branch2"
             assert_equal subproject.current_revision, "3"
+
+            # now let's test unfreezing...
+            Ext.run "unfreeze", "modules"
+            assert_equal subproject.current_branch, "branches/branch2"
+            assert_equal subproject.current_revision, "4"
+
+            # Check it in to make sure it sticks
+            `git add .externals`
+            raise unless $? == 0
+            `git commit -m 'unfreezing modules'`
+            raise unless $? == 0
+            `git push`
+            raise unless $? == 0
+          end
+        end
+
+        rm_rf workdir
+        mkdir_p workdir
+
+        Dir.chdir workdir do
+          rm_r repository.name if File.exists? repository.name
+          source = repository.clean_dir
+
+          puts "About to checkout #{source}"
+          Ext.run "checkout", "--git", source
+
+          Dir.chdir repository.name do
+            ext = Ext.new
+            subproject = ext.subproject_by_name_or_path("modules")
+
+            assert_equal subproject.current_branch, "branches/branch2"
+            assert_equal subproject.current_revision, "4"
           end
         end
       end
