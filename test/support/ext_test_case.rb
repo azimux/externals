@@ -2,7 +2,6 @@ require 'test/unit'
 require 'fileutils'
 
 module Externals
-  TestCase = Test::Unit::TestCase
   module ExtTestCase
     include FileUtils
 

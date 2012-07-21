@@ -1,11 +1,11 @@
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
-require 'externals/test_case'
+require 'ext_test_case'
 require 'externals/ext'
 require 'externals/test/rails_app_svn_branches'
 
 module Externals
   module Test
-    class TestSvnBranches < TestCase
+    class TestSvnBranches < ::Test::Unit::TestCase
       include ExtTestCase
 
       def test_checkout_with_subproject

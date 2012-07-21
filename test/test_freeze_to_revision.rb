@@ -1,5 +1,5 @@
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
-require 'externals/test_case'
+require 'ext_test_case'
 require 'externals/ext'
 require 'externals/test/rails_app_git_repository'
 require 'externals/test/basic_git_repository'
@@ -7,7 +7,7 @@ require 'externals/test/modules_svn_branches_repository'
 
 module Externals
   module Test
-    class TestFreezeToRevision < TestCase
+    class TestFreezeToRevision < ::Test::Unit::TestCase
       include ExtTestCase
 
       def test_freeze_to_revision

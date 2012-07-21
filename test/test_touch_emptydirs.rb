@@ -1,11 +1,11 @@
 $:.unshift File.join(File.dirname(__FILE__),'..','lib') if $0 == __FILE__
 
-require 'externals/test_case'
+require 'ext_test_case'
 require 'externals/ext'
 
 module Externals
   module Test
-    class TestTouchEmptydirs < TestCase
+    class TestTouchEmptydirs < ::Test::Unit::TestCase
       include ExtTestCase
 
       def setup

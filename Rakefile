@@ -11,7 +11,7 @@ $LOAD_PATH << File.join(root_dir, 'lib')
 require File.join(root_dir, 'lib', 'externals', 'ext')
 
 Rake::TestTask.new('test') do |task|
-  task.libs = [File.expand_path('lib'),File.expand_path('test')]
+  task.libs = [File.expand_path('lib'),File.expand_path('test/support')]
   task.pattern = './test/test_*.rb'
   #task.warning = true
 end

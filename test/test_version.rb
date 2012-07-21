@@ -1,11 +1,11 @@
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
-require 'externals/test_case'
+require 'ext_test_case'
 require 'externals/ext'
 require 'stringio'
 
 module Externals
   module Test
-    class TestVersion < TestCase
+    class TestVersion < ::Test::Unit::TestCase
       include ExtTestCase
 
       def test_version
