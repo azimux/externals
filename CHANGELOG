@@ -1,3 +1,6 @@
+July 20, 2012 Version 1.10 released
+- unfreeze feature added.
+
 July 17, 2012 Version 1.0.7 released
 - Fixes a bug that removes the branch from the .externals configuration
   file when freezing a subproject managed by subversion.
