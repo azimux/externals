@@ -1,7 +1,7 @@
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
 require 'ext_test_case'
 require 'externals/ext'
-require 'externals/test/rails_app_svn_branches'
+require 'rails_app_svn_branches'
 
 module Externals
   module Test

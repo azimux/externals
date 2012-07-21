@@ -1,4 +1,4 @@
-require 'externals/test/git_repository'
+require 'git_repository'
 
 module Externals
   module Test

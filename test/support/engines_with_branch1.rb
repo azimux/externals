@@ -1,5 +1,5 @@
-require 'externals/test/git_repository'
-require 'externals/test/engines'
+require 'git_repository'
+require 'engines'
 
 module Externals
   module Test

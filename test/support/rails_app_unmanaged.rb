@@ -1,4 +1,4 @@
-require 'externals/test/repository'
+require 'repository'
 
 module Externals
   module Test

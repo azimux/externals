@@ -1,11 +1,11 @@
-require 'externals/test/repository'
-require 'externals/test/git_repository_from_internet'
-require 'externals/test/svn_repository_from_dump'
-require 'externals/test/svn_repository_helper'
-require 'externals/test/engines_with_branch1'
-require 'externals/test/fake_rails_repository'
-require 'externals/test/modules_svn_branches_repository'
-require 'externals/test/rails_app_unmanaged'
+require 'repository'
+require 'git_repository_from_internet'
+require 'svn_repository_from_dump'
+require 'svn_repository_helper'
+require 'engines_with_branch1'
+require 'fake_rails_repository'
+require 'modules_svn_branches_repository'
+require 'rails_app_unmanaged'
 
 module Externals
   module Test

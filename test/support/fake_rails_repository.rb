@@ -1,6 +1,6 @@
-require 'externals/test/git_repository'
+require 'git_repository'
 require 'find'
-require 'externals/test/git_repository_from_internet'
+require 'git_repository_from_internet'
 
 module Externals
   module Test

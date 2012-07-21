@@ -1,5 +1,5 @@
-require 'externals/test/git_repository'
-require 'externals/test/basic_git_repository'
+require 'git_repository'
+require 'basic_git_repository'
 
 module Externals
   module Test

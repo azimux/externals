@@ -1,5 +1,5 @@
-require 'externals/test/repository'
-require 'externals/test/svn_repository_helper'
+require 'repository'
+require 'svn_repository_helper'
 
 module Externals
   module Test
