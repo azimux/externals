@@ -18,14 +18,15 @@ The externals executable is called ext.  Commands come in a long form and a
 short form.  The longer form applies the action to the main project.  The short
 forms apply the action to all sub projects.
 
-The commands and usage are as follows (from 'ext help'):
 There's a tutorial available at http://nopugs.com/ext-tutorial
 
+The commands and usage are as follows (from 'ext help'):
+
 ext [OPTIONS] <command> [repository] [-b <branch>] [path]
-  -g, --git                same as '--scm git' Uses git to checkout/export the
-                           main project
       --svn, --subversion  same as '--scm svn' Uses subversion to
                            checkout/export the main project
+  -g, --git                same as '--scm git' Uses git to checkout/export the
+                           main project
   -t, --type TYPE          The type of project the main project is. For example,
                            'rails'.
   -s, --scm SCM            The SCM used to manage the main project. For example,
@@ -50,16 +51,15 @@ ext [OPTIONS] <command> [repository] [-b <branch>] [path]
 
 
 Commands that apply to the main project or the .externals file:
-freeze, help, init, install, switch, touch_emptydirs, uninstall, update_ignore, version
+freeze, help, init, install, switch, touch_emptydirs, unfreeze, uninstall, update_ignore, version
 
-freeze          Usage: ext freeze project [REVISION]
-
+freeze          Usage: ext freeze <subproject> [REVISION]
                 Locks a subproject into a specific revision/branch.  If no
                 revision is supplied, the current revision/branch of the
-                project will be used.  You can specify the project by name
+                project will be used.  You can specify the subproject by name
                 or path.
 
-help            You probably just ran this command just now.
+help            It helps.  Hopefully.
 
 init            Creates a .externals file containing only [main]
                 It will try to determine the SCM used by the main project,
@@ -85,6 +85,10 @@ touch_emptydirs Recurses through all directories from the
                 comes across.  Useful for dealing with SCMs that refuse to
                 track empty directories (such as git, for example)
 
+unfreeze        Usage: ext unfreeze <subproject>
+                Unfreezes a previously frozen subproject.  You can specify
+                the subproject by name or path.
+
 uninstall       Usage: ext uninstall [-f|--force_removal] <project>
                 Removes a subproject from being tracked by ext.  If you
                 want the files associated with this subproject deleted as well
@@ -105,22 +109,18 @@ Commands that apply to the main project and all subprojects:
 checkout, export, status, update
 
 checkout        Usage: ext checkout <repository>
-
                 Checks out <repository>, and checks out any subprojects
                 registered in <repository>'s .externals file.
 
 export          Usage: ext export <repository>
-
                 Like checkout except this command fetches as little
                 history as possible.
 
 status          Usage: ext status
-
                 Prints out the status of the main project, followed by
                 the status of each subproject.
 
 update          Usage: ext update
-
                 Brings the main project, and all subprojects, up to the
                 latest version.
 

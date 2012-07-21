@@ -16,17 +16,17 @@ module Externals
   # short commands only operate on the externals
   # Main commands only operate on the main project
   FULL_COMMANDS_HASH = [
-    [:checkout, "ext checkout <repository>", %{
-      Checks out <repository>, and checks out any subprojects
+    [:checkout, "ext checkout <repository>",
+      %{Checks out <repository>, and checks out any subprojects
       registered in <repository>'s .externals file.}],
-    [:export, "ext export <repository>", %{
-      Like checkout except this command fetches as little
+    [:export, "ext export <repository>",
+      %{Like checkout except this command fetches as little
       history as possible.}],
-    [:status, "ext status", %{
-      Prints out the status of the main project, followed by
+    [:status, "ext status",
+      %{Prints out the status of the main project, followed by
       the status of each subproject.}],
-    [:update, "ext update", %{
-      Brings the main project, and all subprojects, up to the
+    [:update, "ext update",
+      %{Brings the main project, and all subprojects, up to the
       latest version.}]
   ]
   SHORT_COMMANDS_HASH = [
@@ -37,10 +37,10 @@ module Externals
     [:up, "Like update, but skips the main project."]
   ]
   MAIN_COMMANDS_HASH = [
-    [:freeze, "ext freeze project [REVISION]", %{
-      Locks a subproject into a specific revision/branch.  If no
+    [:freeze, "ext freeze <subproject> [REVISION]",
+      %{Locks a subproject into a specific revision/branch.  If no
       revision is supplied, the current revision/branch of the
-      project will be used.  You can specify the project by name
+      project will be used.  You can specify the subproject by name
       or path.}],
     [:help, "You probably just ran this command just now."],
     [:init, "Creates a .externals file containing only [main]
@@ -63,6 +63,9 @@ module Externals
       top and adds a .emptydir file to any empty directories it
       comes across.  Useful for dealing with SCMs that refuse to
       track empty directories (such as git, for example)"],
+    [:unfreeze, "ext unfreeze <subproject>",
+      %{Unfreezes a previously frozen subproject.  You can specify
+      the subproject by name or path.}],
     [:uninstall, "ext uninstall [-f|--force_removal] <project>",
       "Removes a subproject from being tracked by ext.  If you
       want the files associated with this subproject deleted as well
@@ -388,6 +391,25 @@ Please use
         end
       end
       section[:revision] = revision
+      configuration.write '.externals'
+      reload_configuration
+
+      subproject_by_name_or_path(args[0]).up
+    end
+
+    def unfreeze args, options
+      project = subproject_by_name_or_path(args[0])
+
+      raise "No such project named #{args[0]}" unless project
+
+      section = configuration[project.path]
+
+      unless section[:revision]
+        puts "Uhh... #{project.name} wasn't frozen, so I can't unfreeze it."
+        exit
+      end
+
+      section.rm_setting :revision
       configuration.write '.externals'
       reload_configuration
 
