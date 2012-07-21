@@ -110,8 +110,6 @@ module Externals
       end
     end
 
-    #puts "Project types available: #{project_types.join(' ')}"
-
     def self.project_type_files
       project_types.map do |project_type|
         "#{File.join(PROJECT_TYPES_DIRECTORY, project_type)}.rb"
@@ -312,7 +310,6 @@ module Externals
       scm = configuration['.']
       scm = scm['scm'] if scm
       scm ||= options[:scm]
-      #scm ||= infer_scm(repository)
 
       type = configuration['.']
       type = type['type'] if type
@@ -338,18 +335,6 @@ Please use
       end
     end
 
-    def self.project_class(scm)
-      Externals.module_eval("#{scm.to_s.cap_first}Project", __FILE__, __LINE__)
-    end
-
-    def self.project_classes
-      retval = []
-      registered_scms.each do |scm|
-        retval << project_class(scm)
-      end
-
-      retval
-    end
     def self.project_class(scm)
       Externals.module_eval("#{scm.to_s.cap_first}Project", __FILE__, __LINE__)
     end
@@ -454,7 +439,6 @@ that you are installing. Use an option to specify it
     end
 
     def uninstall args, options
-      #init args, options unless File.exists? '.externals'
       raise "Hmm... there's no .externals file in this directory." if !File.exists? '.externals'
 
       project = subproject_by_name_or_path(args[0])
@@ -476,9 +460,6 @@ that you are installing. Use an option to specify it
     end
 
     def update_ignore args, options
-      #path = args[0]
-
-
       scm = configuration['.']
       scm = scm['scm'] if scm
 
@@ -494,9 +475,7 @@ that you are installing. Use an option to specify it
       raise "only makes sense for main project" unless project.main_project?
 
       subprojects.each do |subproject|
-        #puts "about to add #{subproject.path} to ignore"
         project.update_ignore subproject.path
-        #puts "finished adding #{subproject.path}"
       end
     end
 
@@ -533,11 +512,7 @@ that you are installing. Use an option to specify it
 
     def status args, options
       options ||= {}
-      #repository = "."
-      #path = "."
-      #main_project = nil
       scm = options[:scm]
-      #scm ||= infer_scm(repository)
 
       if !scm
         scm ||= configuration['.']
@@ -565,7 +540,6 @@ by creating the .externals file manually"
           (such as --git or --svn)"
       end
 
-      #main_project = self.class.project_class(scm).new("#{repository} #{path}", :is_main)
       project = main_project
       project.scm ||= scm
       project.st
@@ -639,9 +613,7 @@ commands below if you actually wish to delete them."
 
     def update args, options
       options ||= {}
-      #repository = args[0]
       scm = options[:scm]
-      #scm ||= infer_scm(repository)
 
       if !scm
         scm ||= configuration['.']
@@ -653,7 +625,6 @@ commands below if you actually wish to delete them."
           (such as --git or --svn)"
       end
 
-      #main_project = self.class.project_class(scm).new("#{repository} #{path}", :is_main)
       project = main_project
       project.scm ||= scm
       project.up
@@ -737,7 +708,7 @@ Please use the --type option to tell ext which to use."
 
       config.add_empty_section '.'
 
-      # If we are using subversion, we should warn about not setting a branch
+      # TODO: If we are using subversion, we should warn about not setting a branch
       if scm == "svn"
         if options[:branch]
           config['.'][:repository] = SvnProject.extract_repository(
@@ -746,7 +717,6 @@ Please use the --type option to tell ext which to use."
           )
         elsif args[0]
           config['.'][:repository] = args[0].strip
-        else
         end
       end
 
