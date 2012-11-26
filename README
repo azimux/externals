@@ -205,10 +205,20 @@ it's important that there is a repository field under [.] in the .externals file
 This can be accomplished by using -b with commands like 'ext checkout' and 'ext init'
 or by manually editing the .externals file.
 
+RUNNING TESTS
+-------------
+
+Tests are ran with:
+
+rake test
+
+You will need git and svn installed.
+If you are using Ruby 1.9 to run the tests, you will need to have the simplecov gem installed.
+
 
 Copyright Information
 ---------------------
-The externals project is copyright 2008 by Miles Georgi, nopugs.com, azimux.com
+The externals project is copyright 2008 by Miles Georgi
 and is released under the MIT license.
 
 The license is available in the same directory as this README

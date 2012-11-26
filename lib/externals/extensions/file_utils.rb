@@ -30,13 +30,16 @@ FileUtils.class_eval do
       rm_rf_old *args
 
       while File.exists?(args[0]) && tries < 10
+        # :nocov:
         sleep 1
         tries += 1
+        # :nocov:
       end
     end
 
     rm.call
     if tries >= 10
+      # :nocov:
       puts "WARNING: deleted #{args[0]} didn't work, trying again"
       tries = 0
       rm.call
@@ -44,6 +47,7 @@ FileUtils.class_eval do
       if tries >= 10
         raise "Could not delete #{args[0]}"
       end
+      # :nocov:
     end
   end
 
