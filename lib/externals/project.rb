@@ -117,17 +117,6 @@ module Externals
       end
     end
 
-    def parent_path
-      File.dirname path
-    end
-
-    def self.project_line? line
-      #Make sure it's not a comment
-      return false if line =~ /^\s*#/
-
-      line =~ PROJECT_LINE_REGEX
-    end
-
     #test helper method
     def assert_e_dne_i_ni assert, exists, doesnt = [], ignored = exists, notignored = []
       ignored.each do |proj|
