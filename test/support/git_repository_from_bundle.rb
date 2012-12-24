@@ -6,21 +6,15 @@ module Externals
       attr_accessor :bundle_name
 
       def initialize name, subpath = nil, bundle_name = nil
-        super name, subpath || "git"
+        super name, subpath || "gitbundle"
         self.bundle_name = bundle_name || self.name
       end
 
       #builds the test repository in the current directory
       def build_here
-        mkdir "#{name}.git"
-        Dir.chdir("#{name}.git") do
-          `git init --bare`
-          raise unless $? == 0
-
-          bundle_path = File.join(root_dir, "test", "setup", "#{bundle_name}.bundle")
-          `git fetch #{bundle_path} master:master`
-          raise unless $? == 0
-        end
+        bundle_path = File.join(root_dir, "test", "setup", "#{bundle_name}.bundle")
+        `git clone #{bundle_path} -b master #{name}.git`
+        raise unless $? == 0
       end
     end
   end
