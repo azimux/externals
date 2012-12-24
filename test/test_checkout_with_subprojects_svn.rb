@@ -98,7 +98,7 @@ module Externals
 
               Dir.chdir "rails_app" do
                 #install a new project
-                subproject = GitRepositoryFromInternet.new("ssl_requirement")
+                subproject = GitRepositoryFromBundle.new("ssl_requirement")
                 Ext.run "install", subproject.clean_dir
 
                 SvnProject.add_all
@@ -121,7 +121,7 @@ module Externals
       def test_update_with_missing_subproject_by_revision_git
         repository = RailsAppSvnRepository.new
         repository.prepare
-        subproject = GitRepositoryFromInternet.new("ssl_requirement")
+        subproject = GitRepositoryFromBundle.new("ssl_requirement")
         subproject.prepare
         revision = "aa2dded823f8a9b378c22ba0159971508918928a"
         subproject_name = subproject.name.gsub(".git", "")

@@ -15,8 +15,8 @@ module Externals
       def initialize
         super "rails_app", "svn2"
         dependents.merge!(
-          :acts_as_list => GitRepositoryFromInternet.new("acts_as_list"),
-          :ssl_requirement => GitRepositoryFromInternet.new("ssl_requirement"),
+          :acts_as_list => GitRepositoryFromBundle.new("acts_as_list"),
+          :ssl_requirement => GitRepositoryFromBundle.new("ssl_requirement"),
           :engines => Engines.new,
           :redhillonrails_core => SvnRepositoryFromDump.new("redhillonrails_core"),
           :empty_plugin => SvnRepositoryFromDump.new("empty_plugin"),

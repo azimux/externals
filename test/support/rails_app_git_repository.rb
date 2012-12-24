@@ -9,7 +9,7 @@ module Externals
       def initialize
         super "rails_app", "git"
         dependents.merge!(
-          :acts_as_list => GitRepositoryFromInternet.new("acts_as_list"),
+          :acts_as_list => GitRepositoryFromBundle.new("acts_as_list"),
           :redhillonrails_core => SvnRepositoryFromDump.new("redhillonrails_core"),
           :foreign_key_migrations => SvnRepositoryFromDump.new("foreign_key_migrations"),
           :rails_app_unmanaged => RailsAppUnmanaged.new
