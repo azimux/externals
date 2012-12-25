@@ -1,5 +1,5 @@
 require 'git_repository'
-require 'engines'
+require 'some_subproject_with_edge'
 
 module Externals
   module Test
@@ -7,7 +7,7 @@ module Externals
       def initialize
         super "engines", File.join("git", "with_branch1")
         dependents.merge!(
-          :other_engines => Engines.new
+          :other_engines => SomeSubprojectWithEdge.new
         )
       end
 

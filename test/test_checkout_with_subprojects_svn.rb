@@ -33,7 +33,7 @@ module Externals
             puts(ignore_text = `svn propget svn:ignore vendor`)
             assert(ignore_text =~ /^rails$/)
 
-            %w(redhillonrails_core acts_as_list engines).each do |proj|
+            %w(redhillonrails_core acts_as_list some_subproject_with_edge).each do |proj|
               assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
             end
 
@@ -56,7 +56,7 @@ module Externals
 
             assert File.read(File.join('modules', 'modules.txt')) =~ /line1 of/
 
-            Dir.chdir File.join('vendor', 'plugins', 'engines') do
+            Dir.chdir File.join('vendor', 'plugins', 'some_subproject_with_edge') do
               assert(`git branch -a` =~ /^\*\s*edge\s*$/)
               assert(`git branch -a` !~ /^\*\s*master\s*$/)
             end

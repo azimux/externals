@@ -1,5 +1,5 @@
 require 'repository'
-require 'git_repository_from_internet'
+require 'git_repository_from_bundle'
 require 'svn_repository_from_dump'
 require 'svn_repository_helper'
 require 'engines_with_branch1'

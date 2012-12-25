@@ -1,11 +1,11 @@
 require 'repository'
-require 'git_repository_from_internet'
+require 'git_repository_from_bundle'
 require 'svn_repository_from_dump'
 require 'svn_repository_helper'
 require 'fake_rails_repository'
 require 'modules_svn_repository'
 require 'rails_app_unmanaged'
-require 'engines'
+require 'some_subproject_with_edge'
 
 module Externals
   module Test
@@ -17,7 +17,7 @@ module Externals
         dependents.merge!(
           :acts_as_list => GitRepositoryFromBundle.new("acts_as_list"),
           :ssl_requirement => GitRepositoryFromBundle.new("ssl_requirement"),
-          :engines => Engines.new,
+          :engines => SomeSubprojectWithEdge.new,
           :redhillonrails_core => SvnRepositoryFromDump.new("redhillonrails_core"),
           :empty_plugin => SvnRepositoryFromDump.new("empty_plugin"),
           #fkm seems to cause problems when running tests, concerning a corrupt repository.
