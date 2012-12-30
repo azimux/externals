@@ -9,14 +9,17 @@ module Externals
 
       def build_here
         rm_rf name
-        if rails_version =~ /^3([^\d]|$)/
-          puts `#{rails_exe} new #{name}`
-          raise unless $? == 0
-        elsif rails_version =~ /^2([^\d]|$)/
-          puts `#{rails_exe} #{name}`
-          raise unless $? == 0
-        else
-          raise "can't determine rails version"
+
+        # git-bundle is just used as an alternative here to avoid creating
+        # a dependency on something such as tar
+        rails3_app = GitRepositoryFromBundle.new("rails3_app")
+        rm_rf rails3_app.name
+
+        `git clone #{rails3_app.bundle_path} -b master #{name}`
+        raise unless $? == 0
+
+        Dir.chdir(name) do
+          rm_rf ".git"
         end
       end
 

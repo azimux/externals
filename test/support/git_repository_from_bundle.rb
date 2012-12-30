@@ -12,9 +12,12 @@ module Externals
 
       #builds the test repository in the current directory
       def build_here
-        bundle_path = File.join(root_dir, "test", "setup", "#{bundle_name}.bundle")
         `git clone #{bundle_path} -b master #{name}.git`
         raise unless $? == 0
+      end
+
+      def bundle_path
+        File.join(root_dir, "test", "setup", "#{bundle_name}.bundle")
       end
     end
   end
