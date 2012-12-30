@@ -20,7 +20,7 @@ module Externals
       application_path = File.join('config', 'application.rb')
       if File.exists? application_path
         open(application_path) do |f|
-          f.read =~ /^\s*module\s+RailsApp/
+          f.read =~ /<\s*Rails::Application/
         end
       else
         boot_path = File.join('config', 'boot.rb')
