@@ -1,4 +1,7 @@
-July 20, 2012 Version 1.10 released
+January 1, 2012 Version 1.1.1 released
+- Fixes a bug preventing proper rails 3 project detection
+
+July 20, 2012 Version 1.1.0 released
 - unfreeze feature added.
 
 July 17, 2012 Version 1.0.7 released
