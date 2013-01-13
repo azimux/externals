@@ -8,10 +8,14 @@ module Externals
 
     public
     def co *args
-      # delete path if not empty
-      rmdir_ie path
+      # delete path if empty
+      rmdir_ie path unless path == "."
 
-      if File.exists? path
+      dest = path
+      dest = '' if dest == '.'
+      dest = "\"#{dest}\"" if dest && !dest.empty?
+
+      if File.exists? dest
         up
       else
         opts = resolve_opts "co"
@@ -23,7 +27,7 @@ module Externals
           url = [url, branch].join("/")
         end
 
-        puts(svncocmd = "svn #{opts} co #{url} #{path}")
+        puts(svncocmd = "svn #{opts} co #{url} #{dest}")
         puts `#{svncocmd}`
         unless $? == 0
           raise
@@ -45,8 +49,12 @@ module Externals
     end
 
     def ex *args
-      # delete path if not empty
-      rmdir_ie path
+      # delete path if  empty
+      rmdir_ie path unless path == "."
+
+      dest = path
+      dest = '' if dest == '.'
+      dest = "\"#{dest}\"" if dest && !dest.empty?
 
       url = repository
 
@@ -59,7 +67,7 @@ module Externals
         url += "@#{revision}"
       end
 
-      puts(svncocmd = "svn #{scm_opts_ex} export #{url} #{path}")
+      puts(svncocmd = "svn #{scm_opts_ex} export #{url} #{dest}")
       puts `#{svncocmd}`
     end
 

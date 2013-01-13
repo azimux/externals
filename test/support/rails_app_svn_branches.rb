@@ -54,10 +54,16 @@ module Externals
             SvnProject.add_all
             puts `svn commit -m "created branch directory structure"`
             raise unless $? == 0
+          end
 
-            puts `svn switch #{[clean_url, "current"].join("/")}`
-            raise unless $? == 0
+          rm_rf name
 
+          cmd = "svn checkout \"#{clean_url}\"/current #{name}"
+          puts "about to run #{cmd}"
+          puts `#{cmd}`
+          raise unless $? == 0
+
+          Dir.chdir name do
             Ext.run "init", "-b", "current"
             raise " could not create .externals"  unless File.exists? '.externals'
 

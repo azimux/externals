@@ -20,9 +20,7 @@ module Externals
           cmd = "svn checkout \"#{clean_url}\""
           puts "about to run #{cmd}"
           puts `#{cmd}`
-          unless $? == 0
-            raise
-          end
+          raise unless $? == 0
 
           Dir.chdir name do
             mkdir "branches"
@@ -31,10 +29,16 @@ module Externals
             SvnProject.add_all
             puts `svn commit -m "created branch directory structure"`
             raise unless $? == 0
+          end
 
-            `svn switch #{[clean_url, 'current'].join("/")}`
-            raise unless $? == 0
+          rm_rf name
 
+          cmd = "svn checkout \"#{clean_url}/current\" #{name}"
+          puts "about to run #{cmd}"
+          puts `#{cmd}`
+          raise unless $? == 0
+
+          Dir.chdir name do
             open("modules.txt", "w") do |f|
               f.write "line1 of modules.txt\n"
             end

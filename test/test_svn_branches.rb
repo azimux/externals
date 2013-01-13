@@ -1,4 +1,5 @@
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
+$:.unshift File.join(File.dirname(__FILE__), 'support') if $0 == __FILE__
 require 'ext_test_case'
 require 'externals/ext'
 require 'rails_app_svn_branches'
@@ -257,6 +258,7 @@ module Externals
         assert File.exists?(File.join(repository.clean_dir, "db"))
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir", mode, "svn", "branch_test")
+        rm_rf workdir
         mkdir_p workdir
 
         if File.exists?(File.join(workdir,"rails_app"))
@@ -276,7 +278,7 @@ module Externals
             assert !File.exists?('.svn')
 
             %w(redhillonrails_core).each do |proj|
-              assert !File.exists?(File.join('vendor', 'plugins',proj, '.svn'))
+              assert !File.exists?(File.join('vendor', 'plugins', proj, '.svn'))
             end
 
             %w(redhillonrails_core acts_as_list engines).each do |proj|

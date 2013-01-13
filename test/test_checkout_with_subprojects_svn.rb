@@ -1,4 +1,5 @@
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
+$:.unshift File.join(File.dirname(__FILE__), 'support') if $0 == __FILE__
 
 require 'ext_test_case'
 require 'externals/ext'
@@ -292,51 +293,87 @@ module Externals
             end
 
             assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+
+            # Check that engines subproject has content expected for edge branch
+            ext = Ext.new
+
+            assert_equal(ext.configuration["vendor/plugins/some_subproject_with_edge"]["branch"], "edge")
+            assert_equal(ext.configuration["vendor/plugins/some_subproject_with_edge"]["revision"], nil)
+
+            Dir.chdir File.join("vendor", "plugins", "some_subproject_with_edge") do
+              assert(File.read(File.join("lib", "somelib.rb")) =~ /living on the edge/)
+            end
           end
         end
       end
 
-      def test_uninstall
-        return
-        Dir.chdir File.join(root_dir, 'test') do
-          Dir.chdir 'workdir' do
-            `mkdir checkout`
-            Dir.chdir 'checkout' do
-              #source = File.join(root_dir, 'test', 'workdir', 'rails_app')
-              source = repository_dir('svn')
+      def test_export_with_subproject_by_revision
+        # figure out the revision to set it to.
+        sub_project_revision = nil
+        sub_repository = SomeSubprojectWithEdge.new
+        sub_repository.prepare
 
-              if windows?
-                source = source.gsub(/\\/, "/")
-                #source.gsub!(/^[A-Z]:[\/\\]/, "")
-              end
-              source = "file:///#{source}"
+        workdir = File.join(root_dir, 'test', "tmp", "workdir", "export")
+        rm_rf_ie workdir
+        mkdir_p workdir
 
-              puts "About to checkout #{source}"
-              Ext.run "checkout", "--svn", source, "rails_app"
+        Dir.chdir workdir do
+          `git clone #{sub_repository.clean_dir}`
+          raise unless $? == 0
 
-              Dir.chdir 'rails_app' do
-                mp = Ext.new.main_project
+          Dir.chdir sub_repository.name do
+            git_show = `git show origin/master`
+            raise unless $? == 0
 
-                projs = %w(foreign_key_migrations redhillonrails_core acts_as_list)
-                projs_i = projs.dup
-                projs_ni = []
+            sub_project_revision = /^commit:?\s*([a-f\d]+)$/.match(git_show)[1]
+            assert(sub_project_revision =~ /^[a-f\d]+$/)
+          end
+        end
 
-                #let's uninstall acts_as_list
-                Ext.run "uninstall", "acts_as_list"
+        # Change the project to use a revision instead of a branch
+        repository = RailsAppSvnRepository.new
+        repository.prepare
+        repository.mark_dirty
 
-                projs_ni << projs_i.delete('acts_as_list')
+        rm_rf_ie workdir
+        mkdir_p workdir
 
-                mp.assert_e_dne_i_ni proc{|a|assert(a)}, projs, [], projs_i, projs_ni
+        Dir.chdir workdir do
+          Ext.run "checkout", "--svn", repository.clean_url
 
-                Ext.run "uninstall", "-f", "foreign_key_migrations"
+          Dir.chdir repository.name do
+            assert(sub_project_revision)
+            Ext.run "freeze", "some_subproject_with_edge", sub_project_revision
+            ext = Ext.new
+            ext.configuration["vendor/plugins/some_subproject_with_edge"].rm_setting("branch")
+            ext.configuration.write
 
-                projs_ni << projs_i.delete('foreign_key_migrations')
+            SvnProject.add_all
+            `svn commit -m 'changed some_subproject_with_edge to use a revision instead'`
+            raise unless $? == 0
+          end
+        end
 
-                projs_dne = []
-                projs_dne << projs.delete('foreign_key_migrations')
+        rm_rf_ie workdir
+        mkdir_p workdir
+        Dir.chdir workdir do
+          source = repository.clean_url
 
-                mp.assert_e_dne_i_ni proc{|a|assert(a)}, projs, projs_dne, projs_i, projs_ni
-              end
+          puts "About to export #{source}"
+          Ext.run "export", "--svn", source, 'rails_app'
+
+          Dir.chdir 'rails_app' do
+            assert !File.exists?('.svn')
+
+            # Check that engines subproject has content expected for sub_project_revision
+            ext = Ext.new
+
+            assert_equal(ext.configuration["vendor/plugins/some_subproject_with_edge"]["branch"], nil)
+            assert_equal(ext.configuration["vendor/plugins/some_subproject_with_edge"]["revision"], sub_project_revision)
+
+            Dir.chdir File.join("vendor", "plugins", "some_subproject_with_edge") do
+              assert(File.read(File.join("lib", "somelib.rb")) !~ /living on the edge/)
+              assert(File.read(File.join("lib", "somelib.rb")) =~ /'double lulz!'/)
             end
           end
         end

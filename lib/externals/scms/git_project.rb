@@ -136,10 +136,17 @@ module Externals
     end
 
     def ex *args
-      do_clone "ex", "--depth 1"
-
-      puts "Exporting #{path}..."
-      change_to_branch_revision "ex"
+      if revision
+        # No clean reliable way to clone something that's not a branch or tag.
+        # just call up instead.
+        up *args
+      else
+        clone_opts = "--depth 1"
+        if branch
+          clone_opts << " -b #{branch}"
+        end
+        do_clone "ex", clone_opts
+      end
     end
 
     def up *args
