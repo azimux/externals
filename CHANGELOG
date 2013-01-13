@@ -1,3 +1,8 @@
+January 13, 2012 Version 1.1.2 released
+- Fixes export problem with newer versions of git.
+- Fixes build on Windows, along with a bug that can prevent svn branches from
+  working.
+
 January 1, 2012 Version 1.1.1 released
 - Fixes a bug preventing proper rails 3 project detection
 
