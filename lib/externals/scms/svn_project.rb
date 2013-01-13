@@ -160,7 +160,7 @@ module Externals
     def current_branch
       require_repository
 
-      branch = info_url.gsub(/\/+/, "/").gsub(repository.gsub(/\/+/, "/"), "")
+      branch = info_url.downcase.gsub(/\/+/, "/").gsub(repository.downcase.gsub(/\/+/, "/"), "")
       if branch == repository
         raise "Could not determine branch from URL #{info_url}.
     Does not appear have a substring of #{repository}"

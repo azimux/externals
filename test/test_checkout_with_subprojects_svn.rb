@@ -349,7 +349,7 @@ module Externals
             ext.configuration.write
 
             SvnProject.add_all
-            `svn commit -m 'changed some_subproject_with_edge to use a revision instead'`
+            `svn commit -m "changed some_subproject_with_edge to use a revision instead"`
             raise unless $? == 0
           end
         end

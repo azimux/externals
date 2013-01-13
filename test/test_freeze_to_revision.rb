@@ -112,7 +112,7 @@ module Externals
 
             repository.mark_dirty
 
-            `git commit -m 'froze modules to revision 3'`
+            `git commit -m "froze modules to revision 3"`
             raise unless $? == 0
             `git push`
             raise unless $? == 0
@@ -144,7 +144,7 @@ module Externals
             # Check it in to make sure it sticks
             `git add .externals`
             raise unless $? == 0
-            `git commit -m 'unfreezing modules'`
+            `git commit -m "unfreezing modules"`
             raise unless $? == 0
             `git push`
             raise unless $? == 0
