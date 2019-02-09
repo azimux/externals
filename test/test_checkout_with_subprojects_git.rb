@@ -15,7 +15,7 @@ module Externals
         workdir = File.join(root_dir, 'test', "tmp", "workdir", "branches", "git")
         mkdir_p workdir
 
-        if File.exists?(File.join(workdir,"rails_app"))
+        if File.exist?(File.join(workdir,"rails_app"))
           rm_rf File.join(workdir, "rails_app")
         end
 
@@ -25,9 +25,9 @@ module Externals
           Ext.run "checkout", "--git", source
 
           Dir.chdir 'rails_app' do
-            assert File.exists?('.git')
+            assert File.exist?('.git')
 
-            assert File.exists?('.gitignore')
+            assert File.exist?('.gitignore')
 
             ext = Ext.new
             main_project = ext.main_project
@@ -40,7 +40,7 @@ module Externals
             assert_equal "edge", engines.current_branch
             assert_equal "edge", ext.configuration["vendor/plugins/engines"]["branch"]
 
-            assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+            assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
             `git checkout --track -b new_branch origin/new_branch`
             raise unless $? == 0
@@ -57,7 +57,7 @@ module Externals
             assert !main_project.ignore_contains?("vendor/rails")
 
             rm_rf "vendor/rails"
-            raise if File.exists?(File.join("vendor", "rails"))
+            raise if File.exist?(File.join("vendor", "rails"))
 
             `git checkout master`
             raise unless $? == 0
@@ -68,7 +68,7 @@ module Externals
             Ext.run "up"
             assert_equal "master", main_project.current_branch
             assert_equal "edge", engines.current_branch
-            assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+            assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
             `git checkout new_branch`
             assert_equal "new_branch", main_project.current_branch
@@ -91,21 +91,21 @@ module Externals
             assert_equal "branch1", engines.current_branch
 
             assert !main_project.ignore_contains?("vendor/rails")
-            assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+            assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
             rm_rf "vendor/rails"
 
             Ext.run "switch", "master"
             assert_equal "master", main_project.current_branch
             assert_equal "edge", engines.current_branch
 
-            assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+            assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
             assert main_project.ignore_contains?("vendor/rails")
           end
 
           #now let's check it out again to test "ext checkout -b new_branch"
           rm_rf "rails_app"
-          if File.exists?("rails_app")
+          if File.exist?("rails_app")
             raise
           end
 
@@ -129,7 +129,7 @@ module Externals
         workdir = File.join(root_dir, 'test', "tmp", "workdir", "branches", "uninstall", "git")
         mkdir_p workdir
 
-        if File.exists?(File.join(workdir,"rails_app"))
+        if File.exist?(File.join(workdir,"rails_app"))
           rm_rf File.join(workdir, "rails_app")
         end
 

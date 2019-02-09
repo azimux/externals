@@ -12,14 +12,14 @@ module Externals
         repository = BasicGitRepository.new
         repository.prepare
 
-        assert File.exists?(repository.clean_dir)
+        assert File.exist?(repository.clean_dir)
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir")
         mkdir_p workdir
 
         Dir.chdir workdir do
           delete_if_dirty(repository.name)
-          if !File.exists?(repository.name)
+          if !File.exist?(repository.name)
             `git clone #{repository.clean_dir} #{repository.name}`
             raise unless $? == 0
           end
@@ -34,7 +34,7 @@ module Externals
       def test_init
         Dir.chdir @workdir do
           Dir.chdir @repository.name do
-            assert !File.exists?('.externals')
+            assert !File.exist?('.externals')
 
             rescue_exit { Ext.run "init" }
 
@@ -47,7 +47,7 @@ module Externals
       def test_init_rails_project
         Dir.chdir @workdir do
           Dir.chdir @repository.name do
-            assert !File.exists?('.externals')
+            assert !File.exist?('.externals')
 
             rescue_exit { Ext.run "init", "--type", "rails" }
 

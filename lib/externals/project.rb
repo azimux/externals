@@ -128,11 +128,11 @@ module Externals
       end
 
       exists.each do |proj|
-        assert.call File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+        assert.call File.exist?(File.join('vendor', 'plugins', proj, 'lib'))
       end
 
       doesnt.each do |proj|
-        assert.call !File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+        assert.call !File.exist?(File.join('vendor', 'plugins', proj, 'lib'))
       end
     end
 

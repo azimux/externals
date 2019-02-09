@@ -176,7 +176,7 @@ module Externals
 
       puts "Updating #{path}..."
 
-      if !File.exists? project_path
+      if !File.exist?(project_path)
         do_clone command
       end
       change_to_branch_revision command
@@ -203,7 +203,7 @@ module Externals
     end
 
     def self.detected?
-      File.exists? ".git"
+      File.exist?(".git")
     end
 
     #this is a test helper method
@@ -218,7 +218,7 @@ module Externals
     end
 
     def ignore_text(path = nil)
-      return '' unless File.exists? '.gitignore'
+      return '' unless File.exist?('.gitignore')
       retval = ''
       open('.gitignore') do |f|
         retval = f.read

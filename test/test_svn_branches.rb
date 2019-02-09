@@ -14,12 +14,12 @@ module Externals
         repository = RailsAppSvnBranches.new
         repository.prepare
 
-        assert File.exists?(File.join(repository.clean_dir, "db"))
+        assert File.exist?(File.join(repository.clean_dir, "db"))
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir", mode, "svn", "branches")
         mkdir_p workdir
 
-        if File.exists?(File.join(workdir, "rails_app"))
+        if File.exist?(File.join(workdir, "rails_app"))
           rm_r File.join(workdir, "rails_app")
         end
 
@@ -33,7 +33,7 @@ module Externals
           Ext.run mode, "--svn", source, "-b", "current", 'rails_app'
 
           Dir.chdir 'rails_app' do
-            assert File.exists?('.svn')
+            assert File.exist?('.svn')
 
             %w(redhillonrails_core acts_as_list).each do |proj|
               ignore_text = `svn propget svn:ignore vendor/plugins`
@@ -46,14 +46,14 @@ module Externals
             assert(ignore_text =~ /^rails$/)
 
             %w(redhillonrails_core acts_as_list engines).each do |proj|
-              assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+              assert File.exist?(File.join('vendor', 'plugins', proj, 'lib'))
             end
 
-            assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+            assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
-            assert File.exists?(File.join('vendor', 'rails', '.git'))
+            assert File.exist?(File.join('vendor', 'rails', '.git'))
 
-            assert File.exists?(File.join('modules', 'modules.txt'))
+            assert File.exist?(File.join('modules', 'modules.txt'))
 
             assert File.read(File.join('modules', 'modules.txt')) =~ /line1 of/
 
@@ -70,8 +70,8 @@ module Externals
             assert_equal "current", modules.current_branch
             assert_equal "current", ext.configuration["modules"]["branch"]
 
-            assert !File.exists?(File.join(%w(vendor plugins ssl_requirement)))
-            assert !File.exists?(File.join(%w(vendor plugins empty_plugin)))
+            assert !File.exist?(File.join(%w(vendor plugins ssl_requirement)))
+            assert !File.exist?(File.join(%w(vendor plugins empty_plugin)))
 
             #let's run update.  This can expose certain errors.
             Ext.run "update"
@@ -81,8 +81,8 @@ module Externals
               raise
             end
 
-            assert !File.exists?(File.join(%w(vendor plugins ssl_requirement)))
-            assert !File.exists?(File.join(%w(vendor plugins empty_plugin)))
+            assert !File.exist?(File.join(%w(vendor plugins ssl_requirement)))
+            assert !File.exist?(File.join(%w(vendor plugins empty_plugin)))
 
             assert !main_project.ignore_contains?("vendor/rails")
 
@@ -101,8 +101,8 @@ module Externals
 
             Ext.run "up"
 
-            assert File.exists?(File.join(%w(vendor plugins ssl_requirement)))
-            assert File.exists?(File.join(%w(vendor plugins empty_plugin)))
+            assert File.exist?(File.join(%w(vendor plugins ssl_requirement)))
+            assert File.exist?(File.join(%w(vendor plugins empty_plugin)))
 
             Dir.chdir File.join("vendor",'plugins', "ssl_requirement") do
               assert `git show HEAD` =~ /^\s*commit\s*#{
@@ -146,9 +146,9 @@ module Externals
             engines = ext.subproject("engines")
             modules = ext.subproject("modules")
 
-            assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+            assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
-            assert File.exists?(File.join('vendor', 'rails', '.git'))
+            assert File.exist?(File.join('vendor', 'rails', '.git'))
 
             assert_equal "current", main_project.current_branch
 
@@ -224,9 +224,9 @@ module Externals
 
             capture = capture.string
 
-            assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+            assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
-            assert File.exists?(File.join('vendor', 'rails', '.git'))
+            assert File.exist?(File.join('vendor', 'rails', '.git'))
 
 
             assert_equal "current", main_project.current_branch
@@ -255,13 +255,13 @@ module Externals
         repository = RailsAppSvnBranches.new
         repository.prepare
 
-        assert File.exists?(File.join(repository.clean_dir, "db"))
+        assert File.exist?(File.join(repository.clean_dir, "db"))
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir", mode, "svn", "branch_test")
         rm_rf workdir
         mkdir_p workdir
 
-        if File.exists?(File.join(workdir,"rails_app"))
+        if File.exist?(File.join(workdir,"rails_app"))
           rm_r File.join(workdir, "rails_app")
         end
 
@@ -275,21 +275,21 @@ module Externals
           Ext.run mode, "--svn", source, "-b", "current", 'rails_app'
 
           Dir.chdir 'rails_app' do
-            assert !File.exists?('.svn')
+            assert !File.exist?('.svn')
 
             %w(redhillonrails_core).each do |proj|
-              assert !File.exists?(File.join('vendor', 'plugins', proj, '.svn'))
+              assert !File.exist?(File.join('vendor', 'plugins', proj, '.svn'))
             end
 
             %w(redhillonrails_core acts_as_list engines).each do |proj|
-              assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+              assert File.exist?(File.join('vendor', 'plugins', proj, 'lib'))
             end
 
-            assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+            assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
-            assert File.exists?(File.join('vendor', 'rails', '.git'))
+            assert File.exist?(File.join('vendor', 'rails', '.git'))
 
-            assert File.exists?(File.join('modules', 'modules.txt'))
+            assert File.exist?(File.join('modules', 'modules.txt'))
 
             assert File.read(File.join('modules', 'modules.txt')) =~ /line1 of/
 
@@ -297,8 +297,8 @@ module Externals
             assert_equal "edge", ext.configuration["vendor/plugins/engines"]["branch"]
             assert_equal "current", ext.configuration["modules"]["branch"]
 
-            assert !File.exists?(File.join(%w(vendor plugins ssl_requirement)))
-            assert !File.exists?(File.join(%w(vendor plugins empty_plugin)))
+            assert !File.exist?(File.join(%w(vendor plugins ssl_requirement)))
+            assert !File.exist?(File.join(%w(vendor plugins empty_plugin)))
           end
         end
       end
@@ -307,12 +307,12 @@ module Externals
         repository = RailsAppSvnBranches.new
         repository.prepare
 
-        assert File.exists?(File.join(repository.clean_dir, "db"))
+        assert File.exist?(File.join(repository.clean_dir, "db"))
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir","uninstall","svn","branches")
         mkdir_p workdir
 
-        if File.exists?(File.join(workdir,"rails_app"))
+        if File.exist?(File.join(workdir,"rails_app"))
           rm_r File.join(workdir, "rails_app")
         end
 

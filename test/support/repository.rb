@@ -90,7 +90,7 @@ module Externals
         end
 
         #if the directory is there, we don't need to do anything
-        if !File.exists? clean_dir
+        if !File.exist?(clean_dir)
           Dir.chdir clean_dir_parent do
             mark_dirty
             if pristine_exists? && !pristine_dirty?
@@ -111,7 +111,7 @@ module Externals
         end
 
         # if it exists, it's already done
-        if !File.exists? pristine_dir
+        if !File.exist?(pristine_dir)
           pristine_mark_dirty
           Dir.chdir pristine_dir_parent do
             cp_a clean_dir, "."
@@ -125,7 +125,7 @@ module Externals
       end
 
       def pristine_exists?
-        File.exists? pristine_dir
+        File.exist?(pristine_dir)
       end
 
       def delete_clean_dir
@@ -140,7 +140,7 @@ module Externals
 
       def dirty?
         Dir.chdir clean_dir_parent do
-          File.exists? working_file_name
+          File.exist?(working_file_name)
         end
       end
 
@@ -160,7 +160,7 @@ module Externals
 
       def pristine_dirty?
         Dir.chdir pristine_dir_parent do
-          File.exists? working_file_name
+          File.exist?(working_file_name)
         end
       end
 

@@ -36,9 +36,9 @@ module Externals
         puts `svnadmin create #{name}`
         raise unless $? == 0
 
-        mkdir "workdir" unless File.exists? 'workdir'
+        mkdir "workdir" unless File.exist?('workdir')
         Dir.chdir 'workdir' do
-          rm_rf name if File.exists? name
+          rm_rf name if File.exist?(name)
           cmd = "svn checkout \"#{clean_url}\""
           puts "about to run #{cmd}"
           puts `#{cmd}`
@@ -46,11 +46,11 @@ module Externals
 
           Dir.chdir name do
             mkdir "branches"
-            
+
             cp_a dependents[:rails_app_unmanaged].clean_dir, name
 
             mv name, "current"
-            
+
             SvnProject.add_all
             puts `svn commit -m "created branch directory structure"`
             raise unless $? == 0
@@ -65,7 +65,7 @@ module Externals
 
           Dir.chdir name do
             Ext.run "init", "-b", "current"
-            raise " could not create .externals"  unless File.exists? '.externals'
+            raise " could not create .externals"  unless File.exist?('.externals')
 
             # this line is necessary as ext can't perform the necessary
             # ignores otherwise if vendor and vendor/plugins haven't been added

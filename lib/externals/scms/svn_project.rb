@@ -15,7 +15,7 @@ module Externals
       dest = '' if dest == '.'
       dest = "\"#{dest}\"" if dest && !dest.empty?
 
-      if File.exists? dest
+      if File.exist?(dest)
         up
       else
         opts = resolve_opts "co"
@@ -89,7 +89,7 @@ module Externals
       # delete path if empty
       rmdir_if_empty_ie path
 
-      if File.exists? path
+      if File.exist?(path)
         puts "updating #{path}:"
 
         if branch
@@ -140,7 +140,7 @@ module Externals
     end
 
     def self.detected?
-      File.exists? ".svn"
+      File.exist?(".svn")
     end
 
     #this is a test helper method

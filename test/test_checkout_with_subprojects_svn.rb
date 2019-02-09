@@ -24,7 +24,7 @@ module Externals
           Ext.run "checkout", "--svn", source, 'rails_app'
 
           Dir.chdir 'rails_app' do
-            assert File.exists?('.svn')
+            assert File.exist?('.svn')
 
             %w(redhillonrails_core acts_as_list).each do |proj|
               puts(ignore_text = `svn propget svn:ignore vendor/plugins`)
@@ -35,12 +35,12 @@ module Externals
             assert(ignore_text =~ /^rails$/)
 
             %w(redhillonrails_core acts_as_list some_subproject_with_edge).each do |proj|
-              assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+              assert File.exist?(File.join('vendor', 'plugins', proj, 'lib'))
             end
 
-            assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+            assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
-            assert File.exists?(File.join('vendor', 'rails', '.git'))
+            assert File.exist?(File.join('vendor', 'rails', '.git'))
 
             Dir.chdir File.join('vendor', 'rails') do
               heads = File.readlines("heads").map(&:strip)
@@ -53,7 +53,7 @@ module Externals
                 /^\s*commit\s+#{heads[0]}\s*$/
             end
 
-            assert File.exists?(File.join('modules', 'modules.txt'))
+            assert File.exist?(File.join('modules', 'modules.txt'))
 
             assert File.read(File.join('modules', 'modules.txt')) =~ /line1 of/
 
@@ -80,8 +80,8 @@ module Externals
 
           Dir.chdir 'rails_app' do
             pretests = proc do
-              assert File.exists?('.svn')
-              assert !File.exists?(File.join('vendor', 'plugins', 'ssl_requirement', 'lib'))
+              assert File.exist?('.svn')
+              assert !File.exist?(File.join('vendor', 'plugins', 'ssl_requirement', 'lib'))
               assert File.read(".externals") =~ /rails/
               assert File.read(".externals") !~ /ssl_requirement/
             end
@@ -114,7 +114,7 @@ module Externals
             #update the project and make sure ssl_requirement was added and checked out
             Ext.run "update"
             assert File.read(".externals") =~ /ssl_requirement/
-            assert File.exists?(File.join('vendor', 'plugins', 'ssl_requirement', 'lib'))
+            assert File.exist?(File.join('vendor', 'plugins', 'ssl_requirement', 'lib'))
           end
         end
       end
@@ -139,8 +139,8 @@ module Externals
           Dir.chdir 'rails_app' do
 
             pretests = proc do
-              assert File.exists?('.svn')
-              assert !File.exists?(File.join('vendor', 'plugins', subproject_name, 'lib'))
+              assert File.exist?('.svn')
+              assert !File.exist?(File.join('vendor', 'plugins', subproject_name, 'lib'))
               assert File.read(".externals") =~ /rails/
               assert File.read(".externals") !~ /#{subproject}/
             end
@@ -189,7 +189,7 @@ module Externals
             Ext.run "update"
             assert File.read(".externals") =~ /ssl_requirement/
 
-            assert File.exists?(File.join('vendor', 'plugins', subproject_name, 'lib'))
+            assert File.exist?(File.join('vendor', 'plugins', subproject_name, 'lib'))
 
             Dir.chdir File.join("vendor",'plugins', subproject_name) do
               assert `git show HEAD` =~ /^\s*commit\s*#{revision}\s*$/i
@@ -215,8 +215,8 @@ module Externals
 
           Dir.chdir 'rails_app' do
             pretests = proc do
-              assert File.exists?('.svn')
-              assert !File.exists?(File.join('vendor', 'plugins', subproject.name, 'lib'))
+              assert File.exist?('.svn')
+              assert !File.exist?(File.join('vendor', 'plugins', subproject.name, 'lib'))
               assert File.read(".externals") =~ /rails/
               assert File.read(".externals") !~ /empty_plugin/
             end
@@ -248,7 +248,7 @@ module Externals
             #update the project and make sure ssl_requirement was added and checked out
             Ext.run "update"
             assert File.read(".externals") =~ /empty_plugin/
-            assert File.exists?(File.join('vendor', 'plugins', subproject.name, 'lib'))
+            assert File.exist?(File.join('vendor', 'plugins', subproject.name, 'lib'))
           end
         end
       end
@@ -267,7 +267,7 @@ module Externals
           Ext.run "export", "--svn", source, 'rails_app'
 
           Dir.chdir 'rails_app' do
-            assert !File.exists?('.svn')
+            assert !File.exist?('.svn')
 
             Dir.chdir File.join('vendor', 'rails') do
               heads = File.readlines("heads").map(&:strip)
@@ -281,18 +281,18 @@ module Externals
             end
 
             %w(redhillonrails_core acts_as_list).each do |proj|
-              puts "filethere? #{proj}: #{File.exists?(File.join('vendor', 'plugins', proj, 'lib'))}"
-              if !File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+              puts "filethere? #{proj}: #{File.exist?(File.join('vendor', 'plugins', proj, 'lib'))}"
+              if !File.exist?(File.join('vendor', 'plugins', proj, 'lib'))
                 puts "here"
               end
-              assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+              assert File.exist?(File.join('vendor', 'plugins', proj, 'lib'))
             end
 
             %w(redhillonrails_core).each do |proj|
-              assert !File.exists?(File.join('vendor', 'plugins',proj, '.svn'))
+              assert !File.exist?(File.join('vendor', 'plugins',proj, '.svn'))
             end
 
-            assert File.exists?(File.join('vendor', 'rails', 'activerecord', 'lib'))
+            assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
             # Check that engines subproject has content expected for edge branch
             ext = Ext.new
@@ -363,7 +363,7 @@ module Externals
           Ext.run "export", "--svn", source, 'rails_app'
 
           Dir.chdir 'rails_app' do
-            assert !File.exists?('.svn')
+            assert !File.exist?('.svn')
 
             # Check that engines subproject has content expected for sub_project_revision
             ext = Ext.new

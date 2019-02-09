@@ -26,7 +26,7 @@ module Externals
       #
       #  delete_all_but_1_file :depth => 3
       #
-      #  raise "why is rails already here?" if File.exists? 'rails.git'
+      #  raise "why is rails already here?" if File.exist?('rails.git')
       #
       #  Dir.mkdir('rails.git')
       #

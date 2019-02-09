@@ -18,13 +18,13 @@ module Externals
   class RailsDetector
     def self.detected?
       application_path = File.join('config', 'application.rb')
-      if File.exists? application_path
+      if File.exist?(application_path)
         open(application_path) do |f|
           f.read =~ /<\s*Rails::Application/
         end
       else
         boot_path = File.join('config', 'boot.rb')
-        if File.exists? boot_path
+        if File.exist?(boot_path)
           open(boot_path) do |f|
             f.read =~ /^\s*module\s+Rails/
           end

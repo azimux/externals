@@ -14,21 +14,21 @@ module Externals
         repository = RailsAppGitRepository.new
         repository.prepare
 
-        assert File.exists?(repository.clean_dir)
+        assert File.exist?(repository.clean_dir)
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir", "checkout", "git")
         mkdir_p workdir
 
         Dir.chdir workdir do
-          rm_r repository.name if File.exists? repository.name
+          rm_r repository.name if File.exist?(repository.name)
           source = repository.clean_dir
           puts "About to checkout #{source}"
           Ext.run "checkout", "--git", source
 
           Dir.chdir repository.name do
-            assert File.exists?('.git')
+            assert File.exist?('.git')
 
-            assert File.exists?('.gitignore')
+            assert File.exist?('.gitignore')
 
             %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
               assert(File.read('.gitignore') =~ /^vendor[\/\\]plugins[\/\\]#{proj}$/)
@@ -63,7 +63,7 @@ module Externals
             raise unless $? == 0
 
             %w(foreign_key_migrations redhillonrails_core acts_as_list).each do |proj|
-              assert File.exists?(File.join('vendor', 'plugins', proj, 'lib'))
+              assert File.exist?(File.join('vendor', 'plugins', proj, 'lib'))
             end
           end
         end
@@ -76,13 +76,13 @@ module Externals
         sub_repository = ModulesSvnBranchesRepository.new
         sub_repository.prepare
 
-        assert File.exists?(repository.clean_dir)
+        assert File.exist?(repository.clean_dir)
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir", "checkout", "git")
         mkdir_p workdir
 
         Dir.chdir workdir do
-          rm_r repository.name if File.exists? repository.name
+          rm_r repository.name if File.exist?(repository.name)
           source = repository.clean_dir
 
           puts "About to checkout #{source}"
@@ -123,7 +123,7 @@ module Externals
         mkdir_p workdir
 
         Dir.chdir workdir do
-          rm_r repository.name if File.exists? repository.name
+          rm_r repository.name if File.exist?(repository.name)
           source = repository.clean_dir
 
           puts "About to checkout #{source}"
@@ -155,7 +155,7 @@ module Externals
         mkdir_p workdir
 
         Dir.chdir workdir do
-          rm_r repository.name if File.exists? repository.name
+          rm_r repository.name if File.exist?(repository.name)
           source = repository.clean_dir
 
           puts "About to checkout #{source}"

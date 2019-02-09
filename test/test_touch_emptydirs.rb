@@ -41,15 +41,15 @@ module Externals
 
       def test_touch_emptydirs
         Dir.chdir File.join(root_dir, 'test') do
-          assert !File.exists?(File.join('.emptydir'))
+          assert !File.exist?(File.join('.emptydir'))
           Dir.chdir 'workdir' do
             Ext.run "touch_emptydirs"
-            assert !File.exists?(File.join('.emptydir'))
-            assert !File.exists?(File.join('notempty1', '.emptydir'))
-            assert File.exists?(File.join('notempty1', 'empty1', '.emptydir'))
-            assert !File.exists?(File.join('notempty1', 'notempty2', '.emptydir'))
-            assert File.exists?(File.join('notempty1', 'notempty2', 'empty2', '.emptydir'))
-            assert !File.exists?(File.join('notempty1', 'notempty2', 'notempty3', '.emptydir'))
+            assert !File.exist?(File.join('.emptydir'))
+            assert !File.exist?(File.join('notempty1', '.emptydir'))
+            assert File.exist?(File.join('notempty1', 'empty1', '.emptydir'))
+            assert !File.exist?(File.join('notempty1', 'notempty2', '.emptydir'))
+            assert File.exist?(File.join('notempty1', 'notempty2', 'empty2', '.emptydir'))
+            assert !File.exist?(File.join('notempty1', 'notempty2', 'notempty3', '.emptydir'))
           end
         end
       end

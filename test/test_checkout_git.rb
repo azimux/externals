@@ -12,19 +12,19 @@ module Externals
         repository = BasicGitRepository.new
         repository.prepare
 
-        assert File.exists?(repository.clean_dir)
+        assert File.exist?(repository.clean_dir)
 
         workdir = File.join(root_dir, 'test', "tmp", "workdir")
         mkdir_p workdir
 
         Dir.chdir workdir do
-          if File.exists?(repository.name)
+          if File.exist?(repository.name)
             rm_r repository.name
           end
 
           Ext.run "checkout", "--git", repository.clean_dir
 
-          assert File.exists?(File.join(repository.name, "readme.txt"))
+          assert File.exist?(File.join(repository.name, "readme.txt"))
         end
       end
     end

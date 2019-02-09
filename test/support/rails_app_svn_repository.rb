@@ -59,7 +59,7 @@ module Externals
             raise unless $? == 0
 
             Ext.run "init"
-            raise " could not create .externals"  unless File.exists? '.externals'
+            raise " could not create .externals"  unless File.exist?('.externals')
 
             # this line is necessary as ext can't perform the necessary
             # ignores otherwise if vendor and vendor/plugins haven't been added

@@ -15,6 +15,7 @@ module Externals
     protected
 
     def mark_dirty file
+
       File.open working_file_name(file), "w" do |file|
         file.puts "dirty"
       end
@@ -29,11 +30,11 @@ module Externals
     end
 
     def dirty?(file)
-      File.exists? working_file_name(file)
+      File.exist?(working_file_name(file))
     end
 
     def delete_if_dirty file
-      if File.exists? file
+      if File.exist?(file)
         if dirty?(file)
           rm_rf file
         end

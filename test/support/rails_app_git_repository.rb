@@ -34,7 +34,7 @@ module Externals
           `git init`
           raise unless $? == 0
           Ext.run "init"
-          raise " could not create .externals"  unless File.exists? '.externals'
+          raise " could not create .externals"  unless File.exist?('.externals')
           Ext.run "install", dependents[:acts_as_list].clean_dir
 
           #install a couple svn managed subprojects
