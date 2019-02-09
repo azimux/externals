@@ -705,6 +705,7 @@ commands below if you actually wish to delete them."
           possible_project_classes.map(&:to_s).join(',')}
 Please explicitly declare the SCM (using --git or --svn, or, by creating .externals manually"
         end
+
         scm = possible_project_classes.first.scm
       end
 
