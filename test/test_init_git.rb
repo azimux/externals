@@ -8,7 +8,7 @@ module Externals
     class TestInitGit < ::Test::Unit::TestCase
       include ExtTestCase
 
-      def test_init
+      def setup
         repository = BasicGitRepository.new
         repository.prepare
 
@@ -25,13 +25,35 @@ module Externals
           end
 
           mark_dirty(repository.name)
-          Dir.chdir repository.name do
+        end
+
+        @workdir = workdir
+        @repository = repository
+      end
+
+      def test_init
+        Dir.chdir @workdir do
+          Dir.chdir @repository.name do
             assert !File.exists?('.externals')
 
-            Ext.run "init"
+            rescue_exit { Ext.run "init" }
 
-            assert File.exists?('.externals')
-            assert(File.read('.externals') =~ /^\s*scm\s*=\s*git\s*$/)
+            config = Externals::Configuration::Configuration.new(File.read('.externals'))
+            assert_equal(config['.']['scm'], 'git')
+          end
+        end
+      end
+
+      def test_init_rails_project
+        Dir.chdir @workdir do
+          Dir.chdir @repository.name do
+            assert !File.exists?('.externals')
+
+            rescue_exit { Ext.run "init", "--type", "rails" }
+
+            config = Externals::Configuration::Configuration.new(File.read('.externals'))
+            assert_equal(config['.']['scm'], 'git')
+            assert_equal(config['.']['type'], 'rails')
           end
         end
       end
