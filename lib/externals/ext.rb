@@ -140,7 +140,7 @@ module Externals
         String,
         *"The type of project the main project is.
           For example, 'rails'.".lines_by_width(summary_width)
-      ) {|type| sub_options[:scm] = main_options[:type] = type}
+      ) {|type| sub_options[:type] = main_options[:type] = type}
       opts.on("--scm SCM", "-s SCM",
         String,
         *"The SCM used to manage the main project.  For example, '--scm svn'.".lines_by_width(summary_width)
