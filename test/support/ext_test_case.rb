@@ -56,5 +56,11 @@ module Externals
     def root_dir
       File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
     end
+
+    def rescue_exit
+      yield
+    rescue SystemExit => e
+      # We don't want to end the test suite just because `exit` was called
+    end
   end
 end
