@@ -140,7 +140,7 @@ module Externals
         String,
         *"The type of project the main project is.
           For example, 'rails'.".lines_by_width(summary_width)
-      ) {|type| sub_options[:scm] = main_options[:type] = type}
+      ) {|type| sub_options[:type] = main_options[:type] = type}
       opts.on("--scm SCM", "-s SCM",
         String,
         *"The SCM used to manage the main project.  For example, '--scm svn'.".lines_by_width(summary_width)
@@ -705,7 +705,6 @@ commands below if you actually wish to delete them."
           possible_project_classes.map(&:to_s).join(',')}
 Please explicitly declare the SCM (using --git or --svn, or, by creating .externals manually"
         end
-
         scm = possible_project_classes.first.scm
       end
 
