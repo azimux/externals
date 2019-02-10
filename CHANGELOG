@@ -1,3 +1,7 @@
+February 10, 2019 Version 1.1.3 released
+- Includes a --type bug fix
+- Removes several deprecation warnings
+
 January 13, 2012 Version 1.1.2 released
 - Fixes export problem with newer versions of git.
 - Fixes build on Windows, along with a bug that can prevent svn branches from

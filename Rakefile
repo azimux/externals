@@ -65,6 +65,8 @@ the main project.}
   specification.executables = ['ext']
   specification.default_executable = "ext"
 
+  specification.licenses = ['MIT']
+
   specification.files = ['Rakefile', 'README', 'MIT_LICENSE.txt', 'CHANGELOG'] +
     FileList['lib/**/*.rb']
   #specification.require_path = 'lib'
