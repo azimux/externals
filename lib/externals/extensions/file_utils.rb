@@ -27,7 +27,7 @@ FileUtils.class_eval do
     tries = 0
 
     rm = proc do
-      rm_rf_old *args
+      rm_rf_old(*args)
 
       while File.exist?(args[0]) && tries < 10
         # :nocov:

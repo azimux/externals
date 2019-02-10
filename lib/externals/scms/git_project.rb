@@ -139,7 +139,7 @@ module Externals
       if revision
         # No clean reliable way to clone something that's not a branch or tag.
         # just call up instead.
-        up *args
+        up(*args)
       else
         clone_opts = "--depth 1"
         if branch
@@ -161,8 +161,6 @@ module Externals
     end
 
     def do_up command
-      opts = resolve_opts(command)
-
       project_path = if path == "."
         name || "." # if no name is specified then we are expected to already be in the right path.
         # this is a little confusing and should be cleaned up.

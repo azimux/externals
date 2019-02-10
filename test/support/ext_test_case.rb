@@ -15,10 +15,7 @@ module Externals
     protected
 
     def mark_dirty file
-
-      File.open working_file_name(file), "w" do |file|
-        file.puts "dirty"
-      end
+      File.write(working_file_name(file), "dirty")
     end
 
     def unmark_dirty file
@@ -46,7 +43,7 @@ module Externals
     end
 
     def rails_exe
-      "jruby -S rails"
+      # "jruby -S rails"
       "rails"
     end
 
@@ -60,7 +57,7 @@ module Externals
 
     def rescue_exit
       yield
-    rescue SystemExit => e
+    rescue SystemExit
       # We don't want to end the test suite just because `exit` was called
     end
   end

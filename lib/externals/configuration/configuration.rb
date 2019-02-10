@@ -19,8 +19,8 @@ module Externals
       end
 
 
-      SETTING_REGEX = /^\s*([\.\w_-]+)\s*=\s*([^#\n]*)(?:#[^\n]*)?$/
-      SET_SETTING_REGEX = /^(\s*(?:[\.\w_-]+)\s*=\s*)(?:[^#\n]*)(#[^\n]*)?$/
+      SETTING_REGEX = /^\s*([\.\w-]+)\s*=\s*([^#\n]*)(?:#[^\n]*)?$/
+      SET_SETTING_REGEX = /^(\s*(?:[\.\w-]+)\s*=\s*)(?:[^#\n]*)(#[^\n]*)?$/
 
       def attributes
         retval = {}

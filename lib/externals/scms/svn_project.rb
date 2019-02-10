@@ -119,12 +119,12 @@ module Externals
       return true if path =~ /^svn(\+ssh)?:/
 
       # Look for http(s)://svn.*/*
-      if path =~ /^https?:\/\/([\w+\-_]+)\.(?:[\w+\-_]+\.)*[\w\-_]+(?:\/|$)/
+      if path =~ /^https?:\/\/([\w+\-]+)\.(?:[\w+\-]+\.)*[\w\-]+(?:\/|$)/
         return true if $1.downcase == "svn"
       end
 
       # Look for http(s)://*/*svn*/
-      if path =~ /^https?:\/\/(?:[\w+\-_]+\.?)+\/(\w+)/
+      if path =~ /^https?:\/\/(?:[\w+\-]+\.?)+\/(\w+)/
         return true if $1.downcase.include? "svn"
       end
 

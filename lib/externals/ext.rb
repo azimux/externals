@@ -237,6 +237,7 @@ module Externals
       print_commands(SHORT_COMMANDS_HASH)
     end
 
+    @registered_scms = nil
     def self.registered_scms
       return @registered_scms if @registered_scms
       @registered_scms ||= []
@@ -310,6 +311,9 @@ module Externals
     def initialize options = {}
       super()
 
+      @configuration = nil
+      @projects = nil
+
       scm = configuration['.']
       scm = scm['scm'] if scm
       scm ||= options[:scm]
@@ -360,8 +364,8 @@ Please use
         end
 
         if project_name_or_path
-          project = subprojects.detect do |project|
-            project.name == project_name_or_path || project.path == project_name_or_path
+          project = subprojects.detect do |p|
+            p.name == project_name_or_path || p.path == project_name_or_path
           end
 
           raise "no such project" unless project

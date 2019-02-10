@@ -16,11 +16,12 @@ module Externals
     def self.attr_attr_accessor *names
       names = [names].flatten
       names.each do |name|
-        define_method name do
-          attributes[name.to_sym]
-        end
         define_method "#{name}=" do |value|
           attributes[name.to_sym] = value
+        end
+        next if name == "name" || name == "scm"
+        define_method name do
+          attributes[name.to_sym]
         end
       end
     end
@@ -112,7 +113,7 @@ module Externals
     end
 
     def extract_name repository
-      if repository =~ /\/([\w_-]+)(?:\.git)?$/
+      if repository =~ /\/([\w-]+)(?:\.git)?$/
         $1
       end
     end
@@ -153,7 +154,7 @@ module Externals
 
     # create the suffixed versions
     OPTS_SUFFIXES.map do |suffix|
-      name = "scm_opts_#{suffix}"
+      "scm_opts_#{suffix}"
     end.each do |name|
       define_method name do
         values = [
@@ -206,7 +207,7 @@ module Externals
 
         #now we create the suffixed version of the global settings.
         OPTS_SUFFIXES.map do |suffix|
-          name = "#{scm_name}_opts_#{suffix}"
+          "#{scm_name}_opts_#{suffix}"
         end.each do |name|
           #defer to the parent project for these global settings
           Project.__send__(:define_method, name) do
