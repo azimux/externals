@@ -2,10 +2,6 @@ require File.join(File.dirname(__FILE__), '..', 'project')
 
 module Externals
   class GitProject < Project
-    def default_branch
-      'master'
-    end
-
     private
     def do_clone command, extra_opts = ""
       opts = resolve_opts(command)

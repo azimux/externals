@@ -2,10 +2,6 @@ require File.join(File.dirname(__FILE__), '..', 'project')
 
 module Externals
   class SvnProject < Project
-    def default_branch
-      raise "There is no default_branch for SvnProject"
-    end
-
     public
     def co *args
       # delete path if empty
