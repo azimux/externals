@@ -48,14 +48,6 @@ module Externals
       self.class.scm
     end
 
-    def self.default_branch
-      raise "subclass responsibility"
-    end
-
-    def default_branch
-      self.class.default_branch
-    end
-
     def switch branch_name, options = {}
       raise "subclass responsibility"
     end
