@@ -31,7 +31,7 @@ module Externals
     # make sure you have already entered Dir.chdir(path) in your calling code!
     def branch_exists branch_name
       opts = resolve_opts
-      `git #{opts} branch -a` =~ /^\s*#{branch_name}\s*$/
+      `git #{opts} branch -a` =~ /^[\s\*]*#{branch_name}\s*$/
     end
 
     # make sure you have already entered Dir.chdir(path) in your calling code!
