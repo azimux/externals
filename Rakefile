@@ -68,11 +68,18 @@ the main project.}
   specification.bindir = "bin"
   specification.executables = ['ext']
 
-  specification.licenses = ['MIT']
+  specification.license = "MPL-2.0"
 
-  specification.files = ['Rakefile', 'README', 'MIT_LICENSE.txt', 'CHANGELOG'] +
-    FileList['lib/**/*.rb']
-  #specification.require_path = 'lib'
+  specification.files = Dir[
+                             "bin/ext",
+                             "lib/**/*",
+                             "LICENSE*.txt",
+                             "README*",
+                             "CHANGELOG*",
+                             "version.rb"
+                           ]
+
+  specification.require_paths = ["lib"]
 end
 
 Gem::PackageTask.new(gem_specification) do |package|

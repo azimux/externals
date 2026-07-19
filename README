@@ -215,11 +215,10 @@ rake test
 You will need git and svn installed.
 If you are using Ruby 1.9 to run the tests, you will need to have the simplecov gem installed.
 
-
 Copyright Information
 ---------------------
 The externals project is copyright 2008 by Miles Georgi
-and is released under the MIT license.
 
-The license is available in the same directory as this README
-file and is named MIT_LICENSE.txt
+License
+-------
+This project is licensed under the MPL-2.0 license. Please see LICENSE.txt for more info.
