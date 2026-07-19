@@ -11,8 +11,7 @@ submodules.  Also, the branch tip doesn't automatically move with git-submodule.
 Subversion always checks out the branch tip for subprojects when performing a
 checkout or update.
 
-Externals is designed such that adding support for a new SCM, or new project
-types is easy.
+Externals is designed such that adding support for a new SCM is easy.
 
 The externals executable is called ext.  Commands come in a long form and a
 short form.  The longer form applies the action to the main project.  The short
@@ -27,8 +26,6 @@ ext [OPTIONS] <command> [repository] [-b <branch>] [path]
                            checkout/export the main project
   -g, --git                same as '--scm git' Uses git to checkout/export the
                            main project
-  -t, --type TYPE          The type of project the main project is. For example,
-                           'rails'.
   -s, --scm SCM            The SCM used to manage the main project. For example,
                            '--scm svn'.
   -b, --branch BRANCH      The branch you want the subproject to checkout when
@@ -62,11 +59,7 @@ freeze          Usage: ext freeze <subproject> [REVISION]
 help            It helps.  Hopefully.
 
 init            Creates a .externals file containing only [main]
-                It will try to determine the SCM used by the main project,
-                as well as the project type.  You don't have to specify
-                a project type if you don't want to or if your project type
-                isn't supported.  It just means that when using 'install'
-                that you'll want to specify the path.
+                It will try to determine the SCM used by the main project.
 
 install         Usage: ext install <repository> [-b <branch>] [path]
                 Registers <repository> in .externals under the appropriate

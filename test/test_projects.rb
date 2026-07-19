@@ -25,7 +25,6 @@ module Externals
               open '.externals', 'w' do |f|
                 f.write "[.]
 scm = git
-type = rails
 
 [vendor/plugins/acts_as_list]
 scm = git
@@ -57,7 +56,6 @@ repository = svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/for
               open '.externals', 'w' do |f|
                 f.write "[.]
 scm = git
-type = rails
 
 [vendor/plugins/acts_as_list]
 scm_opts = --verbose
@@ -97,7 +95,6 @@ repository = svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/for
               open '.externals', 'w' do |f|
                 f.write "[.]
 scm = git
-type = rails
 svn_opts = --trust-server-cert
 svn_opts_up = --svn-up
 git_opts = --verbose

@@ -34,12 +34,16 @@ module Externals
           `git init -b master`
           raise unless $? == 0
           Ext.run "init"
+
           raise " could not create .externals"  unless File.exist?('.externals')
-          Ext.run "install", dependents[:acts_as_list].clean_dir
+
+          proj = dependents[:acts_as_list]
+          Ext.run "install", proj.clean_dir, "vendor/plugins/#{proj.name}"
 
           #install a couple svn managed subprojects
-          [:foreign_key_migrations, :redhillonrails_core].each do |proj|
-            Ext.run "install", "--svn", 'file:///' + dependents[proj].clean_dir
+          [:foreign_key_migrations, :redhillonrails_core].each do |project_name|
+            proj = dependents[project_name]
+            Ext.run "install", "--svn", 'file:///' + proj.clean_dir, "vendor/plugins/#{proj.name}"
           end
 
           Dir.chdir File.join('vendor', 'plugins', 'foreign_key_migrations') do

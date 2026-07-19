@@ -3,7 +3,7 @@ require 'fileutils'
 module Externals
   OPTS_SUFFIXES = ["co", "up", "st", "ex"]  unless const_defined?('OPTS_SUFFIXES')
   VALID_ATTRIB = ([
-      :name, :path, :repository, :branch, :type, :scm, :revision
+      :name, :path, :repository, :branch, :scm, :revision
     ]
   ).map(&:to_s) unless const_defined?('VALID_ATTRIB')
 

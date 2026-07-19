@@ -43,20 +43,6 @@ module Externals
           end
         end
       end
-
-      def test_init_rails_project
-        Dir.chdir @workdir do
-          Dir.chdir @repository.name do
-            assert !File.exist?('.externals')
-
-            rescue_exit { Ext.run "init", "--type", "rails" }
-
-            config = Externals::Configuration::Configuration.new(File.read('.externals'))
-            assert_equal(config['.']['scm'], 'git')
-            assert_equal(config['.']['type'], 'rails')
-          end
-        end
-      end
     end
   end
 end

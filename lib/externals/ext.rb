@@ -11,8 +11,6 @@ Dir.entries(File.join(File.dirname(__FILE__), 'extensions')).each do |extension|
 end
 
 module Externals
-  PROJECT_TYPES_DIRECTORY = File.join(File.dirname(__FILE__), '..', 'externals','project_types')
-
   # Full commands operate on the main project as well as the externals
   # short commands only operate on the externals
   # Main commands only operate on the main project
@@ -45,14 +43,11 @@ module Externals
       or path.}],
     [:help, "You probably just ran this command just now."],
     [:init, "Creates a .externals file containing only [main]
-      It will try to determine the SCM used by the main project,
-      as well as the project type.  You don't have to specify
-      a project type if you don't want to or if your project type
-      isn't supported.  It just means that when using 'install'
-      that you'll want to specify the path."],
-    [:install, "ext install <repository> [-b <branch>] [path]",
+      It will try to determine the SCM used by the main project."],
+    [:install, "ext install <repository> [-b <branch>] <path>",
       "Registers <repository> in .externals under the appropriate
-      SCM.  Checks out the project, and also adds it to the ignore
+      SCM.  Checks out the subproject at given path,
+      and also adds it to the ignore
       feature offered by the SCM of the main project.  If the SCM
       type is not obvious from the repository URL, use the --scm,
       --git, or --svn flags."],
@@ -94,35 +89,10 @@ module Externals
     require "externals/scms/#{project}" if project =~ /_project.rb$/
   end
 
-  Dir.entries(PROJECT_TYPES_DIRECTORY).each do |type|
-    require File.join(PROJECT_TYPES_DIRECTORY, type) if type =~ /\.rb$/
-  end
-
   class Ext
     include FileUtils
     extend FileUtils
 
-    attr_accessor :path_calculator
-
-    def self.project_types
-      types = Dir.entries(PROJECT_TYPES_DIRECTORY).select do |file|
-        file =~ /\.rb$/
-      end
-
-      types.map do |type|
-        /^(.*)\.rb$/.match(type)[1]
-      end
-    end
-
-    def self.project_type_files
-      project_types.map do |project_type|
-        "#{File.join(PROJECT_TYPES_DIRECTORY, project_type)}.rb"
-      end
-    end
-
-    project_type_files.each do |file|
-      require file
-    end
 
     def self.new_opts main_options, sub_options
       opts = OptionParser.new(
@@ -137,11 +107,6 @@ module Externals
           :summary_width => summary_width)
       end
 
-      opts.on("--type TYPE", "-t TYPE",
-        String,
-        *"The type of project the main project is.
-          For example, 'rails'.".lines_by_width(summary_width)
-      ) {|type| sub_options[:type] = main_options[:type] = type}
       opts.on("--scm SCM", "-s SCM",
         String,
         *"The SCM used to manage the main project.  For example, '--scm svn'.".lines_by_width(summary_width)
@@ -322,31 +287,6 @@ module Externals
       scm = configuration['.']
       scm = scm['scm'] if scm
       scm ||= options[:scm]
-
-      type = configuration['.']
-      type = type['type'] if type
-
-      type ||= options[:type]
-
-      if type
-        install_project_type type
-      else
-        possible_project_types = self.class.project_types.select do |project_type|
-          self.class.project_type_detector(project_type).detected?
-        end
-
-        if possible_project_types.size > 1
-          # :nocov:
-          raise "We found multiple project types that this could be: #{possible_project_types.join(',')}
-Please use
- the --type option to tell ext which to use."
-          # :nocov:
-        else
-          possible_project_types.each do |project_type|
-            install_project_type project_type
-          end
-        end
-      end
     end
 
     def self.project_class(scm)
@@ -458,7 +398,7 @@ that you are installing. Use an option to specify it
       end
 
       project = self.class.project_class(scm).new(:repository => repository,
-        :path => path || path_calculator.new, :scm => scm)
+        :path => path, :scm => scm)
       path = project.path
 
       raise "no path" unless path
@@ -723,7 +663,6 @@ commands below if you actually wish to delete them."
       # :nocov:
 
       scm = options[:scm]
-      type = options[:type]
 
       if !scm
         possible_project_classes = self.class.project_classes.select do |project_class|
@@ -740,22 +679,6 @@ Please explicitly declare the SCM (using --git or --svn, or, by creating .extern
         end
 
         scm = possible_project_classes.first.scm
-      end
-
-      if !type
-        possible_project_types = self.class.project_types.select do |project_type|
-          self.class.project_type_detector(project_type).detected?
-        end
-
-        if possible_project_types.size > 1
-          raise "We found multiple project types that this could be: #{possible_project_types.join(',')}
-Please use the --type option to tell ext which to use."
-        elsif possible_project_types.size == 0
-          puts "WARNING: We could not automatically determine the project type.
-          Be sure to specify paths when adding subprojects to your .externals file"
-        else
-          type = possible_project_types.first
-        end
       end
 
       config = Configuration::Configuration.new_empty
@@ -776,7 +699,6 @@ Please use the --type option to tell ext which to use."
       end
 
       config['.'][:scm] = scm
-      config['.'][:type] = type if type
 
       config.write '.externals'
       reload_configuration
@@ -784,14 +706,6 @@ Please use the --type option to tell ext which to use."
 
     def version(args, options)
       puts Externals::VERSION
-    end
-
-    def self.project_type_detector name
-      Externals.module_eval("#{name.classify}Detector", __FILE__, __LINE__)
-    end
-
-    def install_project_type name
-      self.path_calculator = Externals.module_eval("#{name.classify}ProjectType::DefaultPathCalculator", __FILE__, __LINE__)
     end
 
     protected

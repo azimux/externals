@@ -100,7 +100,7 @@ module Externals
               Dir.chdir "rails_app" do
                 #install a new project
                 subproject = GitRepositoryFromBundle.new("ssl_requirement")
-                Ext.run "install", subproject.clean_dir
+                Ext.run "install", subproject.clean_dir, "vendor/plugins/#{subproject.name}"
 
                 SvnProject.add_all
 
@@ -159,7 +159,7 @@ module Externals
               Ext.run "checkout", "--svn", source, 'rails_app'
 
               Dir.chdir "rails_app" do
-                Ext.run "install", subproject.clean_dir
+                Ext.run "install", subproject.clean_dir, "vendor/plugins/#{subproject.name}"
 
                 Dir.chdir File.join("vendor", 'plugins', subproject_name) do
                   assert `git show HEAD` !~ /^\s*commit\s*#{revision}\s*$/i
@@ -234,7 +234,7 @@ module Externals
 
               Dir.chdir 'rails_app' do
                 #install a new project
-                Ext.run "install", "--svn", subproject.clean_url
+                Ext.run "install", "--svn", subproject.clean_url, "vendor/plugins/#{subproject.name}"
 
                 SvnProject.add_all
 

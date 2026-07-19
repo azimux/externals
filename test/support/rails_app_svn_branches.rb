@@ -72,24 +72,28 @@ module Externals
             SvnProject.add_all
 
             #install some git subprojects
-            [:rails, :acts_as_list].each do |proj|
-              Ext.run "install", dependents[proj].clean_dir
-            end
+            proj = dependents[:acts_as_list]
+            Ext.run "install", proj.clean_dir, "vendor/plugins/#{proj.name}"
+            proj = dependents[:rails]
+            Ext.run "install", proj.clean_dir, "vendor/#{proj.name}"
 
             #install a couple svn managed subprojects
             [
               #:foreign_key_migrations,
               :redhillonrails_core
-            ].each do |proj|
-              Ext.run "install", "--svn", dependents[proj].clean_url
+            ].each do |project_name|
+              proj = dependents[project_name]
+              Ext.run "install", "--svn", proj.clean_url, "vendor/plugins/#{proj.name}"
             end
 
             #install project with a git branch
-            Ext.run "install", dependents[:engines].clean_dir, "-b", "edge"
+            proj = dependents[:engines]
+            Ext.run "install", proj.clean_dir, "-b", "edge", "vendor/plugins/#{proj.name}"
 
             #install project with a non-default path and svn branching
+            proj = dependents[:modules]
             Ext.run "install", "--svn",
-              "#{dependents[:modules].clean_url}",
+              "#{proj.clean_url}",
               "-b", "current",
               "modules"
 
@@ -112,11 +116,13 @@ module Externals
             Ext.run "uninstall", "-f", "rails"
 
             # add a git managed project...
-            Ext.run "install", dependents[:ssl_requirement].clean_dir,
-              "-r", dependents[:ssl_requirement].attributes[:revision]
+            proj = dependents[:ssl_requirement]
+            Ext.run "install", proj.clean_dir,
+              "-r", proj.attributes[:revision], "vendor/plugins/#{proj.name}"
 
             # add a svn managed project
-            Ext.run "install", "--svn", dependents[:empty_plugin].clean_url
+            proj = dependents[:empty_plugin]
+            Ext.run "install", "--svn", proj.clean_url, "vendor/plugins/#{proj.name}"
 
             ext = Ext.new
             ext.configuration["vendor/plugins/engines"]["branch"] = "branch1"

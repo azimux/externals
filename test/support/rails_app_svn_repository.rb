@@ -68,25 +68,30 @@ module Externals
             #            raise unless $? == 0
 
             #install some git subprojects
-            Ext.run "install", dependents[:acts_as_list].clean_dir
+            proj = dependents[:acts_as_list]
+            Ext.run "install", proj.clean_dir, "vendor/plugins/#{proj.name}"
             #we have to use file:// to test export, because without that
             #git clone optimizes by copying and igores --depth
-            Ext.run "install", "file://#{dependents[:rails].clean_dir}"
+            proj = dependents[:rails]
+            Ext.run "install", "file://#{proj.clean_dir}", "vendor/#{proj.name}"
 
             #install a couple svn managed subprojects
             [
               #:foreign_key_migrations,
               :redhillonrails_core
-            ].each do |proj|
-              Ext.run "install", "--svn", dependents[proj].clean_url
+            ].each do |project_name|
+              proj = dependents[project_name]
+              Ext.run "install", "--svn", proj.clean_url, "vendor/plugins/#{proj.name}"
             end
 
             #install project with a git branch
-            Ext.run "install", dependents[:engines].clean_dir, "-b", "edge"
+            proj = dependents[:engines]
+            Ext.run "install", proj.clean_dir, "-b", "edge", "vendor/plugins/#{proj.name}"
 
             #install project with a non-default path
+            proj = dependents[:modules]
             Ext.run "install", "--svn",
-              "#{dependents[:modules].clean_url}",
+              "#{proj.clean_url}",
               "modules"
 
             SvnProject.add_all

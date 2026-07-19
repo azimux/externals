@@ -39,11 +39,14 @@ module Externals
           raise unless $? == 0
           Ext.run "init"
           raise " could not create .externals"  unless File.exist?('.externals')
-          Ext.run "install", dependents[:acts_as_list].clean_dir
+
+          proj = dependents[:acts_as_list]
+          Ext.run "install", proj.clean_dir, "vendor/plugins/#{proj.name}"
 
           #install a couple svn managed subprojects
-          [:foreign_key_migrations, :redhillonrails_core].each do |proj|
-            Ext.run "install", "--svn", 'file:///' + dependents[proj].clean_dir
+          [:foreign_key_migrations, :redhillonrails_core].each do |project_name|
+            proj = dependents[project_name]
+            Ext.run "install", "--svn", 'file:///' + proj.clean_dir, "vendor/plugins/#{proj.name}"
           end
 
           ext = Ext.new
@@ -53,8 +56,9 @@ module Externals
             raise
           end
           #install project with a branch
-          Ext.run "install", dependents[:engines].clean_dir, "-b", "edge"
-          unless main_project.ignore_contains? "vendor/plugins/engines"
+          proj = dependents[:engines]
+          Ext.run "install", proj.clean_dir, "-b", "edge", "vendor/plugins/#{proj.name}"
+          unless main_project.ignore_contains? "vendor/plugins/#{proj.name}"
             raise
           end
 
@@ -62,9 +66,11 @@ module Externals
           unless !main_project.ignore_contains? "vendor/rails"
             raise
           end
-          Ext.run "install",
-            dependents[:rails].clean_dir
-          unless main_project.ignore_contains? "vendor/rails"
+
+          proj = dependents[:rails]
+          Ext.run "install", proj.clean_dir, "vendor/#{proj.name}"
+
+          unless main_project.ignore_contains? "vendor/#{proj.name}"
             raise
           end
 
