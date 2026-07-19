@@ -2,13 +2,13 @@ require 'fileutils'
 
 FileUtils.class_eval do
   # simulates cp -a
-  def cp_a source, dest, options = {}
-    cp_r source, dest, options.merge(:preserve => true)
+  def cp_a source, dest, **options
+    cp_r source, dest, **options.merge(:preserve => true)
   end
 
   # calls rm_rf if the file exists
-  def rm_rf_ie file, options = {}
-    rm_rf file, options if File.exist?(file)
+  def rm_rf_ie file, **options
+    rm_rf(file, **options) if File.exist?(file)
   end
 
   # calls rmdir if the file exists and is empty
@@ -23,13 +23,13 @@ FileUtils.class_eval do
 
   alias rm_rf_old rm_rf
   #going to try to give a delay after calling rm if necessary...
-  def rm_rf *args
+  def rm_rf(filename, *args, **opts)
     tries = 0
 
     rm = proc do
-      rm_rf_old(*args)
+      rm_rf_old(filename, *args, **opts)
 
-      while File.exist?(args[0]) && tries < 10
+      while File.exist?(filename) && tries < 10
         # :nocov:
         sleep 1
         tries += 1
@@ -40,12 +40,12 @@ FileUtils.class_eval do
     rm.call
     if tries >= 10
       # :nocov:
-      puts "WARNING: deleted #{args[0]} didn't work, trying again"
+      puts "WARNING: deleted #{filename} didn't work, trying again"
       tries = 0
       rm.call
 
       if tries >= 10
-        raise "Could not delete #{args[0]}"
+        raise "Could not delete #{filename}"
       end
       # :nocov:
     end
