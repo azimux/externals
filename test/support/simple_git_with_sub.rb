@@ -14,14 +14,14 @@ module Externals
       def build_here
         mkdir "#{name}.git"
         Dir.chdir "#{name}.git" do
-          `git init --bare`
+          `git init --bare -b master`
           raise unless $? == 0
         end
 
         mkdir "#{name}.working"
 
         Dir.chdir("#{name}.working") do
-          `git init`
+          `git init -b master`
           raise unless $? == 0
 
           open 'simple_readme.txt', 'w' do |f|

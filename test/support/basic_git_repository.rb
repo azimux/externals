@@ -13,7 +13,7 @@ module Externals
         mkdir repo_name
 
         Dir.chdir("#{repo_name}") do
-          `git init --bare`
+          `git init --bare -b master`
 
           raise unless $? == 0
         end
@@ -21,7 +21,7 @@ module Externals
         mkdir "#{name}.local"
 
         Dir.chdir("#{name}.local") do
-          `git init`
+          `git init -b master`
 
           raise unless $? == 0
 

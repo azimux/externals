@@ -26,7 +26,7 @@ module Externals
       def build_here
         mkdir "#{name}.git"
         Dir.chdir "#{name}.git" do
-          `git init --bare`
+          `git init --bare -b master`
           raise unless $? == 0
         end
 
@@ -35,7 +35,7 @@ module Externals
         Dir.chdir "#{name}.working" do
           Ext.run "touch_emptydirs"
 
-          `git init`
+          `git init -b master`
           raise unless $? == 0
           Ext.run "init"
           raise " could not create .externals"  unless File.exist?('.externals')
