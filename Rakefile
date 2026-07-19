@@ -63,7 +63,6 @@ the main project.}
 
   specification.bindir = "bin"
   specification.executables = ['ext']
-  specification.default_executable = "ext"
 
   specification.licenses = ['MIT']
 
