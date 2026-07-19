@@ -4,6 +4,8 @@ require 'rdoc/task'
 require 'rubygems/package_task'
 require 'find'
 
+require_relative "version"
+
 root_dir = File.dirname(__FILE__)
 
 $LOAD_PATH << File.join(root_dir, 'lib')
@@ -58,6 +60,8 @@ the main project.}
   specification.author = "Miles Georgi"
   specification.email = "azimux@gmail.com"
   specification.homepage = "http://nopugs.com/ext-tutorial"
+
+  specification.required_ruby_version = Externals::MINIMUM_RUBY_VERSION
 
   specification.test_files = FileList['test/test_*.rb', 'test/setup/*.gz']
 

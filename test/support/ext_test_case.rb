@@ -1,8 +1,7 @@
-if RUBY_VERSION =~ /^1\.9/
-  require 'simplecov'
-  SimpleCov.start do
-    add_filter "test/"
-  end
+require 'simplecov'
+
+SimpleCov.start do
+  add_filter "test/"
 end
 
 require 'test/unit'
