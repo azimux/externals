@@ -52,7 +52,9 @@ module Externals
 
         if found
           if rows[found] !~ SET_SETTING_REGEX
+            # :nocov:
             raise "thought I found the row, but didn't"
+            # :nocov:
           end
           rows[found] = "#{$1}#{value}#{$2}"
         else
@@ -76,7 +78,9 @@ module Externals
         if found
           value = self[key]
           if rows[found] !~ SET_SETTING_REGEX
+            # :nocov:
             raise "thought I found the row, but didn't"
+            # :nocov:
           end
           rows.delete rows[found]
         end
@@ -158,7 +162,9 @@ module Externals
 
         if titles.size > 0 && bodies.size > 0
           if titles.size + 1 != bodies.size
+            # :nocov:
             raise "bodies and sections do not match up"
+            # :nocov:
           end
 
           bodies = bodies[1..(bodies.size - 1)]

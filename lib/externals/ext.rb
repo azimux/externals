@@ -197,15 +197,19 @@ module Externals
       command = :version if main_options[:version]
 
       if !command || command.to_s == ''
+        # :nocov:
         puts "hey... you didn't tell me what you want to do."
         puts "Try 'ext help' for a list of commands"
-        exit
+        exit 1
+        # :nocov:
       end
 
       unless COMMANDS.index command
+        # :nocov:
         puts "unknown command: #{command}"
         puts "for a list of commands try 'ext help'"
-        exit
+        exit 1
+        # :nocov:
       end
 
 
@@ -332,9 +336,11 @@ module Externals
         end
 
         if possible_project_types.size > 1
+          # :nocov:
           raise "We found multiple project types that this could be: #{possible_project_types.join(',')}
 Please use
  the --type option to tell ext which to use."
+          # :nocov:
         else
           possible_project_types.each do |project_type|
             install_project_type project_type
@@ -369,7 +375,9 @@ Please use
             p.name == project_name_or_path || p.path == project_name_or_path
           end
 
+          # :nocov:
           raise "no such project" unless project
+          # :nocov:
 
           project.send command_name, args, options
         else
@@ -410,8 +418,10 @@ Please use
       section = configuration[project.path]
 
       unless section[:revision]
+        # :nocov:
         puts "Uhh... #{project.name} wasn't frozen, so I can't unfreeze it."
-        exit
+        exit 1
+        # :nocov:
       end
 
       section.rm_setting :revision
@@ -423,8 +433,10 @@ Please use
 
     def install args, options
       if !File.exist?('.externals')
+        # :nocov:
         STDERR.puts "This project does not appear to be managed by externals.  Try 'ext init' first"
         exit NO_EXTERNALS_FILE
+        # :nocov:
       end
       repository = args[0]
       path = args[1]
@@ -436,11 +448,13 @@ Please use
       scm ||= infer_scm(repository)
 
       unless scm
+        # :nocov:
         STDERR.puts "Unable to determine SCM from the repository name.
 You need to either specify the scm used to manage the subproject
 that you are installing. Use an option to specify it
 (such as --git or --svn)"
         exit COULD_NOT_DETERMINE_SCM
+        # :nocov:
       end
 
       project = self.class.project_class(scm).new(:repository => repository,
@@ -467,7 +481,9 @@ that you are installing. Use an option to specify it
 
     def uninstall args, options
       unless File.exist?('.externals')
+        # :nocov:
         raise "Hmm... there's no .externals file in this directory."
+        # :nocov:
       end
 
       project = subproject_by_name_or_path(args[0])
@@ -495,8 +511,10 @@ that you are installing. Use an option to specify it
       scm ||= options[:scm]
 
       unless scm
+        # :nocov:
         raise "You need to either specify the scm as the first line in .externals (for example, scm = git), or use an option to specify it
           (such as --git or --svn)"
+        # :nocov:
       end
 
       project = self.class.project_class(scm).new(:path => ".")
@@ -565,8 +583,10 @@ by creating the .externals file manually"
       end
 
       unless scm
+        # :nocov:
         raise "You need to either specify the scm as the first line in .externals, or use an option to specify it
           (such as --git or --svn)"
+        # :nocov:
       end
 
       project = main_project
@@ -604,8 +624,10 @@ by creating the .externals file manually"
       end
 
       unless scm
+        # :nocov:
         raise "You need to either specify the scm as the first line in .externals, or use an option to specify it
           (such as --git or --svn)"
+        # :nocov:
       end
 
       old_config = configuration
@@ -696,7 +718,9 @@ commands below if you actually wish to delete them."
     end
 
     def init args, options = {}
+      # :nocov:
       raise ".externals already exists" if File.exist?('.externals')
+      # :nocov:
 
       scm = options[:scm]
       type = options[:type]
@@ -708,9 +732,11 @@ commands below if you actually wish to delete them."
 
         raise "Could not determine this project's scm" if  possible_project_classes.empty?
         if possible_project_classes.size > 1
+          # :nocov:
           raise "This project appears to be managed by multiple SCMs: #{
           possible_project_classes.map(&:to_s).join(',')}
 Please explicitly declare the SCM (using --git or --svn, or, by creating .externals manually"
+          # :nocov:
         end
 
         scm = possible_project_classes.first.scm
@@ -771,7 +797,9 @@ Please use the --type option to tell ext which to use."
     protected
     def do_checkout_or_export repository, path, options, sym
       if File.exist?('.externals')
+        # :nocov:
         raise "seems main project is already checked out here?"
+        # :nocov:
       else
         #We appear to be attempting to checkout/export a main project
         scm = options[:scm]
@@ -784,8 +812,10 @@ Please use the --type option to tell ext which to use."
         end
 
         unless scm
+          # :nocov:
           raise "You need to either specify the scm as the first line in .externals, or use an option to specify it
           (such as --git or --svn)"
+          # :nocov:
         end
 
         main_project = self.class.project_class(scm).new(

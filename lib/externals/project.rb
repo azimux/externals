@@ -1,4 +1,3 @@
-require 'externals/extensions/symbol'
 require 'fileutils'
 
 module Externals
@@ -49,7 +48,9 @@ module Externals
     end
 
     def switch branch_name, options = {}
+      # :nocov:
       raise "subclass responsibility"
+      # :nocov:
     end
 
     def initialize hash
@@ -68,7 +69,9 @@ module Externals
           attribute =~ /^\w+_opts(_(#{OPTS_SUFFIXES.join("|")}))?/
         end
         if !invalid_attrib.empty?
+          # :nocov:
           raise "invalid attribute(s): #{invalid_attrib.join(', ')}"
+          # :nocov:
         end
       end
 
@@ -86,7 +89,9 @@ module Externals
 
     [:co, :ex].each do |method_name|
       define_method method_name do |args|
+        # :nocov:
         raise "subclass responsibility"
+        # :nocov:
       end
     end
 

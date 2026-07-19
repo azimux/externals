@@ -18,7 +18,9 @@ module Externals
       puts(gitclonecmd = "git #{opts} clone #{extra_opts} \"#{repository}\" #{dest}")
       puts `#{gitclonecmd}`
       unless $? == 0
+        # :nocov:
         raise "git clone of #{repository} failed."
+        # :nocov:
       end
     end
 
@@ -74,7 +76,9 @@ module Externals
               puts `git #{opts} checkout --track -b #{branch} origin/#{branch}`
             end
             unless $? == 0
+              # :nocov:
               raise "Could not checkout origin/#{branch}"
+              # :nocov:
             end
           end
         end
@@ -125,7 +129,9 @@ module Externals
             puts `git #{resolve_opts("co")} checkout --track -b #{branch_name} origin/#{branch_name}`
           end
           unless $? == 0
+            # :nocov:
             raise "Could not checkout origin/#{branch_name}"
+            # :nocov:
           end
         end
       end
@@ -247,11 +253,15 @@ module Externals
       rows = ir.select {|row| row.strip != path.strip}
 
       if rows.size == ir.size
+        # :nocov:
         raise "row not found matching #{path} in .gitignore"
+        # :nocov:
       end
 
       if ir.size - rows.size != 1
+        # :nocov:
         raise "More than one row found matching #{path} in .gitignore"
+        # :nocov:
       end
 
       open('.gitignore', 'w') do |f|

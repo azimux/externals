@@ -26,7 +26,9 @@ module Externals
         puts(svncocmd = "svn #{opts} co #{url} #{dest}")
         puts `#{svncocmd}`
         unless $? == 0
-          raise
+          # :nocov:
+          raise "Failed to run #{svncocmd}"
+          # :nocov:
         end
 
         change_to_revision "co"
@@ -75,7 +77,9 @@ module Externals
           url = [repository, branch_name].join("/")
           `svn #{scm_opts} switch #{url}`
           unless $? == 0
+            # :nocov:
             raise "Could not switch to #{url}"
+            # :nocov:
           end
         end
       end
@@ -145,7 +149,9 @@ module Externals
 
       status.split("\n").grep(/^\?/).each do |to_add|
         puts `svn add #{to_add.gsub(/^\?\s*/,"")}`
+        # :nocov:
         raise unless $? == 0
+        # :nocov:
       end
     end
 
@@ -158,12 +164,16 @@ module Externals
 
       branch = info_url.downcase.gsub(/\/+/, "/").gsub(repository.downcase.gsub(/\/+/, "/"), "")
       if branch == repository
+        # :nocov:
         raise "Could not determine branch from URL #{info_url}.
     Does not appear have a substring of #{repository}"
+        # :nocov:
       end
       if branch !~ /^\//
+        # :nocov:
         raise "Was expecting the branch and repository to be separated by '/'
       Please file an issue about this at http://github.com/azimux/externals"
+        # :nocov:
       end
       branch.gsub(/^\//, "")
     end
@@ -171,13 +181,18 @@ module Externals
     def self.extract_repository url, branch
       repository = url.gsub(branch, "")
       if url == repository
+        # :nocov:
         raise "Could not determine repository from URL #{info_url}.
     Does not appear to have the branch #{branch} as a substring"
+        # :nocov:
       end
       if repository !~ /\/$/
+        # :nocov:
         raise "Was expecting the branch and repository to be separated by '/'
       Please file an issue about this at http://github.com/azimux/externals"
+        # :nocov:
       end
+
       repository.gsub(/\/$/, "")
     end
 
@@ -198,7 +213,10 @@ You might need to change your .externals file to contain something like this:
 scm = svn
 repository = #{info_url}
         "
+
+        # :nocov:
         raise "Cannot use subversion branching features without a repository in .externals file"
+        # :nocov:
       end
     end
 
@@ -226,11 +244,15 @@ repository = #{info_url}
       rows = ir.select {|row| row.strip != child}
 
       if rows.size == ir.size
+        # :nocov:
         raise "row not found matching #{path} in svn propget svn:ignore"
+        # :nocov:
       end
 
       if ir.size - rows.size != 1
+        # :nocov:
         raise "More than one row found matching #{path} in svn propget svn:ignore"
+        # :nocov:
       end
 
       Dir.chdir(parent) do
@@ -266,7 +288,9 @@ repository = #{info_url}
       if `svn #{scm_opts} info` =~ /^\s*URL:\s*([^\s]+)\s*$/
         $1
       else
+        # :nocov:
         raise "Could not get URL from svn info"
+        # :nocov:
       end
     end
 
