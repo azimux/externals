@@ -1,0 +1,44 @@
+AllCops:
+  TargetRubyVersion: 3.2
+  NewCops: enable
+
+inherit_gem:
+  foobara-rubocop-rules:
+    - rules/*
+
+Layout/MultilineMethodCallBraceLayout:
+  Enabled: false
+
+Naming/FileName:
+  inherit_mode:
+    merge:
+      - Exclude
+
+Style/BlockDelimiters:
+  Enabled: false
+
+# This is a super old project and seems no need to generate diff lines updating these
+Style/HashSyntax:
+  Enabled: false
+
+
+
+# TODO: turn this back on when we get to Ruby 4
+Style/ArgumentsForwarding:
+  Enabled: false
+
+# I like this rule but results in too many changed lines
+Style/MethodDefParentheses:
+  Enabled: false
+
+# I like this rule but results in too many changed lines
+Layout/SpaceBeforeBlockBraces:
+  Enabled: false
+  
+# I like this rule but results in too many changed lines
+Layout/SpaceInsideBlockBraces:
+  Enabled: false
+
+# I like this rule but results in too many changed lines
+Layout/LeadingCommentSpace:
+  Enabled: false

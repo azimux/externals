@@ -46,7 +46,7 @@ module Externals
       end
     end
 
-    def ex *args
+    def ex *_args
       # delete path if  empty
       rmdir_ie path unless path == "."
 
@@ -69,7 +69,7 @@ module Externals
       puts `#{svncocmd}`
     end
 
-    def switch branch_name, options = {}
+    def switch branch_name, _options = {}
       require_repository
 
       if current_branch != branch_name
@@ -85,7 +85,7 @@ module Externals
       end
     end
 
-    def up *args
+    def up *_args
       # delete path if empty
       rmdir_if_empty_ie path
 

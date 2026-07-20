@@ -47,7 +47,7 @@ module Externals
       self.class.scm
     end
 
-    def switch branch_name, options = {}
+    def switch _branch_name, _options = {}
       # :nocov:
       raise "subclass responsibility"
       # :nocov:
@@ -85,7 +85,7 @@ module Externals
     end
 
     [:co, :ex].each do |method_name|
-      define_method method_name do |args|
+      define_method method_name do
         # :nocov:
         raise "subclass responsibility"
         # :nocov:

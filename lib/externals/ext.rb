@@ -126,7 +126,9 @@ module Externals
         *"When doing an uninstall of a subproject,
         remove it's files and subfolders, too.".lines_by_width(summary_width)
       ) {|branch| sub_options[:force_removal] = true}
-      opts.on("--workdir DIR", "-w DIR", String, *"The working directory to execute commands from.  Use this if for some reason you
+      opts.on(
+        "--workdir DIR", "-w DIR", String,
+        *"The working directory to execute commands from.  Use this if for some reason you
         cannot execute ext from the main project's directory (or if it's just inconvenient, such as in a script
         or in a Capistrano task)".lines_by_width(summary_width)) {|dir|
         raise "No such directory: #{dir}" unless File.exist?(dir) && File.directory?(dir)
@@ -190,7 +192,7 @@ module Externals
       puts
     end
 
-    def help(args, options)
+    def help(_args, _options)
       puts "There's a tutorial available at http://nopugs.com/ext-tutorial\n\n"
       puts "#{self.class.new_opts({},{}).to_s}\n\n"
 
@@ -242,7 +244,7 @@ module Externals
       project ||= subprojects.detect do |p|
         File.split(p.path).last.strip == name
       end
-      project ||= subprojects.detect do |p|
+      project || subprojects.detect do |p|
         p.name == name
       end
     end
@@ -286,11 +288,11 @@ module Externals
 
       scm = configuration['.']
       scm = scm['scm'] if scm
-      scm ||= options[:scm]
+      scm || options[:scm]
     end
 
     def self.project_class(scm)
-      Externals.module_eval("#{scm.to_s.cap_first}Project", __FILE__, __LINE__)
+      Externals.const_get("#{scm.to_s.cap_first}Project")
     end
 
     def self.project_classes
@@ -326,7 +328,7 @@ module Externals
       end
     end
 
-    def freeze args, options
+    def freeze args, _options
       project = subproject_by_name_or_path(args[0])
 
       raise "No such project named #{args[0]}" unless project
@@ -350,7 +352,7 @@ module Externals
       subproject_by_name_or_path(args[0]).up
     end
 
-    def unfreeze args, options
+    def unfreeze args, _options
       project = subproject_by_name_or_path(args[0])
 
       raise "No such project named #{args[0]}" unless project
@@ -452,7 +454,8 @@ that you are installing. Use an option to specify it
 
       unless scm
         # :nocov:
-        raise "You need to either specify the scm as the first line in .externals (for example, scm = git), or use an option to specify it
+        raise "You need to either specify the scm as the first line in .externals (for example, scm = git), " \
+                "or use an option to specify it
           (such as --git or --svn)"
         # :nocov:
       end
@@ -466,7 +469,7 @@ that you are installing. Use an option to specify it
       end
     end
 
-    def touch_emptydirs args, options
+    def touch_emptydirs _args, _options
       require 'find'
 
       excludes = ['.','..','.svn', '.git']
@@ -481,7 +484,7 @@ that you are installing. Use an option to specify it
         if File.directory?(f)
           excluded = false
           File.split(f).each do |part|
-            exclude ||= excludes.index(part)
+            excluded ||= excludes.index(part)
           end
 
           if !excluded && ((Dir.entries(f) - excludes).size == 0)
@@ -491,13 +494,13 @@ that you are installing. Use an option to specify it
       end
 
       paths.each do |p|
-        open(File.join(p,".emptydir"), "w").close
+        File.open(File.join(p,".emptydir"), "w").close
       end
 
     end
 
 
-    def status args, options
+    def status _args, options
       options ||= {}
       scm = options[:scm]
 
@@ -602,7 +605,7 @@ commands below if you actually wish to delete them."
       end
     end
 
-    def update args, options
+    def update _args, options
       options ||= {}
       scm = options[:scm]
 
@@ -704,7 +707,7 @@ Please explicitly declare the SCM (using --git or --svn, or, by creating .extern
       reload_configuration
     end
 
-    def version(args, options)
+    def version(_args, _options)
       puts Externals::VERSION
     end
 

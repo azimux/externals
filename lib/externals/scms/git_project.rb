@@ -25,7 +25,7 @@ module Externals
     end
 
     public
-    def co *args
+    def co *_args
       do_up "co"
     end
 
@@ -153,7 +153,7 @@ module Externals
       end
     end
 
-    def up *args
+    def up *_args
       do_up "up"
     end
 
@@ -219,7 +219,7 @@ module Externals
       text.split(/\n/).detect {|r| r.strip == path.strip}
     end
 
-    def ignore_text(path = nil)
+    def ignore_text(_path = nil)
       return '' unless File.exist?('.gitignore')
       retval = ''
       open('.gitignore') do |f|
@@ -287,8 +287,8 @@ module Externals
       end
     end
 
-    def extract_name s
-      if s =~ /([^\/:]+?)(?:\.git|\.bundle)?$/
+    def extract_name string
+      if string =~ /([^\/:]+?)(?:\.git|\.bundle)?$/
         $1
       end
     end
