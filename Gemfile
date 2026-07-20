@@ -8,7 +8,7 @@ ruby Externals::MINIMUM_RUBY_VERSION
 gem "rake"
 
 group :development do
-  gem "foobara-rubocop-rules", ">= 1.0.0", path: "../../foobara/rubocop-rules"
+  gem "foobara-rubocop-rules", ">= 1.1.0" # , path: "../../foobara/rubocop-rules"
   # gem "guard-rspec"
   gem "rubocop-rake"
 end
