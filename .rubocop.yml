@@ -1,6 +1,8 @@
 AllCops:
   TargetRubyVersion: 3.2
   NewCops: enable
+  Exclude:
+    - 'test/tmp/**/*'
 
 inherit_gem:
   foobara-rubocop-rules:
