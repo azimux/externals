@@ -237,7 +237,7 @@ module Externals
             assert capture !~ /WARNING:/
             assert capture !~ /rm\s+-rf?\s+vendor.rails/
             assert main_project.ignore_contains?("vendor/rails")
-            assert capture.scan('rm').size == 0
+            assert capture.scan('rm').empty?
 
             assert File.read(File.join('modules', 'modules.txt')) !~
                    /line 2 of modules.txt ... this is branch2!/

@@ -93,7 +93,7 @@ module Externals
             #install project with a non-default path and svn branching
             proj = dependents[:modules]
             Ext.run "install", "--svn",
-                    "#{proj.clean_url}",
+                    proj.clean_url.to_s,
                     "-b", "current",
                     "modules"
 

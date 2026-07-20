@@ -259,7 +259,7 @@ module Externals
 
     def drop_from_ignore path
       ir = ignore_rows(path)
-      rows = ir.select {|row| row.strip != path.strip}
+      rows = ir.reject {|row| row.strip == path.strip}
 
       if rows.size == ir.size
         # :nocov:

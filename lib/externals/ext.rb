@@ -27,14 +27,14 @@ module Externals
     [:update, "ext update",
      %{Brings the main project, and all subprojects, up to the
       latest version.}]
-  ]
+  ].freeze
   SHORT_COMMANDS_HASH = [
     [:co, "Like checkout, but skips the main project and
           only checks out subprojects."],
     [:ex, "Like export, but skips the main project."],
     [:st, "Like status, but skips the main project."],
     [:up, "Like update, but skips the main project."]
-  ]
+  ].freeze
   MAIN_COMMANDS_HASH = [
     [:freeze, "ext freeze <subproject> [REVISION]",
      %{Locks a subproject into a specific revision/branch.  If no
@@ -73,7 +73,7 @@ module Externals
       and so you probably only will run this if you are manually
       maintaining .externals"],
     [:version, "Displays the version number of externals and exits."],
-  ]
+  ].freeze
 
   FULL_COMMANDS = FULL_COMMANDS_HASH.map(&:first)
   SHORT_COMMANDS = SHORT_COMMANDS_HASH.map(&:first)
@@ -154,7 +154,7 @@ module Externals
 
       unless args.nil? || args.empty?
         command = args[0]
-        args = args[1..-1] || []
+        args = args[1..] || []
       end
 
       command &&= command.to_sym
@@ -259,7 +259,7 @@ module Externals
     end
 
     def main_project
-      projects.detect {|p| p.main_project?}
+      projects.detect(&:main_project?)
     end
 
     def configuration
@@ -296,12 +296,9 @@ module Externals
     end
 
     def self.project_classes
-      retval = []
-      registered_scms.each do |scm|
-        retval << project_class(scm)
+      retval = registered_scms.map do |scm|
+        project_class(scm)
       end
-
-      retval
     end
 
     SHORT_COMMANDS.each do |command_name|
@@ -486,7 +483,7 @@ that you are installing. Use an option to specify it
             excluded ||= excludes.index(part)
           end
 
-          if !excluded && ((Dir.entries(f) - excludes).size == 0)
+          if !excluded && (Dir.entries(f) - excludes).empty?
             paths << f
           end
         end
@@ -507,14 +504,12 @@ that you are installing. Use an option to specify it
       end
 
       if !scm
-        possible_project_classes = self.class.project_classes.select do |project_class|
-          project_class.detected?
-        end
+        possible_project_classes = self.class.project_classes.select(&:detected?)
 
         raise "Could not determine this projects scm" if possible_project_classes.empty?
         if possible_project_classes.size > 1
           raise "This project appears to be managed by multiple SCMs: #{
-          possible_project_classes.map(&:to_s).join(',')}
+          possible_project_classes.join(',')}
 Please explicitly declare the SCM (by using --git or --svn, or,
 by creating the .externals file manually"
         end
@@ -548,14 +543,12 @@ by creating the .externals file manually"
       end
 
       if !scm
-        possible_project_classes = self.class.project_classes.select do |project_class|
-          project_class.detected?
-        end
+        possible_project_classes = self.class.project_classes.select(&:detected?)
 
         raise "Could not determine this projects scm" if possible_project_classes.empty?
         if possible_project_classes.size > 1
           raise "This project appears to be managed by multiple SCMs: #{
-          possible_project_classes.map(&:to_s).join(',')}
+          possible_project_classes.join(',')}
 Please explicitly declare the SCM (by using --git or --svn, or,
 by creating the .externals file manually"
         end
@@ -665,15 +658,13 @@ commands below if you actually wish to delete them."
       scm = options[:scm]
 
       if !scm
-        possible_project_classes = self.class.project_classes.select do |project_class|
-          project_class.detected?
-        end
+        possible_project_classes = self.class.project_classes.select(&:detected?)
 
         raise "Could not determine this project's scm" if possible_project_classes.empty?
         if possible_project_classes.size > 1
           # :nocov:
           raise "This project appears to be managed by multiple SCMs: #{
-          possible_project_classes.map(&:to_s).join(',')}
+          possible_project_classes.join(',')}
 Please explicitly declare the SCM (using --git or --svn, or, by creating .externals manually"
           # :nocov:
         end

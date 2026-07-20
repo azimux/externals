@@ -82,7 +82,7 @@ module Externals
         if dependents.values.detect(&:dirty?)
           mark_dirty
         end
-        dependents.values.each {|child| child.prepare}
+        dependents.each_value(&:prepare)
 
         if dirty?
           delete_clean_dir

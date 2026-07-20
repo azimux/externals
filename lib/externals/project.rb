@@ -1,7 +1,7 @@
 require 'fileutils'
 
 module Externals
-  OPTS_SUFFIXES = ["co", "up", "st", "ex"] unless const_defined?('OPTS_SUFFIXES')
+  OPTS_SUFFIXES = ["co", "up", "st", "ex"].freeze unless const_defined?('OPTS_SUFFIXES')
   unless const_defined?('VALID_ATTRIB')
     VALID_ATTRIB = [
       :name, :path, :repository, :branch, :scm, :revision
@@ -61,8 +61,8 @@ module Externals
       raise "Abstract class" if self.class == Project
       raise "expected hash" unless hash.is_a? Hash
 
-      hash = hash.keys.each_with_object({}) do |key, new_hash|
-        new_hash[key.to_s] = hash[key]
+      hash = hash.keys.to_h do |key|
+        [key.to_s, hash[key]]
       end
 
       invalid_attrib = hash.keys - Externals::VALID_ATTRIB

@@ -240,7 +240,7 @@ repository = #{info_url}
       child = File.basename(path).strip
 
       ir = ignore_rows(path)
-      rows = ir.select {|row| row.strip != child}
+      rows = ir.reject {|row| row.strip == child}
 
       if rows.size == ir.size
         # :nocov:

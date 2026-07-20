@@ -12,7 +12,7 @@ module Externals
 
         mkdir repo_name
 
-        Dir.chdir("#{repo_name}") do
+        Dir.chdir(repo_name.to_s) do
           `git init --bare -b master`
 
           raise unless $? == 0

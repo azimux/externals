@@ -1,6 +1,6 @@
 String.class_eval do
   def cap_first
-    "#{self[0].chr.upcase}#{self[1..-1]}"
+    "#{self[0].chr.upcase}#{self[1..]}"
   end
 
   def classify
@@ -14,7 +14,7 @@ String.class_eval do
     width ||= 32
     lines = []
     string = gsub(/\s+/, ' ')
-    while string.size > 0
+    until string.empty?
       if string.size <= width
         lines << string
         string = ""
@@ -23,7 +23,7 @@ String.class_eval do
         index ||= string.index(/\s/)
         if index
           lines << string[0, index]
-          string = string[(index + 1)..-1]
+          string = string[(index + 1)..]
         else
           lines << string
           string = ""

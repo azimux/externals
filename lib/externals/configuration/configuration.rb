@@ -160,14 +160,14 @@ module Externals
         file_string.each_line {|line| titles << line if line =~ SECTION_TITLE_REGEX}
         bodies = file_string.split SECTION_TITLE_REGEX_NO_GROUPS
 
-        if titles.size > 0 && bodies.size > 0
+        if !titles.empty? && !bodies.empty?
           if titles.size + 1 != bodies.size
             # :nocov:
             raise "bodies and sections do not match up"
             # :nocov:
           end
 
-          bodies = bodies[1..-1]
+          bodies = bodies[1..]
 
           (0...(bodies.size)).each do |index|
             sections << Section.new(titles[index], bodies[index])
@@ -182,7 +182,7 @@ module Externals
       end
 
       def to_s
-        sections.map(&:to_s).join("\n\n")
+        sections.join("\n\n")
       end
     end
   end

@@ -44,7 +44,7 @@ module Externals
           #install a couple svn managed subprojects
           [:foreign_key_migrations, :redhillonrails_core].each do |project_name|
             proj = dependents[project_name]
-            Ext.run "install", "--svn", 'file:///' + proj.clean_dir, "vendor/plugins/#{proj.name}"
+            Ext.run "install", "--svn", "file:///#{proj.clean_dir}", "vendor/plugins/#{proj.name}"
           end
 
           Dir.chdir File.join('vendor', 'plugins', 'foreign_key_migrations') do
