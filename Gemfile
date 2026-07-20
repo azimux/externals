@@ -19,6 +19,7 @@ group :development, :test do
   # TODO: Just adding this to suppress warnings seemingly coming from pry-byebug. Can probably remove this once
   # pry-byebug has irb as a gem dependency
   gem "irb"
+  gem "test-unit"
 end
 
 group :test do
