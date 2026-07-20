@@ -77,13 +77,10 @@ module Externals
 
       path = hash.delete('path')
 
-      hash.keys.each do |key|
-        send("#{key}=", hash[key])
+      hash.each_pair do |key, value|
+        send("#{key}=", value)
       end
 
-      if path && !path.is_a?(String)
-        path = path.default_path(name)
-      end
       self.path = path
     end
 
@@ -187,9 +184,6 @@ module Externals
         #of the suffixed versions (<scm_name>_opts_co) as well as the project
         #specific ones. (scm_opts, scm_opts_co, etc)
         scm_name = scm
-        Project.__send__(:define_method, "#{scm_name}_opts_raw") do
-          attributes[name.to_sym]
-        end
         #global settings are fetched from the parent project.
         Project.__send__(:define_method, "#{scm_name}_opts") do
           if parent
@@ -229,15 +223,6 @@ module Externals
     end
 
     protected
-    def trim_quotes value
-      if value
-        if [value[0].chr, value[-1].chr] == ['"', '"']
-          value[1..-2]
-        else
-          value
-        end
-      end
-    end
 
     #helper method for converting "co" into "scm_opts_co" and "" into "scm_opts"
     def resolve_opts command = ""

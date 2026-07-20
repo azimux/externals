@@ -94,13 +94,6 @@ module Externals
         set_setting(key, value)
       end
 
-      def add_row(row)
-        rows << row
-
-        self.body_string = body_string.chomp + "\n#{row}\n"
-        #clear_caches
-      end
-
       def to_s
         "[#{title}]\n#{rows.join("\n")}"
       end

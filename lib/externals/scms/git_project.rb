@@ -95,7 +95,9 @@ module Externals
         Dir.chdir project_path do
           puts `git #{opts} checkout #{revision}`
           unless $? == 0
+            # :nocov:
             raise "Could not checkout #{revision}"
+            # :nocov:
           end
         end
       else
