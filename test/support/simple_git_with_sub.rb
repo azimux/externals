@@ -5,10 +5,10 @@ module Externals
   module Test
     class SimpleGitWithSub < GitRepository
       def initialize
-        super "simple_wth_sub", File.join("git", "5")
+        super("simple_wth_sub", File.join("git", "5"))
         dependents.merge!(
           :basic => BasicGitRepository.new
-          )
+        )
       end
 
       def build_here
@@ -33,6 +33,7 @@ module Externals
 
           `git add .`
           raise unless $? == 0
+
           `git commit -m "added simple_readme.txt"`
           raise unless $? == 0
 
@@ -42,6 +43,7 @@ module Externals
 
           `git add .`
           raise unless $? == 0
+
           `git commit -m "added a line to simple_readme.txt"`
           raise unless $? == 0
 
@@ -54,19 +56,20 @@ module Externals
 
           # adding a branch here exposes a bug
           Ext.run "install", "-g", "-b", "master",
-            dependents[:basic].clean_dir, "subs/#{dependents[:basic].name}"
+                  dependents[:basic].clean_dir, "subs/#{dependents[:basic].name}"
 
           `git add .`
           raise unless $? == 0
+
           `git commit -m "added basic subproject under subs"`
           raise unless $? == 0
+
           `git push ../#{name}.git HEAD:master`
           raise unless $? == 0
         end
 
         rm_rf "#{name}.working"
       end
-
     end
   end
 end

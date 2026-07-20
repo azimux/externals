@@ -7,7 +7,7 @@ module Externals
       include SvnRepositoryHelper
 
       def initialize
-        super "modules_with_branches", "svn"
+        super("modules_with_branches", "svn")
       end
 
       def build_here
@@ -49,13 +49,13 @@ module Externals
 
             `svn copy #{
             [clean_url, "current"].join("/")
-} #{[clean_url, "branches", "branch2"].join("/")
-} -m "created branch2"`
+          } #{[clean_url, "branches", "branch2"].join("/")
+            } -m "created branch2"`
             raise unless $? == 0
 
             puts `svn switch #{
             [clean_url, "branches", "branch2"].join("/")
-}`
+          }`
             raise unless $? == 0
 
             open("modules.txt", "w") do |f|
@@ -70,7 +70,6 @@ module Externals
           rm_rf name
         end
       end
-
     end
   end
 end

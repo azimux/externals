@@ -26,7 +26,7 @@ module Externals
         Dir.chdir workdir do
           source = repository.clean_url
           if windows?
-            source = source.gsub(/\\/, "/")
+            source = source.gsub("\\", "/")
           end
 
           puts "About to #{mode} #{source}"
@@ -104,10 +104,10 @@ module Externals
             assert File.exist?(File.join(%w(vendor plugins ssl_requirement)))
             assert File.exist?(File.join(%w(vendor plugins empty_plugin)))
 
-            Dir.chdir File.join("vendor",'plugins', "ssl_requirement") do
+            Dir.chdir File.join("vendor", 'plugins', "ssl_requirement") do
               assert `git show HEAD` =~ /^\s*commit\s*#{
               repository.dependents[:ssl_requirement].attributes[:revision]
-}\s*$/i
+            }\s*$/i
             end
 
             assert_equal "branches/new_branch", main_project.current_branch
@@ -119,7 +119,7 @@ module Externals
             assert_equal "branches/branch2", ext.configuration["modules"]["branch"]
 
             assert File.read(File.join('modules', 'modules.txt')) =~
-              /line 2 of modules.txt ... this is branch2!/
+                   /line 2 of modules.txt ... this is branch2!/
 
             #let's run update.  This can expose certain errors.
             Ext.run "update"
@@ -138,7 +138,7 @@ module Externals
             assert_equal "branches/branch2", modules.current_branch
             assert_equal "current", ext.configuration["modules"]["branch"]
             assert File.read(File.join('modules', 'modules.txt')) =~
-              /line 2 of modules.txt ... this is branch2!/
+                   /line 2 of modules.txt ... this is branch2!/
 
             Ext.run "up"
             ext = Ext.new
@@ -158,7 +158,7 @@ module Externals
             assert_equal "current", modules.current_branch
             assert_equal "current", ext.configuration["modules"]["branch"]
             assert File.read(File.join('modules', 'modules.txt')) !~
-              /line 2 of modules.txt ... this is branch2!/
+                   /line 2 of modules.txt ... this is branch2!/
             assert File.read(File.join('modules', 'modules.txt')) =~ /line1 of/
 
             assert main_project.ignore_contains?("vendor/rails")
@@ -174,7 +174,6 @@ module Externals
               main_project = ext.main_project
               engines = ext.subproject("engines")
               modules = ext.subproject("modules")
-
             ensure
               $stdout = STDOUT
             end
@@ -190,7 +189,7 @@ module Externals
 
             assert capture =~ /WARNING:/
             assert capture =~ /rm\s+-rf?\s+vendor.rails/
-            assert capture.scan(/rm/).size == 1
+            assert capture.scan('rm').size == 1
 
             assert !main_project.ignore_contains?("vendor/rails")
 
@@ -206,7 +205,7 @@ module Externals
             end
 
             assert File.read(File.join('modules', 'modules.txt')) =~
-              /line 2 of modules.txt ... this is branch2!/
+                   /line 2 of modules.txt ... this is branch2!/
 
             capture = StringIO.new
             begin
@@ -217,7 +216,6 @@ module Externals
               main_project = ext.main_project
               engines = ext.subproject("engines")
               modules = ext.subproject("modules")
-
             ensure
               $stdout = STDOUT
             end
@@ -227,7 +225,6 @@ module Externals
             assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
 
             assert File.exist?(File.join('vendor', 'rails', '.git'))
-
 
             assert_equal "current", main_project.current_branch
 
@@ -240,10 +237,10 @@ module Externals
             assert capture !~ /WARNING:/
             assert capture !~ /rm\s+-rf?\s+vendor.rails/
             assert main_project.ignore_contains?("vendor/rails")
-            assert capture.scan(/rm/).size == 0
+            assert capture.scan('rm').size == 0
 
             assert File.read(File.join('modules', 'modules.txt')) !~
-              /line 2 of modules.txt ... this is branch2!/
+                   /line 2 of modules.txt ... this is branch2!/
             assert File.read(File.join('modules', 'modules.txt')) =~ /line1 of/
           end
         end
@@ -261,14 +258,14 @@ module Externals
         rm_rf workdir
         mkdir_p workdir
 
-        if File.exist?(File.join(workdir,"rails_app"))
+        if File.exist?(File.join(workdir, "rails_app"))
           rm_r File.join(workdir, "rails_app")
         end
 
         Dir.chdir workdir do
           source = repository.clean_url
           if windows?
-            source = source.gsub(/\\/, "/")
+            source = source.gsub("\\", "/")
           end
 
           puts "About to #{mode} #{source}"
@@ -309,10 +306,10 @@ module Externals
 
         assert File.exist?(File.join(repository.clean_dir, "db"))
 
-        workdir = File.join(root_dir, 'test', "tmp", "workdir","uninstall","svn","branches")
+        workdir = File.join(root_dir, 'test', "tmp", "workdir", "uninstall", "svn", "branches")
         mkdir_p workdir
 
-        if File.exist?(File.join(workdir,"rails_app"))
+        if File.exist?(File.join(workdir, "rails_app"))
           rm_r File.join(workdir, "rails_app")
         end
 
@@ -334,7 +331,7 @@ module Externals
 
             projs_ni << projs_i.delete('acts_as_list')
 
-            mp.assert_e_dne_i_ni proc{|a|assert(a)}, projs, [], projs_i, projs_ni
+            mp.assert_e_dne_i_ni proc{|a| assert(a)}, projs, [], projs_i, projs_ni
 
             Ext.run "uninstall", "-f", "redhillonrails_core"
 
@@ -343,11 +340,10 @@ module Externals
             projs_dne = []
             projs_dne << projs.delete('redhillonrails_core')
 
-            mp.assert_e_dne_i_ni proc{|a|assert(a)}, projs, projs_dne, projs_i, projs_ni
+            mp.assert_e_dne_i_ni proc{|a| assert(a)}, projs, projs_dne, projs_i, projs_ni
           end
         end
       end
-
     end
   end
 end

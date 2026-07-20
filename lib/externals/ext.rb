@@ -16,16 +16,16 @@ module Externals
   # Main commands only operate on the main project
   FULL_COMMANDS_HASH = [
     [:checkout, "ext checkout <repository>",
-      %{Checks out <repository>, and checks out any subprojects
+     %{Checks out <repository>, and checks out any subprojects
       registered in <repository>'s .externals file.}],
     [:export, "ext export <repository>",
-      %{Like checkout except this command fetches as little
+     %{Like checkout except this command fetches as little
       history as possible.}],
     [:status, "ext status",
-      %{Prints out the status of the main project, followed by
+     %{Prints out the status of the main project, followed by
       the status of each subproject.}],
     [:update, "ext update",
-      %{Brings the main project, and all subprojects, up to the
+     %{Brings the main project, and all subprojects, up to the
       latest version.}]
   ]
   SHORT_COMMANDS_HASH = [
@@ -37,7 +37,7 @@ module Externals
   ]
   MAIN_COMMANDS_HASH = [
     [:freeze, "ext freeze <subproject> [REVISION]",
-      %{Locks a subproject into a specific revision/branch.  If no
+     %{Locks a subproject into a specific revision/branch.  If no
       revision is supplied, the current revision/branch of the
       project will be used.  You can specify the subproject by name
       or path.}],
@@ -45,14 +45,14 @@ module Externals
     [:init, "Creates a .externals file containing only [main]
       It will try to determine the SCM used by the main project."],
     [:install, "ext install <repository> [-b <branch>] <path>",
-      "Registers <repository> in .externals under the appropriate
+     "Registers <repository> in .externals under the appropriate
       SCM.  Checks out the subproject at given path,
       and also adds it to the ignore
       feature offered by the SCM of the main project.  If the SCM
       type is not obvious from the repository URL, use the --scm,
       --git, or --svn flags."],
     [:switch, "ext switch <branch_name>",
-      "Changes to the named branch <branch_name> and updates any
+     "Changes to the named branch <branch_name> and updates any
       subprojects and applies any changes that have been made to the
       .externals file."],
     [:touch_emptydirs, "Recurses through all directories from the
@@ -60,10 +60,10 @@ module Externals
       comes across.  Useful for dealing with SCMs that refuse to
       track empty directories (such as git, for example)"],
     [:unfreeze, "ext unfreeze <subproject>",
-      %{Unfreezes a previously frozen subproject.  You can specify
+     %{Unfreezes a previously frozen subproject.  You can specify
       the subproject by name or path.}],
     [:uninstall, "ext uninstall [-f|--force_removal] <project>",
-      "Removes a subproject from being tracked by ext.  If you
+     "Removes a subproject from being tracked by ext.  If you
       want the files associated with this subproject deleted as well
       (if, for example, you wish to reinstall it from a different
       repository) then you can use the -f option to remove the files."],
@@ -75,9 +75,8 @@ module Externals
     [:version, "Displays the version number of externals and exits."],
   ]
 
-
   FULL_COMMANDS = FULL_COMMANDS_HASH.map(&:first)
-  SHORT_COMMANDS =  SHORT_COMMANDS_HASH.map(&:first)
+  SHORT_COMMANDS = SHORT_COMMANDS_HASH.map(&:first)
   MAIN_COMMANDS = MAIN_COMMANDS_HASH.map(&:first)
 
   COMMANDS = FULL_COMMANDS + SHORT_COMMANDS + MAIN_COMMANDS
@@ -85,14 +84,13 @@ module Externals
   COULD_NOT_DETERMINE_SCM = 1
   NO_EXTERNALS_FILE = 2
 
-  Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals','scms')).each do |project|
+  Dir.entries(File.join(File.dirname(__FILE__), '..', 'externals', 'scms')).each do |project|
     require "externals/scms/#{project}" if project =~ /_project.rb$/
   end
 
   class Ext
     include FileUtils
     extend FileUtils
-
 
     def self.new_opts main_options, sub_options
       opts = OptionParser.new(
@@ -104,26 +102,26 @@ module Externals
 
       project_classes.each do |project_class|
         project_class.fill_in_opts(opts, main_options, sub_options,
-          :summary_width => summary_width)
+                                   :summary_width => summary_width)
       end
 
       opts.on("--scm SCM", "-s SCM",
-        String,
-        *"The SCM used to manage the main project.  For example, '--scm svn'.".lines_by_width(summary_width)
+              String,
+              *"The SCM used to manage the main project.  For example, '--scm svn'.".lines_by_width(summary_width)
       ) {|scm| sub_options[:scm] = main_options[:scm] = scm}
       opts.on("--branch BRANCH", "-b BRANCH",
-        String,
-        *"The branch you want the
+              String,
+              *"The branch you want the
         subproject to checkout when doing 'ext install'".lines_by_width(summary_width)
       ) {|branch| sub_options[:branch] = main_options[:branch] = branch}
       opts.on("--revision REVISION", "-r REVISION",
-        String,
-        *"The revision you want the
+              String,
+              *"The revision you want the
         subproject to checkout when doing 'ext install'".lines_by_width(summary_width)
       ) {|revision| sub_options[:revision] = main_options[:revision] = revision}
       opts.on("--force_removal", "-f",
-        String,
-        *"When doing an uninstall of a subproject,
+              String,
+              *"When doing an uninstall of a subproject,
         remove it's files and subfolders, too.".lines_by_width(summary_width)
       ) {|branch| sub_options[:force_removal] = true}
       opts.on(
@@ -132,6 +130,7 @@ module Externals
         cannot execute ext from the main project's directory (or if it's just inconvenient, such as in a script
         or in a Capistrano task)".lines_by_width(summary_width)) {|dir|
         raise "No such directory: #{dir}" unless File.exist?(dir) && File.directory?(dir)
+
         main_options[:workdir] = dir
       }
       opts.on(
@@ -155,7 +154,7 @@ module Externals
 
       unless args.nil? || args.empty?
         command = args[0]
-        args = args[1..(args.size - 1)] || []
+        args = args[1..-1] || []
       end
 
       command &&= command.to_sym
@@ -179,9 +178,8 @@ module Externals
         # :nocov:
       end
 
-
       Dir.chdir(main_options[:workdir] || ".") do
-        self.new(main_options).send(command, args, sub_options)
+        new(main_options).send(command, args, sub_options)
       end
     end
 
@@ -194,7 +192,7 @@ module Externals
 
     def help(_args, _options)
       puts "There's a tutorial available at http://nopugs.com/ext-tutorial\n\n"
-      puts "#{self.class.new_opts({},{}).to_s}\n\n"
+      puts "#{self.class.new_opts({}, {})}\n\n"
 
       puts "\nCommands that apply to the main project or the .externals file:"
       puts "#{MAIN_COMMANDS.join(', ')}\n\n"
@@ -212,6 +210,7 @@ module Externals
     @registered_scms = nil
     def self.registered_scms
       return @registered_scms if @registered_scms
+
       @registered_scms ||= []
 
       scmdir = File.join(File.dirname(__FILE__), 'scms')
@@ -227,9 +226,10 @@ module Externals
 
     def projects
       return @projects if @projects
+
       @projects = []
       configuration.sections.each do |section|
-        @projects << Ext.project_class(section[:scm]||infer_scm(section[:repository])).new(
+        @projects << Ext.project_class(section[:scm] || infer_scm(section[:repository])).new(
           section.attributes.merge(:path => section.title))
       end
       #let's set the parents of these projects
@@ -248,7 +248,7 @@ module Externals
         p.name == name
       end
     end
-    alias :subproject :subproject_by_name_or_path
+    alias subproject subproject_by_name_or_path
 
     def subprojects
       s = []
@@ -323,7 +323,7 @@ module Externals
 
           project.send command_name, args, options
         else
-          subprojects.each {|p| p.send(*([command_name, args, options].flatten))}
+          subprojects.each {|p| p.send(*[command_name, args, options].flatten)}
         end
       end
     end
@@ -376,7 +376,7 @@ module Externals
     def install args, options
       if !File.exist?('.externals')
         # :nocov:
-        STDERR.puts "This project does not appear to be managed by externals.  Try 'ext init' first"
+        warn "This project does not appear to be managed by externals.  Try 'ext init' first"
         exit NO_EXTERNALS_FILE
         # :nocov:
       end
@@ -391,7 +391,7 @@ module Externals
 
       unless scm
         # :nocov:
-        STDERR.puts "Unable to determine SCM from the repository name.
+        warn "Unable to determine SCM from the repository name.
 You need to either specify the scm used to manage the subproject
 that you are installing. Use an option to specify it
 (such as --git or --svn)"
@@ -400,7 +400,7 @@ that you are installing. Use an option to specify it
       end
 
       project = self.class.project_class(scm).new(:repository => repository,
-        :path => path, :scm => scm)
+                                                  :path => path, :scm => scm)
       path = project.path
 
       raise "no path" unless path
@@ -433,7 +433,6 @@ that you are installing. Use an option to specify it
       raise "No such project named #{args[0]}" unless project
 
       main_project.drop_from_ignore project.path
-
 
       configuration.remove_section(project.path)
       configuration.write '.externals'
@@ -472,7 +471,7 @@ that you are installing. Use an option to specify it
     def touch_emptydirs _args, _options
       require 'find'
 
-      excludes = ['.','..','.svn', '.git']
+      excludes = ['.', '..', '.svn', '.git']
 
       excludes.dup.each do |exclude|
         excludes << "./#{exclude}"
@@ -494,11 +493,9 @@ that you are installing. Use an option to specify it
       end
 
       paths.each do |p|
-        File.open(File.join(p,".emptydir"), "w").close
+        File.open(File.join(p, ".emptydir"), "w").close
       end
-
     end
-
 
     def status _args, options
       options ||= {}
@@ -514,7 +511,7 @@ that you are installing. Use an option to specify it
           project_class.detected?
         end
 
-        raise "Could not determine this projects scm" if  possible_project_classes.empty?
+        raise "Could not determine this projects scm" if possible_project_classes.empty?
         if possible_project_classes.size > 1
           raise "This project appears to be managed by multiple SCMs: #{
           possible_project_classes.map(&:to_s).join(',')}
@@ -555,7 +552,7 @@ by creating the .externals file manually"
           project_class.detected?
         end
 
-        raise "Could not determine this projects scm" if  possible_project_classes.empty?
+        raise "Could not determine this projects scm" if possible_project_classes.empty?
         if possible_project_classes.size > 1
           raise "This project appears to be managed by multiple SCMs: #{
           possible_project_classes.map(&:to_s).join(',')}
@@ -672,7 +669,7 @@ commands below if you actually wish to delete them."
           project_class.detected?
         end
 
-        raise "Could not determine this project's scm" if  possible_project_classes.empty?
+        raise "Could not determine this project's scm" if possible_project_classes.empty?
         if possible_project_classes.size > 1
           # :nocov:
           raise "This project appears to be managed by multiple SCMs: #{
@@ -712,6 +709,7 @@ Please explicitly declare the SCM (using --git or --svn, or, by creating .extern
     end
 
     protected
+
     def do_checkout_or_export repository, path, options, sym
       if File.exist?('.externals')
         # :nocov:

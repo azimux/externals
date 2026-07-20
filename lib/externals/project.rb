@@ -1,14 +1,16 @@
 require 'fileutils'
 
 module Externals
-  OPTS_SUFFIXES = ["co", "up", "st", "ex"]  unless const_defined?('OPTS_SUFFIXES')
-  VALID_ATTRIB = ([
+  OPTS_SUFFIXES = ["co", "up", "st", "ex"] unless const_defined?('OPTS_SUFFIXES')
+  unless const_defined?('VALID_ATTRIB')
+    VALID_ATTRIB = [
       :name, :path, :repository, :branch, :scm, :revision
-    ]
-  ).map(&:to_s) unless const_defined?('VALID_ATTRIB')
+    ].map(&:to_s)
+  end
 
   class Project
     attr_accessor :parent
+
     include FileUtils
     extend FileUtils
 
@@ -19,20 +21,22 @@ module Externals
           attributes[name.to_sym] = value
         end
         next if name == "name" || name == "scm"
+
         define_method name do
           attributes[name.to_sym]
         end
       end
     end
 
-
     attr_attr_accessor Externals::VALID_ATTRIB
     def attributes
       @attributes ||= {}
     end
+
     def name
       attributes[:name] || extract_name(repository)
     end
+
     def main_project?
       path == '.'
     end
@@ -57,9 +61,8 @@ module Externals
       raise "Abstract class" if self.class == Project
       raise "expected hash" unless hash.is_a? Hash
 
-      hash = hash.keys.inject({}) do |new_hash, key|
+      hash = hash.keys.each_with_object({}) do |key, new_hash|
         new_hash[key.to_s] = hash[key]
-        new_hash
       end
 
       invalid_attrib = hash.keys - Externals::VALID_ATTRIB
@@ -167,7 +170,6 @@ module Externals
       end
     end
 
-
     def self.inherited child
       child.class_eval do
         def self.scm
@@ -189,11 +191,11 @@ module Externals
           if parent
             parent.__send__("#{scm_name}_opts")
           else
-            attributes["#{scm_name}_opts".to_sym]
+            attributes[:"#{scm_name}_opts"]
           end
         end
         Project.__send__(:define_method, "#{scm_name}_opts=") do |value|
-          attributes["#{scm_name}_opts".to_sym] = value
+          attributes[:"#{scm_name}_opts"] = value
         end
 
         #now we create the suffixed version of the global settings.
@@ -207,7 +209,7 @@ module Externals
             else
               values = [
                 attributes[name.to_sym],
-                self.send("#{scm_name}_opts")
+                send("#{scm_name}_opts")
               ].compact
 
               if !values.empty?

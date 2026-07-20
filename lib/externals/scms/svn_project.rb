@@ -2,7 +2,6 @@ require File.join(File.dirname(__FILE__), '..', 'project')
 
 module Externals
   class SvnProject < Project
-    public
     def co *args
       # delete path if empty
       rmdir_ie path unless path == "."
@@ -119,12 +118,12 @@ module Externals
       return true if path =~ /^svn(\+ssh)?:/
 
       # Look for http(s)://svn.*/*
-      if path =~ /^https?:\/\/([\w+\-]+)\.(?:[\w+\-]+\.)*[\w\-]+(?:\/|$)/
+      if path =~ /^https?:\/\/([\w+-]+)\.(?:[\w+-]+\.)*[\w-]+(?:\/|$)/
         return true if $1.downcase == "svn"
       end
 
       # Look for http(s)://*/*svn*/
-      if path =~ /^https?:\/\/(?:[\w+\-]+\.?)+\/(\w+)/
+      if path =~ /^https?:\/\/(?:[\w+-]+\.?)+\/(\w+)/
         return true if $1.downcase.include? "svn"
       end
 
@@ -133,10 +132,10 @@ module Externals
 
     def self.fill_in_opts opts, main_options, sub_options, options = {}
       opts.on("--svn", "--subversion",
-        Integer,
-        *"same as '--scm svn'  Uses subversion to
+              Integer,
+              *"same as '--scm svn'  Uses subversion to
         checkout/export the main project".lines_by_width(options[:summary_width])
-        ) {sub_options[:scm] = main_options[:scm] = 'svn'}
+      ) {sub_options[:scm] = main_options[:scm] = 'svn'}
     end
 
     def self.detected?
@@ -148,7 +147,7 @@ module Externals
       status = `svn st`
 
       status.split("\n").grep(/^\?/).each do |to_add|
-        puts `svn add #{to_add.gsub(/^\?\s*/,"")}`
+        puts `svn add #{to_add.gsub(/^\?\s*/, "")}`
         # :nocov:
         raise unless $? == 0
         # :nocov:
@@ -261,7 +260,7 @@ repository = #{info_url}
     end
 
     def ignore_rows(path)
-      rows = ignore_text(path).split(/\n/)
+      rows = ignore_text(path).split("\n")
 
       rows.delete_if {|row| row =~ /^\s*$/}
 
@@ -299,6 +298,5 @@ repository = #{info_url}
         self.class.info_url scm_opts
       end
     end
-
   end
 end

@@ -37,9 +37,8 @@ module Externals
             Dir.chdir File.join('vendor', 'plugins') do
               Dir.chdir 'acts_as_list' do
                 %w(8771a632dc26a7782800347993869c964133ea29
-                  27a941c80ccaa8afeb9bfecb84c0ff098d8ba962
-                  9baff190a52c05cc542bfcaa7f77a91ce669f2f8
-                ).each do |hash|
+                   27a941c80ccaa8afeb9bfecb84c0ff098d8ba962
+                   9baff190a52c05cc542bfcaa7f77a91ce669f2f8).each do |hash|
                   assert `git show #{hash}` =~ /^commit\s*#{hash}$/i
                   raise unless $? == 0
                 end
@@ -55,10 +54,11 @@ module Externals
 
             assert `git show HEAD` !~ /^\s*commit\s*8771a632dc26a7782800347993869c964133ea29\s*$/i
             raise unless $? == 0
+
             r = repository.dependents[:acts_as_list].attributes[:revision]
             assert r =~ /^[a-f0-9]{40}$/
             assert_equal r,
-              acts_as_list.current_revision
+                         acts_as_list.current_revision
             `git show HEAD` =~ /^\s*commit\s*#{r}\s*$/i
             raise unless $? == 0
 
@@ -89,7 +89,6 @@ module Externals
           `git clone #{source}`
           raise unless $? == 0
 
-
           Dir.chdir repository.name do
             Ext.run "init"
 
@@ -114,6 +113,7 @@ module Externals
 
             `git commit -m "froze modules to revision 3"`
             raise unless $? == 0
+
             `git push`
             raise unless $? == 0
           end
@@ -144,8 +144,10 @@ module Externals
             # Check it in to make sure it sticks
             `git add .externals`
             raise unless $? == 0
+
             `git commit -m "unfreezing modules"`
             raise unless $? == 0
+
             `git push`
             raise unless $? == 0
           end
@@ -170,7 +172,6 @@ module Externals
           end
         end
       end
-
     end
   end
 end

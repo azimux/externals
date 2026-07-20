@@ -1,6 +1,6 @@
 String.class_eval do
   def cap_first
-    "#{self[0].chr.upcase}#{self[1..(self.length - 1)]}"
+    "#{self[0].chr.upcase}#{self[1..-1]}"
   end
 
   def classify
@@ -8,7 +8,8 @@ String.class_eval do
   end
 
   #avoid collision
-  raise if instance_methods.include?("lines_by_width")
+  raise if method_defined?("lines_by_width")
+
   def lines_by_width(width = 32)
     width ||= 32
     lines = []
@@ -19,10 +20,7 @@ String.class_eval do
         string = ""
       else
         index = string[0, width + 1].rindex(/\s/)
-        unless index
-          # let's find the first space we can.
-          index = string.index(/\s/)
-        end
+        index ||= string.index(/\s/)
         if index
           lines << string[0, index]
           string = string[(index + 1)..-1]
@@ -35,5 +33,4 @@ String.class_eval do
 
     lines
   end
-
 end

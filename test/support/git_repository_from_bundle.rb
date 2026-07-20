@@ -6,7 +6,7 @@ module Externals
       attr_accessor :bundle_name
 
       def initialize name, subpath = nil, bundle_name = nil
-        super name, subpath || "gitbundle"
+        super(name, subpath || "gitbundle")
         self.bundle_name = bundle_name || self.name
       end
 

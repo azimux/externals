@@ -5,7 +5,7 @@ module Externals
   module Test
     class EnginesWithBranch1 < GitRepository
       def initialize
-        super "engines", File.join("git", "with_branch1")
+        super("engines", File.join("git", "with_branch1"))
         dependents.merge!(
           :other_engines => SomeSubprojectWithEdge.new
         )
@@ -23,6 +23,7 @@ module Externals
         Dir.chdir 'workdir' do
           `git clone #{clean_dir}`
           raise unless $? == 0
+
           Dir.chdir name.gsub(".git", "") do
             `git push origin master:branch1`
             raise unless $? == 0
@@ -30,7 +31,6 @@ module Externals
         end
         rm_rf_ie "workdir"
       end
-
     end
   end
 end

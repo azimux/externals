@@ -13,7 +13,7 @@ module Externals
       include SvnRepositoryHelper
 
       def initialize
-        super "rails_app_svn_branches", "svn"
+        super("rails_app_svn_branches", "svn")
         dependents.merge!(
           :acts_as_list => GitRepositoryFromBundle.new("acts_as_list"),
           :ssl_requirement => GitRepositoryFromBundle.new("ssl_requirement"),
@@ -65,7 +65,7 @@ module Externals
 
           Dir.chdir name do
             Ext.run "init", "-b", "current"
-            raise " could not create .externals"  unless File.exist?('.externals')
+            raise " could not create .externals" unless File.exist?('.externals')
 
             # this line is necessary as ext can't perform the necessary
             # ignores otherwise if vendor and vendor/plugins haven't been added
@@ -93,9 +93,9 @@ module Externals
             #install project with a non-default path and svn branching
             proj = dependents[:modules]
             Ext.run "install", "--svn",
-              "#{proj.clean_url}",
-              "-b", "current",
-              "modules"
+                    "#{proj.clean_url}",
+                    "-b", "current",
+                    "modules"
 
             SvnProject.add_all
 
@@ -105,7 +105,7 @@ module Externals
             # now let's make a branch in the main project called new_branch
             `svn copy #{
             [clean_url, "current"].join("/")
-} #{[clean_url, "branches", "new_branch"].join("/")} -m "creating branch" `
+          } #{[clean_url, "branches", "new_branch"].join("/")} -m "creating branch" `
             raise unless $? == 0
 
             # let's update the .externals file in new_branch to reflect these changes
@@ -118,7 +118,7 @@ module Externals
             # add a git managed project...
             proj = dependents[:ssl_requirement]
             Ext.run "install", proj.clean_dir,
-              "-r", proj.attributes[:revision], "vendor/plugins/#{proj.name}"
+                    "-r", proj.attributes[:revision], "vendor/plugins/#{proj.name}"
 
             # add a svn managed project
             proj = dependents[:empty_plugin]
@@ -137,8 +137,6 @@ module Externals
           rm_rf name
         end
       end
-
     end
   end
-
 end

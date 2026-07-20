@@ -3,6 +3,7 @@ require File.join(File.dirname(__FILE__), '..', 'project')
 module Externals
   class GitProject < Project
     private
+
     def do_clone command, extra_opts = ""
       opts = resolve_opts(command)
 
@@ -25,20 +26,23 @@ module Externals
     end
 
     public
+
     def co *_args
       do_up "co"
     end
 
     private
+
     # make sure you have already entered Dir.chdir(path) in your calling code!
     def branch_exists branch_name
       opts = resolve_opts
-      `git #{opts} branch -a` =~ /^[\s\*]*#{branch_name}\s*$/
+      `git #{opts} branch -a` =~ /^[\s*]*#{branch_name}\s*$/
     end
 
     # make sure you have already entered Dir.chdir(path) in your calling code!
 
     public
+
     # this method fetches/pulls/changes branches/changes revisions/changes the oil in your geo metro/brings world peace
     def change_to_branch_revision command = ""
       opts = resolve_opts(command)
@@ -46,15 +50,14 @@ module Externals
       pulled = false
 
       project_path = if path == "."
-        name || "."
-      else
-        path
-      end
+                       name || "."
+                     else
+                       path
+                     end
 
       Dir.chdir project_path do
         do_fetch command
       end
-
 
       if branch
         cb = current_branch
@@ -87,6 +90,7 @@ module Externals
         Dir.chdir project_path do
           `git #{opts} pull`
           raise unless $? == 0
+
           pulled = true
         end
       end
@@ -158,6 +162,7 @@ module Externals
     end
 
     private
+
     def do_fetch command
       opts = resolve_opts(command)
       `git #{opts} fetch`
@@ -166,15 +171,15 @@ module Externals
 
     def do_up command
       project_path = if path == "."
-        name || "." # if no name is specified then we are expected to already be in the right path.
-        # this is a little confusing and should be cleaned up.
-        # When we are doing a checkout, the name is set manually in Ext.checkout.
-        # we are then in the parent directory.
-        # When we are doing an update, the main project has no name.
-        # we are then in the correct directory.
-      else
-        path
-      end
+                       name || "." # if no name is specified then we are expected to already be in the right path.
+                     # this is a little confusing and should be cleaned up.
+                     # When we are doing a checkout, the name is set manually in Ext.checkout.
+                     # we are then in the parent directory.
+                     # When we are doing an update, the main project has no name.
+                     # we are then in the correct directory.
+                     else
+                       path
+                     end
 
       puts "Updating #{path}..."
 
@@ -185,6 +190,7 @@ module Externals
     end
 
     public
+
     def st *args
       puts "\nstatus for #{path}:"
       Dir.chdir path do
@@ -198,8 +204,8 @@ module Externals
 
     def self.fill_in_opts opts, main_options, sub_options, options
       opts.on("--git", "-g",
-        Integer,
-        *"same as '--scm git'  Uses git to
+              Integer,
+              *"same as '--scm git'  Uses git to
         checkout/export the main project".lines_by_width(options[:summary_width])
       ) {sub_options[:scm] = main_options[:scm] = 'git'}
     end
@@ -216,11 +222,12 @@ module Externals
 
     def ignore_contains? path
       text = ignore_text(path)
-      text.split(/\n/).detect {|r| r.strip == path.strip}
+      text.split("\n").detect {|r| r.strip == path.strip}
     end
 
     def ignore_text(_path = nil)
       return '' unless File.exist?('.gitignore')
+
       retval = ''
       open('.gitignore') do |f|
         retval = f.read
@@ -231,7 +238,7 @@ module Externals
     def ignore_rows(path)
       rows = ignore_text(path) || ''
 
-      rows = rows.split(/\n/)
+      rows = rows.split("\n")
 
       rows.delete_if {|row| row =~ /^\s*$/}
 
@@ -292,6 +299,5 @@ module Externals
         $1
       end
     end
-
   end
 end

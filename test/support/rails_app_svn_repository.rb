@@ -13,7 +13,7 @@ module Externals
       include SvnRepositoryHelper
 
       def initialize
-        super "rails_app", "svn2"
+        super("rails_app", "svn2")
         dependents.merge!(
           :acts_as_list => GitRepositoryFromBundle.new("acts_as_list"),
           :ssl_requirement => GitRepositoryFromBundle.new("ssl_requirement"),
@@ -59,7 +59,7 @@ module Externals
             raise unless $? == 0
 
             Ext.run "init"
-            raise " could not create .externals"  unless File.exist?('.externals')
+            raise " could not create .externals" unless File.exist?('.externals')
 
             # this line is necessary as ext can't perform the necessary
             # ignores otherwise if vendor and vendor/plugins haven't been added
@@ -91,8 +91,8 @@ module Externals
             #install project with a non-default path
             proj = dependents[:modules]
             Ext.run "install", "--svn",
-              "#{proj.clean_url}",
-              "modules"
+                    "#{proj.clean_url}",
+                    "modules"
 
             SvnProject.add_all
 
@@ -106,6 +106,5 @@ module Externals
         end
       end
     end
-
   end
 end

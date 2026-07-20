@@ -4,7 +4,7 @@ module Externals
   module Test
     class BasicGitRepository < GitRepository
       def initialize
-        super "basic", "git"
+        super("basic", "git")
       end
 
       def build_here
@@ -33,6 +33,7 @@ module Externals
 
           `git add .`
           raise unless $? == 0
+
           `git commit -m "added readme.txt"`
           raise unless $? == 0
 
@@ -42,6 +43,7 @@ module Externals
 
           `git add .`
           raise unless $? == 0
+
           `git commit -m "added a line to readme.txt"`
           raise unless $? == 0
 
@@ -51,7 +53,6 @@ module Externals
 
         rm_rf "#{name}.local"
       end
-
     end
   end
 end

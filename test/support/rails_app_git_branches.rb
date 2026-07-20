@@ -9,7 +9,7 @@ module Externals
   module Test
     class RailsAppGitBranches < GitRepository
       def initialize
-        super "rails_app", File.join("git", "branches")
+        super("rails_app", File.join("git", "branches"))
         dependents.merge!(
           :acts_as_list => GitRepositoryFromBundle.new("acts_as_list"),
           :redhillonrails_core => SvnRepositoryFromDump.new("redhillonrails_core"),
@@ -37,8 +37,9 @@ module Externals
 
           `git init -b master`
           raise unless $? == 0
+
           Ext.run "init"
-          raise " could not create .externals"  unless File.exist?('.externals')
+          raise " could not create .externals" unless File.exist?('.externals')
 
           proj = dependents[:acts_as_list]
           Ext.run "install", proj.clean_dir, "vendor/plugins/#{proj.name}"
@@ -52,9 +53,10 @@ module Externals
           ext = Ext.new
           main_project = ext.main_project
 
-          unless !main_project.ignore_contains? "vendor/plugins/engines"
+          if main_project.ignore_contains? "vendor/plugins/engines"
             raise
           end
+
           #install project with a branch
           proj = dependents[:engines]
           Ext.run "install", proj.clean_dir, "-b", "edge", "vendor/plugins/#{proj.name}"
@@ -63,7 +65,7 @@ module Externals
           end
 
           #install fake_rails
-          unless !main_project.ignore_contains? "vendor/rails"
+          if main_project.ignore_contains? "vendor/rails"
             raise
           end
 
@@ -101,15 +103,16 @@ module Externals
 
           GitProject.add_all
           raise unless $? == 0
+
           `git commit -m "changed branch on engines subproject, removed rails"`
           raise unless $? == 0
+
           `git push ../#{name}.git HEAD:new_branch`
           raise unless $? == 0
         end
 
         rm_rf "#{name}.working"
       end
-
     end
   end
 end

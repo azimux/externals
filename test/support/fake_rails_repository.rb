@@ -6,7 +6,7 @@ module Externals
   module Test
     class FakeRailsRepository < GitRepositoryFromBundle
       def initialize
-        super "rails", "fake", "fake_rails"
+        super("rails", "fake", "fake_rails")
       end
 
       #def build_here
@@ -120,7 +120,6 @@ module Externals
       #    end
       #  end
       #end
-
     end
   end
 end

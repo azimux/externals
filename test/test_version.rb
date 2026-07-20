@@ -9,7 +9,7 @@ module Externals
       include ExtTestCase
 
       def test_version
-        version_regex = /(?:[^\.\d]|^)(\d+\.\d+\.\d+)(?:[^\.\d]|$)/
+        version_regex = /(?:[^.\d]|^)(\d+\.\d+\.\d+)(?:[^.\d]|$)/
 
         assert Externals::VERSION =~ version_regex
 

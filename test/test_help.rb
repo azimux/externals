@@ -19,7 +19,6 @@ module Externals
         end
         capture = capture.string
 
-
         assert capture =~ /ext \[OPTIONS\] <command>/
       end
     end

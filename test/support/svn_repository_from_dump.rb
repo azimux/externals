@@ -7,7 +7,7 @@ module Externals
       include SvnRepositoryHelper
 
       def initialize name, subpath = nil
-        super name, subpath || "svn"
+        super(name, subpath || "svn")
       end
 
       #builds the test repository in the current directory
@@ -16,12 +16,13 @@ module Externals
 
         puts `gzip -f -d #{name}.svn.gz`
         raise unless $? == 0
+
         puts `svnadmin create #{name}`
         raise unless $? == 0
+
         puts `svnadmin load #{name} < #{name}.svn`
         raise unless $? == 0
       end
-
     end
   end
 end

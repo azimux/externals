@@ -7,7 +7,7 @@ module Externals
       include SvnRepositoryHelper
 
       def initialize
-        super "modules", "svn"
+        super("modules", "svn")
       end
 
       def build_here
@@ -35,7 +35,6 @@ module Externals
           rm_rf name
         end
       end
-
     end
   end
 end

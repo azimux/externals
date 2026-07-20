@@ -52,7 +52,6 @@ repository = svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/for
               assert_equal ext.main_project.git_opts_up, nil
               assert_equal ext.main_project.svn_opts_up, nil
 
-
               open '.externals', 'w' do |f|
                 f.write "[.]
 scm = git
@@ -78,11 +77,11 @@ repository = svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/for
               assert_equal ext.subproject_by_name_or_path('acts_as_list').scm_opts_co, "--verbose"
               assert_equal ext.subproject_by_name_or_path('acts_as_list').scm_opts_up, "--verbose"
               assert_equal ext.subproject_by_name_or_path('foreign_key_migrations').scm_opts,
-                "--trust-server-cert --non-interactive"
+                           "--trust-server-cert --non-interactive"
               assert_equal ext.subproject_by_name_or_path('foreign_key_migrations').scm_opts_co,
-                "--trust-server-cert --non-interactive"
+                           "--trust-server-cert --non-interactive"
               assert_equal ext.subproject_by_name_or_path('foreign_key_migrations').scm_opts_up,
-                "--trust-server-cert --non-interactive"
+                           "--trust-server-cert --non-interactive"
               assert_equal ext.main_project.scm_opts, nil
               assert_equal ext.main_project.scm_opts_co, nil
               assert_equal ext.main_project.scm_opts_up, nil
@@ -118,13 +117,13 @@ repository = svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/for
               assert_equal ext.subproject_by_name_or_path('acts_as_list').scm_opts, "--verbose"
               assert_equal ext.subproject_by_name_or_path('acts_as_list').scm_opts_co, "--verbose"
               assert_equal ext.subproject_by_name_or_path('acts_as_list').scm_opts_up,
-                "--made-up-option --verbose"
+                           "--made-up-option --verbose"
               assert_equal ext.subproject_by_name_or_path('foreign_key_migrations').scm_opts,
-                "--trust-server-cert"
+                           "--trust-server-cert"
               assert_equal ext.subproject_by_name_or_path('foreign_key_migrations').scm_opts_co,
-                "--non-interactive --trust-server-cert"
+                           "--non-interactive --trust-server-cert"
               assert_equal ext.subproject_by_name_or_path('foreign_key_migrations').scm_opts_up,
-                "--svn-up --trust-server-cert"
+                           "--svn-up --trust-server-cert"
               assert_equal ext.main_project.scm_opts, "--main-project-opts --verbose"
               assert_equal ext.main_project.scm_opts_co, "--main-project-opts --verbose"
               assert_equal ext.main_project.scm_opts_up, "--main-project-opts --verbose"
@@ -132,12 +131,10 @@ repository = svn://rubyforge.org/var/svn/redhillonrails/trunk/vendor/plugins/for
               assert_equal ext.main_project.svn_opts, "--trust-server-cert"
               assert_equal ext.main_project.git_opts_up, "--verbose"
               assert_equal ext.main_project.svn_opts_up, "--svn-up --trust-server-cert"
-
             end
           ensure
             rm_rf "test_svn_global_opts" if File.exist?("test_svn_global_opts")
           end
-
         end
       end
     end

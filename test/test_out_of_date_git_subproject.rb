@@ -27,14 +27,14 @@ module Externals
           assert !File.exist?(File.join(repository.name, "readme.txt"))
           assert File.exist?(File.join(repository.name, "simple_readme.txt"))
           assert !File.exist?(File.join(
-              repository.name, "subs", repository.dependents[:basic].name, "simple_readme.txt")
-          )
+                                repository.name, "subs", repository.dependents[:basic].name, "simple_readme.txt")
+                             )
           assert File.exist?(File.join(
-              repository.name, "subs", repository.dependents[:basic].name, "readme.txt")
-          )
+                               repository.name, "subs", repository.dependents[:basic].name, "readme.txt")
+                            )
 
           readme = File.read(File.join(
-              repository.name, "subs", repository.dependents[:basic].name, "readme.txt"))
+                               repository.name, "subs", repository.dependents[:basic].name, "readme.txt"))
 
           assert readme =~ /Line 4/i
           assert readme !~ /Line 5/i
@@ -57,8 +57,10 @@ module Externals
 
               `git add .`
               raise unless $? == 0
+
               `git commit -m "added line 5 to readme.txt"`
               raise unless $? == 0
+
               `git push`
               raise unless $? == 0
             end
@@ -70,7 +72,7 @@ module Externals
             Ext.run "update"
 
             readme = File.read(File.join(
-                "subs", repository.dependents[:basic].name, "readme.txt"))
+                                 "subs", repository.dependents[:basic].name, "readme.txt"))
 
             assert readme =~ /Line 4/i
             assert readme =~ /Line 5/i

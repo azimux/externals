@@ -2,7 +2,6 @@ require 'fileutils'
 
 module Externals
   module Test
-
     # repositories used for testing live in
     #
     # test/tmp/cleanreps
@@ -80,7 +79,7 @@ module Externals
       # builds/copies the test repository if needed
       def prepare
         #let's mark ourselves as dirty if any of our dependents are dirty
-        if dependents.values.detect(&:'dirty?')
+        if dependents.values.detect(&:dirty?)
           mark_dirty
         end
         dependents.values.each {|child| child.prepare}
@@ -130,11 +129,13 @@ module Externals
 
       def delete_clean_dir
         raise "hmmm... too scared to delete #{clean_dir}" unless clean_dir =~ /[\/\\]test[\/\\]tmp[\/\\]/
+
         rm_rf_ie clean_dir
       end
 
       def delete_pristine_dir
         raise "hmmm... too scared to delete #{pristine_dir}" unless clean_dir =~ /[\/\\]test[\/\\]tmp[\/\\]/
+
         rm_rf_ie pristine_dir
       end
 

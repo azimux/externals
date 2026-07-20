@@ -2,10 +2,9 @@ require 'git_repository'
 
 module Externals
   module Test
-
     class SomeSubprojectWithEdge < GitRepository
       def initialize
-        super "some_subproject_with_edge", File.join("git")
+        super("some_subproject_with_edge", File.join("git"))
       end
 
       def build_here
@@ -41,6 +40,7 @@ puts 'lulz!'
 
             `git add .`
             raise unless $? == 0
+
             `git commit -m "added some_subproject_with_edge_readme.txt and somelib.rb"`
             raise unless $? == 0
 
@@ -58,6 +58,7 @@ puts 'double lulz!'
 
             `git add .`
             raise unless $? == 0
+
             `git commit -m "added a line to simple_readme.txt and modified somelib.rb"`
             raise unless $? == 0
 
@@ -74,11 +75,13 @@ puts 'living on the edge'
 
             `git add .`
             raise unless $? == 0
+
             `git commit -m "on the edge"`
             raise unless $? == 0
 
             `git push origin master:master`
             raise unless $? == 0
+
             `git push origin edge:edge`
             raise unless $? == 0
           end

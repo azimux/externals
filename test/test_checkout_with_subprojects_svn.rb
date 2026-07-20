@@ -50,7 +50,7 @@ module Externals
               end
 
               assert `git show #{heads[0]}` =~
-                /^\s*commit\s+#{heads[0]}\s*$/
+                     /^\s*commit\s+#{heads[0]}\s*$/
             end
 
             assert File.exist?(File.join('modules', 'modules.txt'))
@@ -137,7 +137,6 @@ module Externals
           Ext.run "checkout", "--svn", source, 'rails_app'
 
           Dir.chdir 'rails_app' do
-
             pretests = proc do
               assert File.exist?('.svn')
               assert !File.exist?(File.join('vendor', 'plugins', subproject_name, 'lib'))
@@ -153,7 +152,6 @@ module Externals
             mkdir_p workdir2
 
             Dir.chdir workdir2 do
-
               #install a new project
               puts "About to checkout #{source}"
               Ext.run "checkout", "--svn", source, 'rails_app'
@@ -191,7 +189,7 @@ module Externals
 
             assert File.exist?(File.join('vendor', 'plugins', subproject_name, 'lib'))
 
-            Dir.chdir File.join("vendor",'plugins', subproject_name) do
+            Dir.chdir File.join("vendor", 'plugins', subproject_name) do
               assert `git show HEAD` =~ /^\s*commit\s*#{revision}\s*$/i
             end
           end
@@ -277,7 +275,7 @@ module Externals
               end
 
               assert `git show #{heads[0]}` !~
-                /^\s*commit\s+#{heads[0]}\s*$/
+                     /^\s*commit\s+#{heads[0]}\s*$/
             end
 
             %w(redhillonrails_core acts_as_list).each do |proj|
@@ -289,7 +287,7 @@ module Externals
             end
 
             %w(redhillonrails_core).each do |proj|
-              assert !File.exist?(File.join('vendor', 'plugins',proj, '.svn'))
+              assert !File.exist?(File.join('vendor', 'plugins', proj, '.svn'))
             end
 
             assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
@@ -369,7 +367,8 @@ module Externals
             ext = Ext.new
 
             assert_equal(ext.configuration["vendor/plugins/some_subproject_with_edge"]["branch"], nil)
-            assert_equal(ext.configuration["vendor/plugins/some_subproject_with_edge"]["revision"], sub_project_revision)
+            assert_equal(ext.configuration["vendor/plugins/some_subproject_with_edge"]["revision"],
+                         sub_project_revision)
 
             Dir.chdir File.join("vendor", "plugins", "some_subproject_with_edge") do
               assert(File.read(File.join("lib", "somelib.rb")) !~ /living on the edge/)
@@ -378,7 +377,6 @@ module Externals
           end
         end
       end
-
     end
   end
 end

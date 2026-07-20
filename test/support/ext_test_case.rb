@@ -38,7 +38,7 @@ module Externals
     end
 
     def rails_version
-      /[\d\.]+/.match(`#{rails_exe} --version`)[0]
+      /[\d.]+/.match(`#{rails_exe} --version`)[0]
     end
 
     def rails_exe

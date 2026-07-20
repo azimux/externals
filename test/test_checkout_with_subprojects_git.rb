@@ -15,7 +15,7 @@ module Externals
         workdir = File.join(root_dir, 'test', "tmp", "workdir", "branches", "git")
         mkdir_p workdir
 
-        if File.exist?(File.join(workdir,"rails_app"))
+        if File.exist?(File.join(workdir, "rails_app"))
           rm_rf File.join(workdir, "rails_app")
         end
 
@@ -33,7 +33,9 @@ module Externals
             main_project = ext.main_project
             engines = ext.subproject("engines")
 
-            main_project.assert_e_dne_i_ni proc{|a|assert(a)},%w(foreign_key_migrations redhillonrails_core acts_as_list)
+            main_project.assert_e_dne_i_ni proc{|a|
+              assert(a)
+            }, %w(foreign_key_migrations redhillonrails_core acts_as_list)
 
             # let's test switching branches via altering .externals and running "ext up"
             assert_equal "master", main_project.current_branch
@@ -49,7 +51,6 @@ module Externals
             assert_equal "edge", engines.current_branch
 
             assert_equal "new_branch", main_project.current_branch
-
 
             ext = Ext.new
             assert_equal "branch1", ext.configuration["vendor/plugins/engines"]["branch"]
@@ -129,7 +130,7 @@ module Externals
         workdir = File.join(root_dir, 'test', "tmp", "workdir", "branches", "uninstall", "git")
         mkdir_p workdir
 
-        if File.exist?(File.join(workdir,"rails_app"))
+        if File.exist?(File.join(workdir, "rails_app"))
           rm_rf File.join(workdir, "rails_app")
         end
 
@@ -150,7 +151,7 @@ module Externals
 
             projs_ni << projs_i.delete('acts_as_list')
 
-            mp.assert_e_dne_i_ni proc{|a|assert(a)}, projs, [], projs_i, projs_ni
+            mp.assert_e_dne_i_ni proc{|a| assert(a)}, projs, [], projs_i, projs_ni
 
             Ext.run "uninstall", "-f", "foreign_key_migrations"
 
@@ -159,11 +160,10 @@ module Externals
             projs_dne = []
             projs_dne << projs.delete('foreign_key_migrations')
 
-            mp.assert_e_dne_i_ni proc{|a|assert(a)}, projs, projs_dne, projs_i, projs_ni
+            mp.assert_e_dne_i_ni proc{|a| assert(a)}, projs, projs_dne, projs_i, projs_ni
           end
         end
       end
     end
-
   end
 end

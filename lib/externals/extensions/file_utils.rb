@@ -3,7 +3,7 @@ require 'fileutils'
 FileUtils.class_eval do
   # simulates cp -a
   def cp_a source, dest, **options
-    cp_r source, dest, **options.merge(:preserve => true)
+    cp_r source, dest, **options, :preserve => true
   end
 
   # calls rm_rf if the file exists
@@ -21,7 +21,7 @@ FileUtils.class_eval do
     rmdir path if File.exist?(path)
   end
 
-  alias rm_rf_old rm_rf
+  alias_method :rm_rf_old, :rm_rf
   #going to try to give a delay after calling rm if necessary...
   def rm_rf(filename, *args, **opts)
     tries = 0
@@ -54,6 +54,6 @@ FileUtils.class_eval do
   def dir_empty? path
     File.directory?(path) &&
       File.exist?(path) &&
-      !Dir.entries(path).detect{|entry| !["..","."].include?(entry)}
+      !Dir.entries(path).detect{|entry| !["..", "."].include?(entry)}
   end
 end

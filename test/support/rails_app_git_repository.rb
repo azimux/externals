@@ -7,7 +7,7 @@ module Externals
   module Test
     class RailsAppGitRepository < GitRepository
       def initialize
-        super "rails_app", "git"
+        super("rails_app", "git")
         dependents.merge!(
           :acts_as_list => GitRepositoryFromBundle.new("acts_as_list"),
           :redhillonrails_core => SvnRepositoryFromDump.new("redhillonrails_core"),
@@ -33,9 +33,10 @@ module Externals
 
           `git init -b master`
           raise unless $? == 0
+
           Ext.run "init"
 
-          raise " could not create .externals"  unless File.exist?('.externals')
+          raise " could not create .externals" unless File.exist?('.externals')
 
           proj = dependents[:acts_as_list]
           Ext.run "install", proj.clean_dir, "vendor/plugins/#{proj.name}"
@@ -64,7 +65,6 @@ module Externals
 
         rm_rf "#{name}.working"
       end
-
     end
   end
 end

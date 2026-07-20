@@ -1,4 +1,4 @@
-$:.unshift File.join(File.dirname(__FILE__),'..','lib') if $0 == __FILE__
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
 
 require 'ext_test_case'
 require 'externals/ext'
@@ -21,7 +21,7 @@ module Externals
           "is a",
           "test"
         ],
-          "this is a test".lines_by_width(4)
+                     "this is a test".lines_by_width(4)
 
         assert_equal [
           "this",
@@ -29,7 +29,7 @@ module Externals
           "a",
           "test"
         ],
-          "this is a test".lines_by_width(2)
+                     "this is a test".lines_by_width(2)
 
         assert_equal ["this is a test"], "this is a test".lines_by_width
 
@@ -42,7 +42,7 @@ module Externals
           "inconvenient, such as in a",
           "script or in a Capistrano task)"
         ],
-          "The working directory to execute commands from.  Use this if for some reason you
+                     "The working directory to execute commands from.  Use this if for some reason you
         cannot execute ext from the main project's directory (or if it's just inconvenient, such as in a script
         or in a Capistrano task)".lines_by_width
       end

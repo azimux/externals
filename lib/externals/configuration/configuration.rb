@@ -3,7 +3,6 @@ module Externals
     SECTION_TITLE_REGEX_NO_GROUPS = /^\s*\[(?:[^\]]*)\]\s*$/
     SECTION_TITLE_REGEX = /^\s*\[([^\]]*)\]\s*$/
 
-
     class Section
       attr_accessor :title_string, :body_string, :title, :rows
 
@@ -15,12 +14,11 @@ module Externals
 
         raise "Invalid section title: #{title_string}" unless title
 
-        self.rows = body_string.strip.split(/\n/)
+        self.rows = body_string.strip.split("\n")
       end
 
-
-      SETTING_REGEX = /^\s*([\.\w-]+)\s*=\s*([^#\n]*)(?:#[^\n]*)?$/
-      SET_SETTING_REGEX = /^(\s*(?:[\.\w-]+)\s*=\s*)(?:[^#\n]*)(#[^\n]*)?$/
+      SETTING_REGEX = /^\s*([.\w-]+)\s*=\s*([^#\n]*)(?:#[^\n]*)?$/
+      SET_SETTING_REGEX = /^(\s*(?:[.\w-]+)\s*=\s*)(?:[^#\n]*)(#[^\n]*)?$/
 
       def attributes
         retval = {}
@@ -31,6 +29,7 @@ module Externals
         end
         retval
       end
+
       def setting key
         rows.each do |row|
           if row =~ SETTING_REGEX && key.to_s == $1
@@ -39,6 +38,7 @@ module Externals
         end
         nil
       end
+
       def set_setting key, value
         key = key.to_s
         found = nil
@@ -46,6 +46,7 @@ module Externals
         rows.each_with_index do |row, index|
           if row =~ SETTING_REGEX && key == $1
             raise "found #{key} twice!" if found
+
             found = index
           end
         end
@@ -56,6 +57,7 @@ module Externals
             raise "thought I found the row, but didn't"
             # :nocov:
           end
+
           rows[found] = "#{$1}#{value}#{$2}"
         else
           rows << "#{key} = #{value}"
@@ -71,6 +73,7 @@ module Externals
         rows.each_with_index do |row, index|
           if row =~ SETTING_REGEX && key == $1
             raise "found #{key} twice!" if found
+
             found = index
           end
         end
@@ -82,6 +85,7 @@ module Externals
             raise "thought I found the row, but didn't"
             # :nocov:
           end
+
           rows.delete rows[found]
         end
         value
@@ -90,6 +94,7 @@ module Externals
       def [] key
         setting(key)
       end
+
       def []= key, value
         set_setting(key, value)
       end
@@ -114,7 +119,7 @@ module Externals
       def []= title, hash
         add_empty_section title
         section = self[title]
-        hash.each_pair do |key,value|
+        hash.each_pair do |key, value|
           section[key] = value
         end
       end
@@ -123,12 +128,14 @@ module Externals
         sec = sections.detect{|section| section.title == sec}
 
         raise "No section found in config file for #{sec}" unless sec
+
         sections.delete(sec)
       end
 
-      def add_empty_section  title
+      def add_empty_section title
         raise "Section already exists" if self[title]
-        sections << Section.new("[#{title.to_s}]", "")
+
+        sections << Section.new("[#{title}]", "")
       end
 
       def removed_project_paths other_config
@@ -160,7 +167,7 @@ module Externals
             # :nocov:
           end
 
-          bodies = bodies[1..(bodies.size - 1)]
+          bodies = bodies[1..-1]
 
           (0...(bodies.size)).each do |index|
             sections << Section.new(titles[index], bodies[index])
@@ -170,9 +177,8 @@ module Externals
 
       def write path = ".externals"
         raise "no path given" unless path
-        File.open(path, 'w') do |f|
-          f.write to_s
-        end
+
+        File.write(path, to_s)
       end
 
       def to_s

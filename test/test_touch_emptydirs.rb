@@ -1,4 +1,4 @@
-$:.unshift File.join(File.dirname(__FILE__),'..','lib') if $0 == __FILE__
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
 
 require 'ext_test_case'
 require 'externals/ext'
@@ -23,9 +23,7 @@ module Externals
                 mkdir "empty2"
                 mkdir "notempty3"
                 Dir.chdir 'notempty3' do
-                  File.open('readme.txt', 'w') do |f|
-                    f.write "some text\n"
-                  end
+                  File.write('readme.txt', "some text\n")
                 end
               end
             end
@@ -53,7 +51,6 @@ module Externals
           end
         end
       end
-
     end
   end
 end

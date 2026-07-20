@@ -4,7 +4,7 @@ module Externals
   module Test
     class RailsAppUnmanaged < Repository
       def initialize
-        super "rails_app", "unmanaged"
+        super("rails_app", "unmanaged")
       end
 
       def build_here
@@ -22,7 +22,6 @@ module Externals
           rm_rf ".git"
         end
       end
-
     end
   end
 end
