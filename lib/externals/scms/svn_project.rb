@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), '..', 'project')
 
 module Externals
   class SvnProject < Project
-    def co *args
+    def co *_args
       # delete path if empty
       rmdir_ie path unless path == "."
 
@@ -107,7 +107,7 @@ module Externals
       end
     end
 
-    def st *args
+    def st *_args
       puts "\nstatus for #{path}:"
       Dir.chdir path do
         puts `svn #{scm_opts_st} status`

@@ -91,7 +91,7 @@ module Externals
           raise unless $? == 0
 
           ext = Ext.new
-          main_project = ext.main_project
+          ext.main_project
 
           #update .externals
           ext.configuration["vendor/plugins/engines"]["branch"] = "branch1"

@@ -123,7 +123,7 @@ module Externals
               String,
               *"When doing an uninstall of a subproject,
         remove it's files and subfolders, too.".lines_by_width(summary_width)
-      ) {|branch| sub_options[:force_removal] = true}
+      ) { sub_options[:force_removal] = true }
       opts.on(
         "--workdir DIR", "-w DIR", String,
         *"The working directory to execute commands from.  Use this if for some reason you
@@ -296,7 +296,7 @@ module Externals
     end
 
     def self.project_classes
-      retval = registered_scms.map do |scm|
+      registered_scms.map do |scm|
         project_class(scm)
       end
     end
@@ -442,7 +442,7 @@ that you are installing. Use an option to specify it
       end
     end
 
-    def update_ignore args, options
+    def update_ignore _args, options
       scm = configuration['.']
       scm = scm['scm'] if scm
 
@@ -490,7 +490,12 @@ that you are installing. Use an option to specify it
       end
 
       paths.each do |p|
-        File.open(File.join(p, ".emptydir"), "w").close
+        # TODO: is there not an easier way to touch a file??
+        # rubocop:disable Style/FileOpen
+        f = File.open(File.join(p, ".emptydir"), "w")
+        # rubocop:enable Style/FileOpen
+      ensure
+        f.close
       end
     end
 

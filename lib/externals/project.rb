@@ -171,6 +171,8 @@ module Externals
     end
 
     def self.inherited child
+      super
+
       child.class_eval do
         def self.scm
           @scm ||= /^([^:]*::)*([^:]+)Project$/.match(name)[2].downcase

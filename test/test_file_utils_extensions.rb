@@ -12,8 +12,6 @@ module Externals
         workdir = File.join root_dir, "test", "tmp", "extensions", "file_utils"
         rm_rf_ie workdir
 
-        !dir_empty? workdir
-
         mkdir_p workdir
 
         assert dir_empty?(workdir)

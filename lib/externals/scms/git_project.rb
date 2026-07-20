@@ -114,7 +114,7 @@ module Externals
       end
     end
 
-    def switch branch_name, options = {}
+    def switch branch_name, _options = {}
       cb = current_branch
       if cb == branch_name
         puts "Already on branch #{branch_name}"
@@ -191,7 +191,7 @@ module Externals
 
     public
 
-    def st *args
+    def st *_args
       puts "\nstatus for #{path}:"
       Dir.chdir path do
         puts `git #{scm_opts_st} status`
