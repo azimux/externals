@@ -3,7 +3,7 @@ require_relative "version"
 source "https://rubygems.org"
 ruby Externals::MINIMUM_RUBY_VERSION
 
-# gemspec
+gemspec
 
 gem "rake"
 
