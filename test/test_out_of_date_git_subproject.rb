@@ -68,6 +68,7 @@ module Externals
           rm_rf tmp
 
           Dir.chdir repository.name do
+            Ext.run "status"
             Ext.run "update"
 
             readme = File.read(File.join(

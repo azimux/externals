@@ -91,6 +91,21 @@ module Externals
             assert_equal "new_branch", main_project.current_branch
             assert_equal "branch1", engines.current_branch
 
+            # Let's make sure switching twice works and is a noop
+            Ext.run "switch", "new_branch"
+            assert_equal "new_branch", main_project.current_branch
+            assert_equal "branch1", engines.current_branch
+
+            # What if we switch to a branch that doesn't exist?
+            Ext.run "switch", "branch-that-does-not-exist"
+            assert_equal "branch-that-does-not-exist", main_project.current_branch
+            assert_equal "branch1", engines.current_branch
+
+            # switch back`
+            Ext.run "switch", "new_branch"
+            assert_equal "new_branch", main_project.current_branch
+            assert_equal "branch1", engines.current_branch
+
             assert !main_project.ignore_contains?("vendor/rails")
             assert File.exist?(File.join('vendor', 'rails', 'activerecord', 'lib'))
             rm_rf "vendor/rails"
