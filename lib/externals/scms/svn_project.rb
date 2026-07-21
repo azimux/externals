@@ -4,13 +4,9 @@ module Externals
   class SvnProject < Project
     def co *_args
       # delete path if empty
-      rmdir_ie path unless path == "."
+      rmdir_if_empty_ie path unless path == "."
 
-      dest = path
-      dest = '' if dest == '.'
-      dest = "\"#{dest}\"" if dest && !dest.empty?
-
-      if File.exist?(dest)
+      if path != "." && File.exist?(path)
         up
       else
         opts = resolve_opts "co"
@@ -21,6 +17,10 @@ module Externals
           require_repository
           url = [url, branch].join("/")
         end
+
+        dest = path
+        dest = '' if dest == '.'
+        dest = "\"#{dest}\"" if dest && !dest.empty?
 
         puts(svncocmd = "svn #{opts} co #{url} #{dest}")
         puts `#{svncocmd}`
@@ -86,7 +86,7 @@ module Externals
 
     def up *_args
       # delete path if empty
-      rmdir_if_empty_ie path
+      rmdir_if_empty_ie path unless path == "."
 
       if File.exist?(path)
         puts "updating #{path}:"
