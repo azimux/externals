@@ -1,17 +1,6 @@
-require 'rake'
-require 'rake/testtask'
-require 'rdoc/task'
-require 'rubygems/package_task'
-
 require_relative "version"
 
-Rake::TestTask.new('test') do |task|
-  # task.libs = [File.expand_path('lib'), File.expand_path('test/support')]
-  task.pattern = './test/test_*.rb'
-  #task.warning = true
-end
-
-gem_specification = Gem::Specification.new do |specification|
+Gem::Specification.new do |specification|
   specification.name = 'ext'
   specification.version = Externals::VERSION
   specification.platform = Gem::Platform::RUBY
@@ -59,8 +48,4 @@ the main project.}
                            ]
 
   specification.require_paths = ["lib"]
-end
-
-Gem::PackageTask.new(gem_specification) do |package|
-  package.need_zip = package.need_tar = false
 end
