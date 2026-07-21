@@ -1,6 +1,5 @@
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
+require_relative "support/prepare_test_suite"
 
-require 'ext_test_case'
 require 'externals/ext'
 
 module Externals

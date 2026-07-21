@@ -2,18 +2,11 @@ require 'rake'
 require 'rake/testtask'
 require 'rdoc/task'
 require 'rubygems/package_task'
-require 'find'
 
 require_relative "version"
 
-root_dir = File.dirname(__FILE__)
-
-$LOAD_PATH << File.join(root_dir, 'lib')
-
-require File.join(root_dir, 'lib', 'externals', 'ext')
-
 Rake::TestTask.new('test') do |task|
-  task.libs = [File.expand_path('lib'), File.expand_path('test/support')]
+  # task.libs = [File.expand_path('lib'), File.expand_path('test/support')]
   task.pattern = './test/test_*.rb'
   #task.warning = true
 end

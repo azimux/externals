@@ -1,7 +1,4 @@
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib') if $0 == __FILE__
-$:.unshift File.join(File.dirname(__FILE__), 'support') if $0 == __FILE__
-
-require 'ext_test_case'
+require_relative "support/prepare_test_suite"
 require 'externals/ext'
 require 'rails_app_svn_repository'
 
