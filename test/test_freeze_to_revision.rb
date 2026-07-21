@@ -92,7 +92,7 @@ module Externals
             Ext.run "init"
 
             sub_source = sub_repository.clean_url
-            Ext.run "install", "--svn", sub_source, "-b", "branches/branch2", "modules"
+            Ext.run "install", "--scm", "svn", sub_source, "-b", "branches/branch2", "modules"
 
             ext = Ext.new
             subproject = ext.subproject_by_name_or_path("modules")
