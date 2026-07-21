@@ -209,9 +209,12 @@ module Externals
     end
 
     #this is a test helper method
+    # TODO: can we move it to the test suite, then?
     def self.add_all
+      # :nocov:
       puts `git add .`
       raise unless $? == 0
+      # :nocov:
     end
 
     def ignore_contains? path

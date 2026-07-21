@@ -143,15 +143,16 @@ module Externals
     end
 
     #this is a test helper method
+    # TODO: can we move it to the test suite, then?
     def self.add_all
+      # :nocov:
       status = `svn st`
 
       status.split("\n").grep(/^\?/).each do |to_add|
         puts `svn add #{to_add.gsub(/^\?\s*/, "")}`
-        # :nocov:
         raise unless $? == 0
-        # :nocov:
       end
+      # :nocov:
     end
 
     def ignore_contains? path
