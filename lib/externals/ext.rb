@@ -610,8 +610,10 @@ commands below if you actually wish to delete them."
       end
 
       unless scm
+        # :nocov:
         raise "You need to either specify the scm as the first line in .externals, or use an option to specify it
           (such as --git or --svn)"
+        # :nocov:
       end
 
       project = main_project
@@ -634,7 +636,7 @@ commands below if you actually wish to delete them."
       end
 
       Dir.chdir path do
-        self.class.new({}).co [], {} #args, options
+        self.class.new({}).co [], {}
       end
     end
 
