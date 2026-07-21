@@ -1,5 +1,6 @@
 require "pathname"
-require 'simplecov'
+require "simplecov"
+require "fileutils"
 
 SimpleCov.start do
   add_filter "test/"
@@ -19,5 +20,14 @@ support_dir = Pathname(support_dir).realpath
 unless $LOAD_PATH.include?(support_dir)
   $LOAD_PATH << support_dir
 end
+
+cached_repos_dir = File.join(__dir__, "..", "tmp")
+cached_repos_dir = Pathname(cached_repos_dir).realpath.to_s
+
+unless cached_repos_dir.end_with?("/test/tmp")
+  raise "Too scared to delete #{cached_repos_dir}"
+end
+
+FileUtils.rm_rf(cached_repos_dir)
 
 require "ext_test_case"
