@@ -115,30 +115,24 @@ module Externals
     end
 
     def switch branch_name, _options = {}
-      cb = current_branch
-      if cb == branch_name
-        puts "Already on branch #{branch_name}"
-      else
-        # This allows the main project to be checked out to a directory
-        # that doesn't match it's name.
-        Dir.chdir path do
-          # let's see if the branch exists in the remote repository
-          # and if not, fetch it.
-          if !branch_exists("origin/#{branch_name}")
-            puts `git #{scm_opts} fetch`
-          end
+      # This allows the main project to be checked out to a directory
+      # that doesn't match it's name.
+      Dir.chdir path do
+        # let's see if the branch exists in the remote repository
+        # and if not, fetch it.
+        if !branch_exists("origin/#{branch_name}")
+          puts `git #{scm_opts} fetch`
+        end
 
-          # if the local branch doens't exist, add --track -b
-          if branch_exists(branch_name)
-            puts `git #{scm_opts} checkout #{branch_name}`
-          else
-            puts `git #{resolve_opts("co")} checkout --track -b #{branch_name} origin/#{branch_name}`
-          end
-          unless $? == 0
-            # :nocov:
-            raise "Could not checkout origin/#{branch_name}"
-            # :nocov:
-          end
+        if branch_exists(branch_name)
+          puts `git #{scm_opts} checkout #{branch_name}`
+        else
+          puts `git #{resolve_opts("co")} checkout --track -b #{branch_name}`
+        end
+        unless $? == 0
+          # :nocov:
+          raise "Could not checkout origin/#{branch_name}"
+          # :nocov:
         end
       end
     end
