@@ -1,6 +1,16 @@
-## [unreleased]
+## [2.0.0] - 2026-07-23
 
-- Fix bug that could prevent detecting the current branch as existing (thanks Agatha Zeren)
+Some overdue love!
+
+- Supports Rubies 2.7 through 3.3 (3.4 and 4.0 to in the next release)
+- Modernizes a few other aspects of the app and code-coverage improvements
+- Adds CI via github actions
+- Adds a code-coverage limit enforcement to the build
+- Adds Rubocop to the project using the Foobara rubocop rules
+- Completely eliminates the project-type concept
+- Switches to the MPL-2.0 license
+- Removes meaningless default-branch concept from SVN (thanks Agatha Zeren)
+- Fixes a bug that could prevent detecting the current branch as existing (thanks Agatha Zeren)
 
 ## [1.1.3] - 2019-02-10
 
