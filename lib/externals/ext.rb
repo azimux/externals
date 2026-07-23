@@ -163,19 +163,19 @@ module Externals
       command = :version if main_options[:version]
 
       if !command || command.to_s == ''
-        # :nocov:
+        # simplecov:disable
         puts "hey... you didn't tell me what you want to do."
         puts "Try 'ext help' for a list of commands"
         exit 1
-        # :nocov:
+        # simplecov:enable
       end
 
       unless COMMANDS.index command
-        # :nocov:
+        # simplecov:disable
         puts "unknown command: #{command}"
         puts "for a list of commands try 'ext help'"
         exit 1
-        # :nocov:
+        # simplecov:enable
       end
 
       Dir.chdir(main_options[:workdir] || ".") do
@@ -246,9 +246,9 @@ module Externals
       end
       project || subprojects.detect do |p|
         # TODO: test (or delete) this code path!
-        # :nocov:
+        # simplecov:disable
         p.name == name
-        # :nocov:
+        # simplecov:enable
       end
     end
     alias subproject subproject_by_name_or_path
@@ -317,9 +317,9 @@ module Externals
             p.name == project_name_or_path || p.path == project_name_or_path
           end
 
-          # :nocov:
+          # simplecov:disable
           raise "no such project" unless project
-          # :nocov:
+          # simplecov:enable
 
           project.send command_name, args, options
         else
@@ -343,9 +343,9 @@ module Externals
           section[:branch] = branch
         else
           # TODO: test (or delete) this code path!
-          # :nocov:
+          # simplecov:disable
           section.rm_setting :branch
-          # :nocov:
+          # simplecov:enable
         end
       end
       section[:revision] = revision
@@ -363,10 +363,10 @@ module Externals
       section = configuration[project.path]
 
       unless section[:revision]
-        # :nocov:
+        # simplecov:disable
         puts "Uhh... #{project.name} wasn't frozen, so I can't unfreeze it."
         exit 1
-        # :nocov:
+        # simplecov:enable
       end
 
       section.rm_setting :revision
@@ -378,10 +378,10 @@ module Externals
 
     def install args, options
       if !File.exist?('.externals')
-        # :nocov:
+        # simplecov:disable
         warn "This project does not appear to be managed by externals.  Try 'ext init' first"
         exit NO_EXTERNALS_FILE
-        # :nocov:
+        # simplecov:enable
       end
       repository = args[0]
       path = args[1]
@@ -393,13 +393,13 @@ module Externals
       scm ||= infer_scm(repository)
 
       unless scm
-        # :nocov:
+        # simplecov:disable
         warn "Unable to determine SCM from the repository name.
 You need to either specify the scm used to manage the subproject
 that you are installing. Use an option to specify it
 (such as --git or --svn)"
         exit COULD_NOT_DETERMINE_SCM
-        # :nocov:
+        # simplecov:enable
       end
 
       project = self.class.project_class(scm).new(:repository => repository,
@@ -426,9 +426,9 @@ that you are installing. Use an option to specify it
 
     def uninstall args, options
       unless File.exist?('.externals')
-        # :nocov:
+        # simplecov:disable
         raise "Hmm... there's no .externals file in this directory."
-        # :nocov:
+        # simplecov:enable
       end
 
       project = subproject_by_name_or_path(args[0])
@@ -455,11 +455,11 @@ that you are installing. Use an option to specify it
       scm ||= options[:scm]
 
       unless scm
-        # :nocov:
+        # simplecov:disable
         raise "You need to either specify the scm as the first line in .externals (for example, scm = git), " \
                 "or use an option to specify it
           (such as --git or --svn)"
-        # :nocov:
+        # simplecov:enable
       end
 
       project = self.class.project_class(scm).new(:path => ".")
@@ -516,7 +516,7 @@ that you are installing. Use an option to specify it
 
       if !scm
         # TODO: test (or delete) this code path!
-        # :nocov:
+        # simplecov:disable
         possible_project_classes = self.class.project_classes.select(&:detected?)
 
         raise "Could not determine this projects scm" if possible_project_classes.empty?
@@ -528,14 +528,14 @@ by creating the .externals file manually"
         end
 
         scm = possible_project_classes.first.scm
-        # :nocov:
+        # simplecov:enable
       end
 
       unless scm
-        # :nocov:
+        # simplecov:disable
         raise "You need to either specify the scm as the first line in .externals, or use an option to specify it
           (such as --git or --svn)"
-        # :nocov:
+        # simplecov:enable
       end
 
       project = main_project
@@ -558,7 +558,7 @@ by creating the .externals file manually"
 
       if !scm
         # TODO: test (or delete) this code path!
-        # :nocov:
+        # simplecov:disable
         possible_project_classes = self.class.project_classes.select(&:detected?)
 
         raise "Could not determine this projects scm" if possible_project_classes.empty?
@@ -570,14 +570,14 @@ by creating the .externals file manually"
         end
 
         scm = possible_project_classes.first.scm
-        # :nocov:
+        # simplecov:enable
       end
 
       unless scm
-        # :nocov:
+        # simplecov:disable
         raise "You need to either specify the scm as the first line in .externals, or use an option to specify it
           (such as --git or --svn)"
-        # :nocov:
+        # simplecov:enable
       end
 
       old_config = configuration
@@ -622,10 +622,10 @@ commands below if you actually wish to delete them."
       end
 
       unless scm
-        # :nocov:
+        # simplecov:disable
         raise "You need to either specify the scm as the first line in .externals, or use an option to specify it
           (such as --git or --svn)"
-        # :nocov:
+        # simplecov:enable
       end
 
       project = main_project
@@ -662,9 +662,9 @@ commands below if you actually wish to delete them."
 
       if path == "."
         # TODO: test (or delete) this code path!
-        # :nocov:
+        # simplecov:disable
         path = main_project.name
-        # :nocov:
+        # simplecov:enable
       end
 
       Dir.chdir path do
@@ -673,9 +673,9 @@ commands below if you actually wish to delete them."
     end
 
     def init args, options = {}
-      # :nocov:
+      # simplecov:disable
       raise ".externals already exists" if File.exist?('.externals')
-      # :nocov:
+      # simplecov:enable
 
       scm = options[:scm]
 
@@ -684,11 +684,11 @@ commands below if you actually wish to delete them."
 
         raise "Could not determine this project's scm" if possible_project_classes.empty?
         if possible_project_classes.size > 1
-          # :nocov:
+          # simplecov:disable
           raise "This project appears to be managed by multiple SCMs: #{
           possible_project_classes.join(',')}
 Please explicitly declare the SCM (using --git or --svn, or, by creating .externals manually"
-          # :nocov:
+          # simplecov:enable
         end
 
         scm = possible_project_classes.first.scm
@@ -708,9 +708,9 @@ Please explicitly declare the SCM (using --git or --svn, or, by creating .extern
           )
         elsif args[0]
           # TODO: test (or delete) this code path!
-          # :nocov:
+          # simplecov:disable
           config['.'][:repository] = args[0].strip
-          # :nocov:
+          # simplecov:enable
         end
       end
 
@@ -728,9 +728,9 @@ Please explicitly declare the SCM (using --git or --svn, or, by creating .extern
 
     def do_checkout_or_export repository, path, options, sym
       if File.exist?('.externals')
-        # :nocov:
+        # simplecov:disable
         raise "seems main project is already checked out here?"
-        # :nocov:
+        # simplecov:enable
       else
         #We appear to be attempting to checkout/export a main project
         scm = options[:scm]
@@ -739,17 +739,17 @@ Please explicitly declare the SCM (using --git or --svn, or, by creating .extern
 
         if !scm
           # TODO: test (or delete) this code path!
-          # :nocov:
+          # simplecov:disable
           scm ||= configuration['main']
           scm &&= scm['scm']
-          # :nocov:
+          # simplecov:enable
         end
 
         unless scm
-          # :nocov:
+          # simplecov:disable
           raise "You need to either specify the scm as the first line in .externals, or use an option to specify it
           (such as --git or --svn)"
-          # :nocov:
+          # simplecov:enable
         end
 
         main_project = self.class.project_class(scm).new(

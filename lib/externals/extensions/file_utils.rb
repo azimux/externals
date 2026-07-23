@@ -30,16 +30,16 @@ FileUtils.class_eval do
       rm_rf_old(filename, *args, **opts)
 
       while File.exist?(filename) && tries < 10
-        # :nocov:
+        # simplecov:disable
         sleep 1
         tries += 1
-        # :nocov:
+        # simplecov:enable
       end
     end
 
     rm.call
     if tries >= 10
-      # :nocov:
+      # simplecov:disable
       puts "WARNING: deleted #{filename} didn't work, trying again"
       tries = 0
       rm.call
@@ -47,7 +47,7 @@ FileUtils.class_eval do
       if tries >= 10
         raise "Could not delete #{filename}"
       end
-      # :nocov:
+      # simplecov:enable
     end
   end
 

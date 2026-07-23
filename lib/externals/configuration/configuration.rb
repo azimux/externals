@@ -53,15 +53,16 @@ module Externals
 
         if found
           if rows[found] !~ SET_SETTING_REGEX
-            # :nocov:
+            # simplecov:disable
             raise "thought I found the row, but didn't"
-            # :nocov:
+            # simplecov:enable
           end
 
           rows[found] = "#{$1}#{value}#{$2}"
         else
           rows << "#{key} = #{value}"
         end
+
         value
       end
 
@@ -81,9 +82,9 @@ module Externals
         if found
           value = self[key]
           if rows[found] !~ SET_SETTING_REGEX
-            # :nocov:
+            # simplecov:disable
             raise "thought I found the row, but didn't"
-            # :nocov:
+            # simplecov:enable
           end
 
           rows.delete rows[found]
@@ -162,9 +163,9 @@ module Externals
 
         if !titles.empty? && !bodies.empty?
           if titles.size + 1 != bodies.size
-            # :nocov:
+            # simplecov:disable
             raise "bodies and sections do not match up"
-            # :nocov:
+            # simplecov:enable
           end
 
           bodies = bodies[1..]

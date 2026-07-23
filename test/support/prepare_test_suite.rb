@@ -3,7 +3,7 @@ require "simplecov"
 require "fileutils"
 
 SimpleCov.start do
-  add_filter "test/"
+  skip "test/"
 
   # enable_coverage :branch
   minimum_coverage line: 100

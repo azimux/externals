@@ -25,9 +25,9 @@ module Externals
         puts(svncocmd = "svn #{opts} co #{url} #{dest}")
         puts `#{svncocmd}`
         unless $? == 0
-          # :nocov:
+          # simplecov:disable
           raise "Failed to run #{svncocmd}"
-          # :nocov:
+          # simplecov:enable
         end
 
         change_to_revision "co"
@@ -62,9 +62,9 @@ module Externals
 
       if revision
         # TODO: test (or delete) this code path!
-        # :nocov:
+        # simplecov:disable
         url += "@#{revision}"
-        # :nocov:
+        # simplecov:enable
       end
 
       puts(svncocmd = "svn #{scm_opts_ex} export #{url} #{dest}")
@@ -79,9 +79,9 @@ module Externals
           url = [repository, branch_name].join("/")
           `svn #{scm_opts} switch #{url}`
           unless $? == 0
-            # :nocov:
+            # simplecov:disable
             raise "Could not switch to #{url}"
-            # :nocov:
+            # simplecov:enable
           end
         end
       end
@@ -112,17 +112,17 @@ module Externals
 
     def st *_args
       # TODO: test (or delete) this code path!
-      # :nocov:
+      # simplecov:disable
       puts "\nstatus for #{path}:"
       Dir.chdir path do
         puts `svn #{scm_opts_st} status`
       end
-      # :nocov:
+      # simplecov:enable
     end
 
     def self.scm_path? path
       # TODO: test (or delete) this code path!
-      # :nocov:
+      # simplecov:disable
       return true if path =~ /^svn(\+ssh)?:/
 
       # Look for http(s)://svn.*/*
@@ -136,7 +136,7 @@ module Externals
       end
 
       false
-      # :nocov:
+      # simplecov:enable
     end
 
     def self.fill_in_opts opts, main_options, sub_options, options = {}
@@ -154,14 +154,14 @@ module Externals
     #this is a test helper method
     # TODO: can we move it to the test suite, then?
     def self.add_all
-      # :nocov:
+      # simplecov:disable
       status = `svn st`
 
       status.split("\n").grep(/^\?/).each do |to_add|
         puts `svn add #{to_add.gsub(/^\?\s*/, "")}`
         raise unless $? == 0
       end
-      # :nocov:
+      # simplecov:enable
     end
 
     def ignore_contains? path
@@ -173,16 +173,16 @@ module Externals
 
       branch = info_url.downcase.gsub(/\/+/, "/").gsub(repository.downcase.gsub(/\/+/, "/"), "")
       if branch == repository
-        # :nocov:
+        # simplecov:disable
         raise "Could not determine branch from URL #{info_url}.
     Does not appear have a substring of #{repository}"
-        # :nocov:
+        # simplecov:enable
       end
       if branch !~ /^\//
-        # :nocov:
+        # simplecov:disable
         raise "Was expecting the branch and repository to be separated by '/'
       Please file an issue about this at http://github.com/azimux/externals"
-        # :nocov:
+        # simplecov:enable
       end
       branch.gsub(/^\//, "")
     end
@@ -190,16 +190,16 @@ module Externals
     def self.extract_repository url, branch
       repository = url.gsub(branch, "")
       if url == repository
-        # :nocov:
+        # simplecov:disable
         raise "Could not determine repository from URL #{info_url}.
     Does not appear to have the branch #{branch} as a substring"
-        # :nocov:
+        # simplecov:enable
       end
       if repository !~ /\/$/
-        # :nocov:
+        # simplecov:disable
         raise "Was expecting the branch and repository to be separated by '/'
       Please file an issue about this at http://github.com/azimux/externals"
-        # :nocov:
+        # simplecov:enable
       end
 
       repository.gsub(/\/$/, "")
@@ -207,7 +207,7 @@ module Externals
 
     def require_repository
       if repository.nil? || repository.empty?
-        # :nocov:
+        # simplecov:disable
         url = info_url
         info_url = "svn+ssh://server/path/repository" unless url
         puts "to use any branching features with a subversion project, the
@@ -225,7 +225,7 @@ repository = #{info_url}
         "
 
         raise "Cannot use subversion branching features without a repository in .externals file"
-        # :nocov:
+        # simplecov:enable
       end
     end
 
@@ -253,15 +253,15 @@ repository = #{info_url}
       rows = ir.reject {|row| row.strip == child}
 
       if rows.size == ir.size
-        # :nocov:
+        # simplecov:disable
         raise "row not found matching #{path} in svn propget svn:ignore"
-        # :nocov:
+        # simplecov:enable
       end
 
       if ir.size - rows.size != 1
-        # :nocov:
+        # simplecov:disable
         raise "More than one row found matching #{path} in svn propget svn:ignore"
-        # :nocov:
+        # simplecov:enable
       end
 
       Dir.chdir(parent) do
@@ -297,9 +297,9 @@ repository = #{info_url}
       if `svn #{scm_opts} info` =~ /^\s*URL:\s*([^\s]+)\s*$/
         $1
       else
-        # :nocov:
+        # simplecov:disable
         raise "Could not get URL from svn info"
-        # :nocov:
+        # simplecov:enable
       end
     end
 

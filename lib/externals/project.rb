@@ -52,9 +52,9 @@ module Externals
     end
 
     def switch _branch_name, _options = {}
-      # :nocov:
+      # simplecov:disable
       raise "subclass responsibility"
-      # :nocov:
+      # simplecov:enable
     end
 
     def initialize hash
@@ -72,9 +72,9 @@ module Externals
           attribute =~ /^\w+_opts(_(#{OPTS_SUFFIXES.join("|")}))?/
         end
         if !invalid_attrib.empty?
-          # :nocov:
+          # simplecov:disable
           raise "invalid attribute(s): #{invalid_attrib.join(', ')}"
-          # :nocov:
+          # simplecov:enable
         end
       end
 
@@ -89,9 +89,9 @@ module Externals
 
     [:co, :ex].each do |method_name|
       define_method method_name do
-        # :nocov:
+        # simplecov:disable
         raise "subclass responsibility"
-        # :nocov:
+        # simplecov:enable
       end
     end
 

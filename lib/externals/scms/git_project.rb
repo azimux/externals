@@ -19,9 +19,9 @@ module Externals
       puts(gitclonecmd = "git #{opts} clone #{extra_opts} \"#{repository}\" #{dest}")
       puts `#{gitclonecmd}`
       unless $? == 0
-        # :nocov:
+        # simplecov:disable
         raise "git clone of #{repository} failed."
-        # :nocov:
+        # simplecov:enable
       end
     end
 
@@ -79,9 +79,9 @@ module Externals
               puts `git #{opts} checkout --track -b #{branch} origin/#{branch}`
             end
             unless $? == 0
-              # :nocov:
+              # simplecov:disable
               raise "Could not checkout origin/#{branch}"
-              # :nocov:
+              # simplecov:enable
             end
           end
         end
@@ -99,9 +99,9 @@ module Externals
         Dir.chdir project_path do
           puts `git #{opts} checkout #{revision}`
           unless $? == 0
-            # :nocov:
+            # simplecov:disable
             raise "Could not checkout #{revision}"
-            # :nocov:
+            # simplecov:enable
           end
         end
       else
@@ -130,9 +130,9 @@ module Externals
           puts `git #{resolve_opts("co")} checkout --track -b #{branch_name}`
         end
         unless $? == 0
-          # :nocov:
+          # simplecov:disable
           raise "Could not checkout origin/#{branch_name}"
-          # :nocov:
+          # simplecov:enable
         end
       end
     end
@@ -211,10 +211,10 @@ module Externals
     #this is a test helper method
     # TODO: can we move it to the test suite, then?
     def self.add_all
-      # :nocov:
+      # simplecov:disable
       puts `git add .`
       raise unless $? == 0
-      # :nocov:
+      # simplecov:enable
     end
 
     def ignore_contains? path
@@ -259,15 +259,15 @@ module Externals
       rows = ir.reject {|row| row.strip == path.strip}
 
       if rows.size == ir.size
-        # :nocov:
+        # simplecov:disable
         raise "row not found matching #{path} in .gitignore"
-        # :nocov:
+        # simplecov:enable
       end
 
       if ir.size - rows.size != 1
-        # :nocov:
+        # simplecov:disable
         raise "More than one row found matching #{path} in .gitignore"
-        # :nocov:
+        # simplecov:enable
       end
 
       open('.gitignore', 'w') do |f|
