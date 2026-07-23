@@ -743,10 +743,19 @@ Please explicitly declare the SCM (using --git or --svn, or, by creating .extern
     end
 
     def infer_scm(path)
-      self.class.registered_scms.each do |scm|
-        return scm if self.class.project_class(scm).scm_path?(path)
+      registered_scms.find do |scm|
+        project_class(scm).scm_path?(path)
       end
-      nil
+    end
+
+    private
+
+    def registered_scms
+      self.class.registered_scms
+    end
+
+    def project_class(scm)
+      self.class.project_class(scm)
     end
   end
 end

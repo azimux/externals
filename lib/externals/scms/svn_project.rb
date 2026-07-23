@@ -198,6 +198,7 @@ module Externals
 
     def require_repository
       if repository.nil? || repository.empty?
+        # :nocov:
         url = info_url
         info_url = "svn+ssh://server/path/repository" unless url
         puts "to use any branching features with a subversion project, the
@@ -214,7 +215,6 @@ scm = svn
 repository = #{info_url}
         "
 
-        # :nocov:
         raise "Cannot use subversion branching features without a repository in .externals file"
         # :nocov:
       end

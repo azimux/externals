@@ -20,6 +20,20 @@ module Externals
 
         assert capture =~ /ext \[OPTIONS\] <command>/
       end
+
+      def test_help_switch
+        capture = StringIO.new
+        begin
+          $stdout = capture
+
+          Ext.run "--help"
+        ensure
+          $stdout = STDOUT
+        end
+        capture = capture.string
+
+        assert capture =~ /ext \[OPTIONS\] <command>/
+      end
     end
   end
 end
