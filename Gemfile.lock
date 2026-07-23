@@ -1,3 +1,8 @@
+PATH
+  remote: .
+  specs:
+    ext (2.0.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -87,9 +92,10 @@ GEM
     unicode-emoji (4.2.0)
 
 PLATFORMS
-  ruby
+  x86_64-linux
 
 DEPENDENCIES
+  ext!
   foobara-rubocop-rules (>= 1.1.0)
   irb
   pry
