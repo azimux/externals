@@ -144,9 +144,11 @@ module Externals
         up(*args)
       else
         clone_opts = "--depth 1"
+
         if branch
-          clone_opts << " -b #{branch}"
+          clone_opts = "#{clone_opts} -b #{branch}"
         end
+
         do_clone "ex", clone_opts
       end
     end

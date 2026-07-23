@@ -1,3 +1,7 @@
+## [2.1.0] - 2026-07-23
+
+- Support Rubies 3.3 through 4.0 (the currently supported Ruby versions)
+
 ## [2.0.0] - 2026-07-23
 
 Some overdue love!

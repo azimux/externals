@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ext (2.0.0)
+    ext (2.1.0)
 
 GEM
   remote: https://rubygems.org/
