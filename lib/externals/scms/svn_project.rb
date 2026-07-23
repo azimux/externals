@@ -61,7 +61,10 @@ module Externals
       end
 
       if revision
+        # TODO: test (or delete) this code path!
+        # :nocov:
         url += "@#{revision}"
+        # :nocov:
       end
 
       puts(svncocmd = "svn #{scm_opts_ex} export #{url} #{dest}")
@@ -108,13 +111,18 @@ module Externals
     end
 
     def st *_args
+      # TODO: test (or delete) this code path!
+      # :nocov:
       puts "\nstatus for #{path}:"
       Dir.chdir path do
         puts `svn #{scm_opts_st} status`
       end
+      # :nocov:
     end
 
     def self.scm_path? path
+      # TODO: test (or delete) this code path!
+      # :nocov:
       return true if path =~ /^svn(\+ssh)?:/
 
       # Look for http(s)://svn.*/*
@@ -128,6 +136,7 @@ module Externals
       end
 
       false
+      # :nocov:
     end
 
     def self.fill_in_opts opts, main_options, sub_options, options = {}

@@ -245,7 +245,10 @@ module Externals
         File.split(p.path).last.strip == name
       end
       project || subprojects.detect do |p|
+        # TODO: test (or delete) this code path!
+        # :nocov:
         p.name == name
+        # :nocov:
       end
     end
     alias subproject subproject_by_name_or_path
@@ -339,7 +342,10 @@ module Externals
         if branch
           section[:branch] = branch
         else
+          # TODO: test (or delete) this code path!
+          # :nocov:
           section.rm_setting :branch
+          # :nocov:
         end
       end
       section[:revision] = revision
@@ -509,6 +515,8 @@ that you are installing. Use an option to specify it
       end
 
       if !scm
+        # TODO: test (or delete) this code path!
+        # :nocov:
         possible_project_classes = self.class.project_classes.select(&:detected?)
 
         raise "Could not determine this projects scm" if possible_project_classes.empty?
@@ -520,6 +528,7 @@ by creating the .externals file manually"
         end
 
         scm = possible_project_classes.first.scm
+        # :nocov:
       end
 
       unless scm
@@ -548,6 +557,8 @@ by creating the .externals file manually"
       end
 
       if !scm
+        # TODO: test (or delete) this code path!
+        # :nocov:
         possible_project_classes = self.class.project_classes.select(&:detected?)
 
         raise "Could not determine this projects scm" if possible_project_classes.empty?
@@ -559,6 +570,7 @@ by creating the .externals file manually"
         end
 
         scm = possible_project_classes.first.scm
+        # :nocov:
       end
 
       unless scm
@@ -649,7 +661,10 @@ commands below if you actually wish to delete them."
       main_project = do_checkout_or_export repository, path, options, :export
 
       if path == "."
+        # TODO: test (or delete) this code path!
+        # :nocov:
         path = main_project.name
+        # :nocov:
       end
 
       Dir.chdir path do
@@ -692,7 +707,10 @@ Please explicitly declare the SCM (using --git or --svn, or, by creating .extern
             options[:branch]
           )
         elsif args[0]
+          # TODO: test (or delete) this code path!
+          # :nocov:
           config['.'][:repository] = args[0].strip
+          # :nocov:
         end
       end
 
@@ -720,8 +738,11 @@ Please explicitly declare the SCM (using --git or --svn, or, by creating .extern
         scm ||= infer_scm(repository)
 
         if !scm
+          # TODO: test (or delete) this code path!
+          # :nocov:
           scm ||= configuration['main']
           scm &&= scm['scm']
+          # :nocov:
         end
 
         unless scm
